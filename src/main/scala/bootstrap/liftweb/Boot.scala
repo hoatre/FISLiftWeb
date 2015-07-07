@@ -10,8 +10,7 @@ import sitemap._
 import Loc._
 import net.liftmodules.JQueryModule
 import net.liftweb.http.js.jquery._
-import code.rest.IssuesService
-import code.rest.QuotationsAPI
+import code.rest.{UsersAPI, IssuesService, QuotationsAPI}
 import com.mongodb.{ServerAddress, Mongo}
 import mongodb.{DefaultMongoIdentifier, MongoDB, MongoIdentifier}
 import java.net.URI
@@ -23,7 +22,7 @@ class Boot {
   def boot {
 
     //MongoDB
-    MongoUrl.defineDb(DefaultMongoIdentifier, "mongodb://10.15.171.35:27017/cookbook")
+    MongoUrl.defineDb(DefaultMongoIdentifier, "mongodb://10.15.171.35:27017/TPBUSER")
 
     // where to search snippet
     LiftRules.addToPackages("code")
@@ -60,8 +59,9 @@ class Boot {
     // Init RestService
     IssuesService.init()
 
-    QuotationsAPI.init()
+//    QuotationsAPI.init()
 
+    UsersAPI.init()
 
     //val server = new ServerAddress("127.0.0.1", 27017)
     //MongoDB.defineDb(DefaultMongoIdentifier, new Mongo(server), "mydb")

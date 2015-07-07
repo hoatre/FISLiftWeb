@@ -17,24 +17,24 @@ import net.liftweb.mongodb.record.field.StringPk
  */
 object QuotationsAPI extends RestHelper{
 
-  val rqDB = Birthday.findAll.toList(3)
-  println(rqDB.id)
-  case class Quote(_id: String, dow: String, dow2: String)
-  val quote = Quote(rqDB.id.toString(),
-    rqDB.dow.toString(),
-    rqDB.dow2.toString())
-
-  val json : JValue = Extraction decompose quote
-
-  println(json)
-
-  def init() : Unit = {
-    LiftRules.statelessDispatch.append(QuotationsAPI)
-  }
-
-  serve {
-    case "quotation" :: Nil Json req => json : JValue
-  }
+//  val rqDB = Birthday.findAll.toList(3)
+//  println(rqDB.id)
+//  case class Quote(_id: String, dow: String, dow2: String)
+//  val quote = Quote(rqDB.id.toString(),
+//    rqDB.dow.toString(),
+//    rqDB.dow2.toString())
+//
+//  val json : JValue = Extraction decompose quote
+//
+//  println(json)
+//
+//  def init() : Unit = {
+//    LiftRules.statelessDispatch.append(QuotationsAPI)
+//  }
+//
+//  serve {
+//    case "quotation" :: Nil JsonGet req => json : JValue
+//  }
 
 
 }
