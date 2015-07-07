@@ -16,7 +16,7 @@ import net.liftweb.mongodb.record.field.StringPk
  * Created by phong on 7/6/2015.
  */
 object QuotationsAPI extends RestHelper{
-  new Boot().boot
+
   val rqDB = Birthday.findAll.toList(3)
   println(rqDB.id)
   case class Quote(_id: String, dow: String, dow2: String)
@@ -33,7 +33,7 @@ object QuotationsAPI extends RestHelper{
   }
 
   serve {
-    case "quotation" :: Nil JsonGet req => json : JValue
+    case "quotation" :: Nil Json req => json : JValue
   }
 
 

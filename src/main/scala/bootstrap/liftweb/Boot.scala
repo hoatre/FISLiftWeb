@@ -21,6 +21,10 @@ import java.net.URI
  */
 class Boot {
   def boot {
+
+    //MongoDB
+    MongoUrl.defineDb(DefaultMongoIdentifier, "mongodb://10.15.171.35:27017/cookbook")
+
     // where to search snippet
     LiftRules.addToPackages("code")
 
@@ -58,12 +62,12 @@ class Boot {
 
     QuotationsAPI.init()
 
-    //MongoDB
+
     //val server = new ServerAddress("127.0.0.1", 27017)
     //MongoDB.defineDb(DefaultMongoIdentifier, new Mongo(server), "mydb")
 
 //     MongoUrl.defineDb(DefaultMongoIdentifier, "mongodb://127.0.0.1:27017/cookbook")
-    MongoUrl.defineDb(DefaultMongoIdentifier, "mongodb://10.15.171.35:27017/cookbook")
+
     //MongoUrl.defineDb(OtherMongoIdentifier, "mongodb://127.0.0.1:27017/other")
   }
 
