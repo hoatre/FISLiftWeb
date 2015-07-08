@@ -1,6 +1,5 @@
 package code.rest
 
-
 import java.util.UUID
 
 import code.model._
