@@ -80,6 +80,10 @@ class Boot {
 
     GroupUsersAPI.init()
 
+    FactorAPI.init()
+
+    FactorOptionAPI.init()
+
   }
 
 
