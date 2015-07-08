@@ -130,3 +130,26 @@ class groupmoduleroleIN private () extends BsonRecord[groupmoduleroleIN] {
 object groupmoduleroleIN extends groupmoduleroleIN with BsonMetaRecord[groupmoduleroleIN]
 
 //---------------------------------------------------------------------------------
+
+class GroupUsers private () extends MongoRecord[GroupUsers] with StringPk[GroupUsers] {
+
+  override def meta = GroupUsers
+
+  // An embedded document:
+  object groupuser extends BsonRecordField(this, groupuserIN)
+
+}
+
+object GroupUsers extends GroupUsers with MongoMetaRecord[GroupUsers] {
+  override def collectionName = "usergroups"
+}
+
+class groupuserIN private () extends BsonRecord[groupuserIN] {
+  def meta = groupuserIN
+  object userid extends StringField(this, 1024)
+  object groupid extends StringField(this, 1024)
+}
+
+object groupuserIN extends groupuserIN with BsonMetaRecord[groupuserIN]
+
+//---------------------------------------------------------------------------------
