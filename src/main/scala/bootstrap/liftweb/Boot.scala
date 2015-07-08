@@ -29,8 +29,9 @@ class Boot {
       List(HTTPParam("X-Lift-Version", LiftRules.liftVersion),
         HTTPParam("Access-Control-Allow-Origin", "*"),
         HTTPParam("Access-Control-Allow-Credentials", "true"),
-        HTTPParam("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS"),
-        HTTPParam("Access-Control-Allow-Headers", "WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")
+        HTTPParam("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT"),
+        HTTPParam("Access-Control-Allow-Headers", "origin, authorization, accept, client-security-token, " +
+                        "WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")
       ))
 
     // Build SiteMap
@@ -78,12 +79,7 @@ class Boot {
     ModulesAPI.init()
 
     GroupUsersAPI.init()
-    //val server = new ServerAddress("127.0.0.1", 27017)
-    //MongoDB.defineDb(DefaultMongoIdentifier, new Mongo(server), "mydb")
 
-//     MongoUrl.defineDb(DefaultMongoIdentifier, "mongodb://127.0.0.1:27017/cookbook")
-
-    //MongoUrl.defineDb(OtherMongoIdentifier, "mongodb://127.0.0.1:27017/other")
   }
 
 
