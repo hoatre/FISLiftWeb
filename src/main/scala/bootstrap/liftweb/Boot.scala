@@ -10,7 +10,7 @@ import sitemap._
 import Loc._
 import net.liftmodules.JQueryModule
 import net.liftweb.http.js.jquery._
-import code.rest.{TPBUserAPI, UsersAPI, IssuesService, QuotationsAPI}
+import code.rest._
 import com.mongodb.{ServerAddress, Mongo}
 import mongodb.{DefaultMongoIdentifier, MongoDB, MongoIdentifier}
 import java.net.URI
@@ -59,7 +59,7 @@ class Boot {
     // Init RestService
     IssuesService.init()
 
-    TPBUserAPI.init()
+    GroupsAPI.init()
 
     UsersAPI.init()
     //val server = new ServerAddress("127.0.0.1", 27017)

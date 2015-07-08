@@ -4,7 +4,6 @@ package code.rest
 import java.util.UUID
 
 import code.model._
-import code.rest.UsersAPI._
 import com.mongodb.QueryBuilder
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
@@ -15,17 +14,19 @@ import net.liftweb.util.Helpers._
 /**
  * Created by phong on 7/7/2015.
  */
-object TPBUserAPI extends RestHelper{
+object GroupsAPI extends RestHelper{
 
   def init(): Unit = {
-    LiftRules.statelessDispatch.append(TPBUserAPI)
+    LiftRules.statelessDispatch.append(GroupsAPI)
   }
 
   def getGroupJSON(): JValue = {
 
     val DBList = Groups.findAll
-
-    {"GroupsList" -> DBList.map(_.asJValue)} : JValue
+    if(DBList.isEmpty)
+      "ERROR" -> "Group not found"
+    else
+      {"GroupsList" -> DBList.map(_.asJValue)} : JValue
 
   }
 
@@ -36,15 +37,16 @@ object TPBUserAPI extends RestHelper{
 
     val DBList = Groups.findAll(qry)
 
-    {"GroupsList" -> DBList.map(_.asJValue)} : JValue
+    if(DBList.isEmpty)
+      "ERROR" -> "Group not found"
+    else
+      {"GroupsList" -> DBList.map(_.asJValue)} : JValue
 
   }
 
   def deleteGroup(_id : String): JValue = {
 
     Groups.delete(("_id" -> _id))
-
-    println(_id)
 
     { "SUSCESS" -> " DELETED " } : JValue
 
