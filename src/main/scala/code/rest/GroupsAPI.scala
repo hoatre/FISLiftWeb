@@ -23,7 +23,7 @@ object GroupsAPI extends RestHelper{
 
     val DBList = Groups.findAll
     if(DBList.isEmpty)
-      "ERROR" -> "Group not found"
+      "ERROR" -> "Group not found" : JValue
     else
       {"GroupsList" -> DBList.map(_.asJValue)} : JValue
 
@@ -37,8 +37,8 @@ object GroupsAPI extends RestHelper{
     val DBList = Groups.findAll(qry)
 
     if(DBList.isEmpty)
-      "ERROR" -> "Group not found"
-    else
+      "ERROR" -> "Group not found" :JValue
+
       {"GroupsList" -> DBList.map(_.asJValue)} : JValue
 
   }

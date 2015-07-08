@@ -62,6 +62,8 @@ class Boot {
     GroupsAPI.init()
 
     UsersAPI.init()
+
+    RolesAPI.init()
     //val server = new ServerAddress("127.0.0.1", 27017)
     //MongoDB.defineDb(DefaultMongoIdentifier, new Mongo(server), "mydb")
 

@@ -26,3 +26,26 @@ class groupIN private () extends BsonRecord[groupIN] {
 }
 
 object groupIN extends groupIN with BsonMetaRecord[groupIN]
+
+class Roles private () extends MongoRecord[Roles] with StringPk[Roles] {
+
+  override def meta = Roles
+
+  // An embedded document:
+  object role extends BsonRecordField(this, roleIN)
+
+}
+
+object Roles extends Roles with MongoMetaRecord[Roles] {
+  override def collectionName = "roles"
+}
+
+class roleIN private () extends BsonRecord[roleIN] {
+  def meta = roleIN
+  object status extends StringField(this, 12)
+  object note extends StringField(this, 1024)
+  object controlid extends StringField(this, 1024)
+  object rolename extends StringField(this, 1024)
+}
+
+object roleIN extends roleIN with BsonMetaRecord[roleIN]
