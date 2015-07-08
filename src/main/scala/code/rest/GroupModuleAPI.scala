@@ -24,7 +24,7 @@ object GroupModuleAPI extends RestHelper {
 
     val DBList = GroupModules.findAll
     if(DBList.isEmpty)
-      "ERROR" -> "Role not found" : JValue
+      "ERROR" -> "GroupModule not found" : JValue
     else
       {"GroupModulesList" -> DBList.map(_.asJValue)} : JValue
 
@@ -38,7 +38,7 @@ object GroupModuleAPI extends RestHelper {
     val DBList = GroupModules.findAll(qry)
 
     if(DBList.isEmpty)
-      "ERROR" -> "Role not found" :JValue
+      "ERROR" -> "GroupModule not found" :JValue
     else
       {"GroupModulesList" -> DBList.map(_.asJValue)} : JValue
 
@@ -64,7 +64,7 @@ object GroupModuleAPI extends RestHelper {
 
   def updateGroupModule(id : String, moduleid : String, groupid : String): JValue = {
 
-    Groups.update(("_id" -> id),
+    GroupModules.update(("_id" -> id),
       ("$set" -> ("groupmodule.moduleid" -> moduleid)
         ~ ("groupmodule.groupid" -> groupid)))
 
