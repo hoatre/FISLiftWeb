@@ -3,7 +3,7 @@ package model
 
 import net.liftweb.mongodb.record._
 import net.liftweb.mongodb.record.field._
-import net.liftweb.record.field.{StringField}
+import net.liftweb.record.field.{IntField, StringField}
 
 //---------------------------------------------------------------------------------
 class Groups private () extends MongoRecord[Groups] with StringPk[Groups] {
@@ -151,5 +151,58 @@ class groupuserIN private () extends BsonRecord[groupuserIN] {
 }
 
 object groupuserIN extends groupuserIN with BsonMetaRecord[groupuserIN]
+
+//---------------------------------------------------------------------------------
+
+class Factor private () extends MongoRecord[Factor] with StringPk[Factor] {
+
+  override def meta = Factor
+
+  // An embedded document:
+  object factor extends BsonRecordField(this, factorIN)
+
+}
+
+object Factor extends Factor with MongoMetaRecord[Factor] {
+  override def collectionName = "factor"
+}
+
+class factorIN private () extends BsonRecord[factorIN] {
+  def meta = factorIN
+  object parentid extends StringField(this, 1024)
+  object parentname extends StringField(this, 1024)
+  object name extends StringField(this, 1024)
+  object description extends StringField(this, 1024)
+  object weigth extends StringField(this, 1024)
+}
+
+object factorIN extends factorIN with BsonMetaRecord[factorIN]
+
+//---------------------------------------------------------------------------------
+
+class FactorOption private () extends MongoRecord[FactorOption] with StringPk[FactorOption] {
+
+  override def meta = FactorOption
+
+  // An embedded document:
+  object factoroption extends BsonRecordField(this, factoroptionIN)
+
+}
+
+object FactorOption extends FactorOption with MongoMetaRecord[FactorOption] {
+  override def collectionName = "factoroption"
+}
+
+class factoroptionIN private () extends BsonRecord[factoroptionIN] {
+  def meta = factoroptionIN
+  object factorid extends StringField(this, 1024)
+  object name extends StringField(this, 1024)
+  object description extends StringField(this, 1024)
+  object score extends StringField(this, 1024)
+  object fatal extends StringField(this, 1024)
+  object ordinal extends StringField(this, 15)
+}
+
+object factoroptionIN extends factoroptionIN with BsonMetaRecord[factoroptionIN]
 
 //---------------------------------------------------------------------------------

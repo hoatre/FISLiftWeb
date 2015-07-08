@@ -64,8 +64,8 @@ object RolesAPI extends RestHelper {
 
   def updateRole(id : String, status : String, note : String, rolename : String, controlid : String): JValue = {
 
-    Groups.update(("_id" -> id),
-      ("$set" -> ("role.groupname" -> rolename)
+    Roles.update(("_id" -> id),
+      ("$set" -> ("role.rolename" -> rolename)
                   ~ ("role.note" -> note)
                   ~ ("role.status" -> status)
                   ~ ("role.controlid" -> controlid)))
