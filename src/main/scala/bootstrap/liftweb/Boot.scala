@@ -26,7 +26,8 @@ class Boot {
     LiftRules.addToPackages("code")
 
     LiftRules.supplimentalHeaders = s => s.addHeaders(
-      List(HTTPParam("X-Lift-Version", LiftRules.liftVersion),
+      List(
+        HTTPParam("X-Lift-Version", LiftRules.liftVersion),
         HTTPParam("Access-Control-Allow-Origin", "*"),
         HTTPParam("Access-Control-Allow-Credentials", "true"),
         HTTPParam("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT"),

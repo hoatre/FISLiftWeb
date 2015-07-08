@@ -4,6 +4,7 @@ import net.liftweb.mongodb.record.{BsonMetaRecord, BsonRecord, MongoMetaRecord, 
 import net.liftweb.mongodb.record.field.{BsonRecordField, StringPk}
 import net.liftweb.record.field.{IntField, StringField}
 
+
 /**
  * Created by bacnv on 7/7/15.
  */
