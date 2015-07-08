@@ -1,6 +1,7 @@
 package bootstrap.liftweb
 
 import net.liftweb._
+import net.liftweb.http.provider.HTTPParam
 import util._
 import Helpers._
 
@@ -26,6 +27,14 @@ class Boot {
 
     // where to search snippet
     LiftRules.addToPackages("code")
+
+    LiftRules.supplimentalHeaders = s => s.addHeaders(
+      List(HTTPParam("X-Lift-Version", LiftRules.liftVersion),
+        HTTPParam("Access-Control-Allow-Origin", "*"),
+        HTTPParam("Access-Control-Allow-Credentials", "true"),
+        HTTPParam("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS"),
+        HTTPParam("Access-Control-Allow-Headers", "WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")
+      ))
 
     // Build SiteMap
     val entries = List(
