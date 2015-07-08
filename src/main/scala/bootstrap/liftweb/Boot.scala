@@ -1,20 +1,17 @@
 package bootstrap.liftweb
 
-import net.liftweb._
-import net.liftweb.http.provider.HTTPParam
-import util._
-import Helpers._
-
-import common._
-import http._
-import sitemap._
-import Loc._
-import net.liftmodules.JQueryModule
-import net.liftweb.http.js.jquery._
-import code.rest._
-import com.mongodb.{ServerAddress, Mongo}
-import mongodb.{DefaultMongoIdentifier, MongoDB, MongoIdentifier}
 import java.net.URI
+
+import code.rest._
+import com.mongodb.{Mongo, ServerAddress}
+import net.liftmodules.JQueryModule
+import net.liftweb.common._
+import net.liftweb.http._
+import net.liftweb.http.js.jquery._
+import net.liftweb.http.provider.HTTPParam
+import net.liftweb.mongodb.{DefaultMongoIdentifier, MongoDB, MongoIdentifier}
+import net.liftweb.sitemap.Loc._
+import net.liftweb.sitemap._
 /**
  * A class that's instantiated early and run.  It allows the application
  * to modify lift's environment
@@ -73,6 +70,8 @@ class Boot {
     UsersAPI.init()
 
     RolesAPI.init()
+
+    GroupModuleAPI.init()
     //val server = new ServerAddress("127.0.0.1", 27017)
     //MongoDB.defineDb(DefaultMongoIdentifier, new Mongo(server), "mydb")
 

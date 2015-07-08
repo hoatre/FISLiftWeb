@@ -29,16 +29,15 @@ object GroupsAPI extends RestHelper{
 
   }
 
-  def getGroupByNameJSON(groupName : String): JValue = {
+  def getGroupByIdJSON(id : String): JValue = {
 
-    val qry = QueryBuilder.start("group.groupname").is(groupName)
-      .get
+    val qry = QueryBuilder.start("_id").is(id).get
 
     val DBList = Groups.findAll(qry)
 
     if(DBList.isEmpty)
       "ERROR" -> "Group not found" :JValue
-
+    else
       {"GroupsList" -> DBList.map(_.asJValue)} : JValue
 
   }
@@ -74,7 +73,8 @@ object GroupsAPI extends RestHelper{
   serve {
     case "group" :: "getall"  :: Nil JsonGet req => getGroupJSON() : JValue
 
-    case "group" :: "getbygroupname" :: groupName :: Nil JsonGet req => getGroupByNameJSON(groupName) : JValue
+    case "group" :: "getbygroupid" :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "id").toOpt} yield getGroupByIdJSON(id)
 
     case "group" :: "update" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt

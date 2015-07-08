@@ -30,9 +30,9 @@ object RolesAPI extends RestHelper {
 
   }
 
-  def getRoleByNameJSON(groupName : String): JValue = {
+  def getRoleByIdJSON(id : String): JValue = {
 
-    val qry = QueryBuilder.start("role.rolename").is(groupName)
+    val qry = QueryBuilder.start("_id").is(id)
       .get
 
     val DBList = Roles.findAll(qry)
@@ -76,11 +76,12 @@ object RolesAPI extends RestHelper {
 
 
   serve {
-    case "group" :: "getall"  :: Nil JsonGet req => getRoleJSON() : JValue
+    case "role" :: "getall"  :: Nil JsonGet req => getRoleJSON() : JValue
 
-    case "group" :: "getbygroupname" :: groupName :: Nil JsonGet req => getRoleByNameJSON(groupName) : JValue
+    case "role" :: "getbyroleid" :: id :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "id").toOpt} yield getRoleByIdJSON(id) : JValue
 
-    case "group" :: "update" :: Nil JsonPost json -> request =>
+    case "role" :: "update" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt
           JString(status) <- (json \\ "status").toOpt
           JString(note) <- (json \\ "note").toOpt
@@ -88,10 +89,10 @@ object RolesAPI extends RestHelper {
           JString(controlid) <- (json \\ "controlid").toOpt
       } yield updateRole(id, status, note, rolename, controlid)
 
-    case "group" :: "delete" :: Nil JsonPost json -> request =>
+    case "role" :: "delete" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield deleteRole(id)
 
-    case "group" :: "insert" :: Nil JsonPost json -> request =>
+    case "role" :: "insert" :: Nil JsonPost json -> request =>
       for{JString(status) <- (json \\ "status").toOpt
           JString(note) <- (json \\ "note").toOpt
           JString(rolename) <- (json \\ "rolename").toOpt

@@ -5,6 +5,7 @@ import net.liftweb.mongodb.record._
 import net.liftweb.mongodb.record.field._
 import net.liftweb.record.field.{StringField}
 
+//---------------------------------------------------------------------------------
 class Groups private () extends MongoRecord[Groups] with StringPk[Groups] {
 
   override def meta = Groups
@@ -26,6 +27,8 @@ class groupIN private () extends BsonRecord[groupIN] {
 }
 
 object groupIN extends groupIN with BsonMetaRecord[groupIN]
+
+//---------------------------------------------------------------------------------
 
 class Roles private () extends MongoRecord[Roles] with StringPk[Roles] {
 
@@ -49,3 +52,28 @@ class roleIN private () extends BsonRecord[roleIN] {
 }
 
 object roleIN extends roleIN with BsonMetaRecord[roleIN]
+
+//---------------------------------------------------------------------------------
+
+class GroupModules private () extends MongoRecord[GroupModules] with StringPk[GroupModules] {
+
+  override def meta = GroupModules
+
+  // An embedded document:
+  object groupmodule extends BsonRecordField(this, groupmoduleIN)
+
+}
+
+object GroupModules extends GroupModules with MongoMetaRecord[GroupModules] {
+  override def collectionName = "groupmodules"
+}
+
+class groupmoduleIN private () extends BsonRecord[groupmoduleIN] {
+  def meta = groupmoduleIN
+  object moduleid extends StringField(this, 1024)
+  object groupid extends StringField(this, 1024)
+}
+
+object groupmoduleIN extends groupmoduleIN with BsonMetaRecord[groupmoduleIN]
+
+//---------------------------------------------------------------------------------
