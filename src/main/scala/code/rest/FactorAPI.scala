@@ -92,8 +92,10 @@ object FactorAPI extends RestHelper {
           JString(name) <- (json \\ "name").toOpt
       } yield updateFactor(id, parentid, parentname, weigth, description, name)
 
-    case "factor" :: "delete" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield deleteFactor(id)
+//    case "factor" :: "delete" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt} yield deleteFactor(id)
+
+    case "factor" :: "delete" :: id :: Nil JsonDelete req => deleteFactor(id)
 
     case "factor" :: "insert" :: Nil JsonPost json -> request =>
       for{JString(parentid) <- (json \\ "parentid").toOpt

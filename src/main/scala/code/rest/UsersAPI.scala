@@ -1,19 +1,11 @@
 package code.rest
 
-import com.mongodb.{BasicDBObjectBuilder, QueryBuilder}
-import net.liftweb.http.rest.RestHelper
-import bootstrap.liftweb._
-import net.liftweb.http.LiftRules
-import net.liftweb.json.JsonAST._
-import net.liftweb.json.JsonDSL._
-import code.snippet._
 import code.model.Users
-import net.liftweb.json.Printer._
-import net.liftweb.json.JObject
-import net.liftweb.json.Extraction
-import net.liftweb.mongodb.JObjectParser
-import net.liftweb.http.js.JsExp
-import net.liftweb.json.JsonDSL.seq2jvalue
+import com.mongodb.{BasicDBObjectBuilder, QueryBuilder}
+import net.liftweb.http.LiftRules
+import net.liftweb.http.rest.RestHelper
+import net.liftweb.json.JsonAST._
+import net.liftweb.json.JsonDSL.{seq2jvalue, _}
 
 
 /**
@@ -92,8 +84,10 @@ object UsersAPI extends RestHelper {
     case "users" :: "update" :: Nil JsonPost json -> request =>
       for{JString(username) <- (json \\ "username").toOpt} yield getupdate("",username)
 
-    case "users" :: "delete" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield getDelete(id)
+//    case "users" :: "delete" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt} yield getDelete(id)
+
+    case "users" :: "delete" :: id :: Nil JsonDelete req => getDelete(id)
 
     case "shout" :: Nil JsonPost json->request =>
       for { JString(name) <- (json \\ "name").toOpt }

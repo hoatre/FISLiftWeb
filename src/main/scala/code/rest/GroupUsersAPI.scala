@@ -86,8 +86,10 @@ object GroupUsersAPI extends RestHelper {
           JString(groupid) <- (json \\ "groupid").toOpt
       } yield updateGroupUser(id, userid, groupid)
 
-    case "usergroup" :: "delete" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield deleteGroupUser(id)
+//    case "usergroup" :: "delete" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt} yield deleteGroupUser(id)
+
+    case "usergroup" :: "delete" :: id :: Nil JsonDelete req => deleteGroupUser(id)
 
     case "usergroup" :: "insert" :: Nil JsonPost json -> request =>
       for{JString(userid) <- (json \\ "userid").toOpt

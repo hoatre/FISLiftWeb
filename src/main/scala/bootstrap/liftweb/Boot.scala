@@ -30,8 +30,8 @@ class Boot {
         HTTPParam("Access-Control-Allow-Origin", "*"),
         HTTPParam("Access-Control-Allow-Credentials", "true"),
         HTTPParam("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT"),
-        HTTPParam("Access-Control-Allow-Headers", "origin, authorization, accept, client-security-token, " +
-                        "WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")
+        HTTPParam("Access-Control-Allow-Headers", "X-API-KEY, x-xsrf-token,origin, authorization, accept, client-security-token, " +
+                        "Access-Control-Request-Method, WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")
       ))
 
     // Build SiteMap

@@ -104,8 +104,10 @@ object ModulesAPI extends RestHelper {
       } yield updateModule(id, status, displayforguess, note, parentname
                             , parent, icon, link, modulename)
 
-    case "module" :: "delete" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield deleteModule(id)
+//    case "module" :: "delete" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt} yield deleteModule(id)
+
+    case "module" :: "delete" :: id :: Nil JsonDelete req => deleteModule(id)
 
     case "module" :: "insert" :: Nil JsonPost json -> request =>
       for{JString(status) <- (json \\ "status").toOpt

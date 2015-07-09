@@ -69,7 +69,6 @@ object GroupsAPI extends RestHelper{
 
   }
 
-
   serve {
     case "group" :: "getall"  :: Nil JsonGet req => getGroupJSON() : JValue
 
@@ -83,8 +82,10 @@ object GroupsAPI extends RestHelper{
           JString(groupname) <- (json \\ "groupname").toOpt
       } yield updateGroup(id, status, note, groupname)
 
-    case "group" :: "delete" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield deleteGroup(id)
+//    case "group" :: "delete" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt} yield deleteGroup(id)
+
+    case "group" :: "delete" :: id :: Nil JsonDelete req => deleteGroup(id)
 
     case "group" :: "insert" :: Nil JsonPost json -> request =>
       for{JString(status) <- (json \\ "status").toOpt

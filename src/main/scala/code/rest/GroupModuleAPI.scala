@@ -85,8 +85,10 @@ object GroupModuleAPI extends RestHelper {
           JString(groupid) <- (json \\ "groupid").toOpt
       } yield updateGroupModule(id, moduleid, groupid)
 
-    case "groupmodule" :: "delete" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield deleteGroupModule(id)
+//    case "groupmodule" :: "delete" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt} yield deleteGroupModule(id)
+
+    case "groupmodule" :: "delete" :: id :: Nil JsonDelete req => deleteGroupModule(id)
 
     case "groupmodule" :: "insert" :: Nil JsonPost json -> request =>
       for{JString(moduleid) <- (json \\ "moduleid").toOpt

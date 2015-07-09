@@ -89,8 +89,10 @@ object RolesAPI extends RestHelper {
           JString(controlid) <- (json \\ "controlid").toOpt
       } yield updateRole(id, status, note, rolename, controlid)
 
-    case "role" :: "delete" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield deleteRole(id)
+//    case "role" :: "delete" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt} yield deleteRole(id)
+
+    case "role" :: "delete" :: id :: Nil JsonDelete req => deleteRole(id)
 
     case "role" :: "insert" :: Nil JsonPost json -> request =>
       for{JString(status) <- (json \\ "status").toOpt
