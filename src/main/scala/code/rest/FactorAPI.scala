@@ -80,9 +80,11 @@ object FactorAPI extends RestHelper {
   serve {
     case "factor" :: "getall"  :: Nil JsonGet req => getFactorJSON() : JValue
 
+    case "factor" :: "getbyfactorid" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "factor" :: "getbyfactorid" :: id :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield getFactorByIdJSON(id) : JValue
 
+    case "factor" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "factor" :: "update" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt
           JString(parentid) <- (json \\ "parentid").toOpt
@@ -92,11 +94,11 @@ object FactorAPI extends RestHelper {
           JString(name) <- (json \\ "name").toOpt
       } yield updateFactor(id, parentid, parentname, weigth, description, name)
 
-//    case "factor" :: "delete" :: Nil JsonPost json -> request =>
-//      for{JString(id) <- (json \\ "id").toOpt} yield deleteFactor(id)
+    case "factor" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
+    case "factor" :: "delete" :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "id").toOpt} yield  deleteFactor(id)
 
-    case "factor" :: "delete" :: id :: Nil JsonDelete req => deleteFactor(id)
-
+    case "factor" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "factor" :: "insert" :: Nil JsonPost json -> request =>
       for{JString(parentid) <- (json \\ "parentid").toOpt
           JString(parentname) <- (json \\ "parentname").toOpt

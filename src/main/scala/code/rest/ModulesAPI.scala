@@ -88,9 +88,11 @@ object ModulesAPI extends RestHelper {
   serve {
     case "module" :: "getall"  :: Nil JsonGet req => getModuleJSON() : JValue
 
+    case "module" :: "getbyroleid" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "module" :: "getbyroleid" :: id :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield getModuleByIdJSON(id) : JValue
 
+    case "module" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "module" :: "update" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt
           JString(status) <- (json \\ "status").toOpt
@@ -104,11 +106,13 @@ object ModulesAPI extends RestHelper {
       } yield updateModule(id, status, displayforguess, note, parentname
                             , parent, icon, link, modulename)
 
-//    case "module" :: "delete" :: Nil JsonPost json -> request =>
-//      for{JString(id) <- (json \\ "id").toOpt} yield deleteModule(id)
+    case "module" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
+    case "module" :: "delete" :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "id").toOpt} yield deleteModule(id)
 
-    case "module" :: "delete" :: id :: Nil JsonDelete req => deleteModule(id)
+//    case "module" :: "delete" :: id :: Nil JsonDelete req => deleteModule(id)
 
+    case "module" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "module" :: "insert" :: Nil JsonPost json -> request =>
       for{JString(status) <- (json \\ "status").toOpt
           JString(displayforguess) <- (json \\ "displayforguess").toOpt

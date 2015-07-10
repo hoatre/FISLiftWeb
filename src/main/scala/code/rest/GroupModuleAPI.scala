@@ -76,20 +76,24 @@ object GroupModuleAPI extends RestHelper {
   serve {
     case "groupmodule" :: "getall"  :: Nil JsonGet req => getGroupModuleJSON() : JValue
 
+    case "groupmodule" :: "getbyroleid" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "groupmodule" :: "getbyroleid" :: id :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield getGroupModuleByIdJSON(id) : JValue
 
+    case "groupmodule" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "groupmodule" :: "update" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt
           JString(moduleid) <- (json \\ "moduleid").toOpt
           JString(groupid) <- (json \\ "groupid").toOpt
       } yield updateGroupModule(id, moduleid, groupid)
 
-//    case "groupmodule" :: "delete" :: Nil JsonPost json -> request =>
-//      for{JString(id) <- (json \\ "id").toOpt} yield deleteGroupModule(id)
+    case "groupmodule" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
+    case "groupmodule" :: "delete" :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "id").toOpt} yield deleteGroupModule(id)
 
-    case "groupmodule" :: "delete" :: id :: Nil JsonDelete req => deleteGroupModule(id)
+//    case "groupmodule" :: "delete" :: id :: Nil JsonDelete req => deleteGroupModule(id)
 
+    case "groupmodule" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "groupmodule" :: "insert" :: Nil JsonPost json -> request =>
       for{JString(moduleid) <- (json \\ "moduleid").toOpt
           JString(groupid) <- (json \\ "groupid").toOpt

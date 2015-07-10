@@ -76,9 +76,11 @@ object GroupModuleRolesAPI extends RestHelper {
   serve {
     case "groupmodule" :: "getall"  :: Nil JsonGet req => getGroupModuleRoleJSON() : JValue
 
+    case "groupmodule" :: "getbyroleid" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "groupmodule" :: "getbyroleid" :: id :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield getGroupModuleRoleByIdJSON(id) : JValue
 
+    case "groupmodule" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "groupmodule" :: "update" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt
           JString(moduleid) <- (json \\ "moduleid").toOpt
@@ -86,11 +88,13 @@ object GroupModuleRolesAPI extends RestHelper {
           JString(roleid) <- (json \\ "roleid").toOpt
       } yield updateGroupModuleRole(id, moduleid, groupid, roleid)
 
-//    case "groupmodule" :: "delete" :: Nil JsonPost json -> request =>
-//      for{JString(id) <- (json \\ "id").toOpt} yield deleteGroupModuleRole(id)
+    case "groupmodule" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
+    case "groupmodule" :: "delete" :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "id").toOpt} yield deleteGroupModuleRole(id)
 
-    case "groupmodule" :: "delete" :: id :: Nil JsonDelete req => deleteGroupModuleRole(id)
+//    case "groupmodule" :: "delete" :: id :: Nil JsonDelete req => deleteGroupModuleRole(id)
 
+    case "groupmodule" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "groupmodule" :: "insert" :: Nil JsonPost json -> request =>
       for{JString(moduleid) <- (json \\ "moduleid").toOpt
           JString(groupid) <- (json \\ "groupid").toOpt

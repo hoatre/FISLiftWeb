@@ -3,7 +3,7 @@ package model
 
 import net.liftweb.mongodb.record._
 import net.liftweb.mongodb.record.field._
-import net.liftweb.record.field.{IntField, StringField}
+import net.liftweb.record.field.StringField
 
 //---------------------------------------------------------------------------------
 class Groups private () extends MongoRecord[Groups] with StringPk[Groups] {
@@ -200,7 +200,7 @@ class factoroptionIN private () extends BsonRecord[factoroptionIN] {
   object description extends StringField(this, 1024)
   object score extends StringField(this, 1024)
   object fatal extends StringField(this, 1024)
-  object ordinal extends StringField(this, 15)
+  object ordinal extends StringField(this, 1024)
 }
 
 object factoroptionIN extends factoroptionIN with BsonMetaRecord[factoroptionIN]
