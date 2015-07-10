@@ -69,13 +69,6 @@ object GroupsAPI extends RestHelper{
 
   }
 
-  def test(req : String): JValue = {
-    println(req)
-
-    { "SUSCESS" -> req } : JValue
-
-  }
-
   serve {
     case "group" :: "getall"  :: Nil JsonGet req => getGroupJSON() : JValue
 
