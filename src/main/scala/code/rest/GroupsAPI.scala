@@ -69,7 +69,7 @@ object GroupsAPI extends RestHelper{
 //    val DBList = Groups.findAll(qry)
 //    println(DBList)
 
-    {"GroupItem" -> Groups.createRecord.id(idItem.toString).group(groupin).save.asJValue} : JValue
+    {"SUCCESS" -> Groups.createRecord.id(idItem.toString).group(groupin).save.asJValue} : JValue
 
   }
 

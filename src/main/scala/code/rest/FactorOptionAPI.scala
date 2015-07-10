@@ -59,7 +59,7 @@ object FactorOptionAPI extends RestHelper {
 
 
 
-    { "FactorItem" -> FactorOption.createRecord.id(UUID.randomUUID().toString).factoroption(FactorOptionin).save.asJValue } : JValue
+    { "SUCCESS" -> FactorOption.createRecord.id(UUID.randomUUID().toString).factoroption(FactorOptionin).save.asJValue } : JValue
 
   }
 

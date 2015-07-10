@@ -59,7 +59,7 @@ object ModelInfoAPI extends RestHelper {
 
 
 
-    { "FactorItem" -> ModelInfo.createRecord.id(UUID.randomUUID().toString).modelinfo(ModelInfoin).save.asJValue } : JValue
+    { "SUCCESS" -> ModelInfo.createRecord.id(UUID.randomUUID().toString).modelinfo(ModelInfoin).save.asJValue } : JValue
 
   }
 

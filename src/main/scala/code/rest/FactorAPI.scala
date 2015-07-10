@@ -57,7 +57,7 @@ object FactorAPI extends RestHelper {
 
     val Factorin = factorIN.createRecord.parentid(parentid).parentname(parentname).name(name).description(description).weigth(weigth).status(status)
 
-    {"FactorItem" -> Factor.createRecord.id(UUID.randomUUID().toString).factor(Factorin).save.asJValue} : JValue
+    {"SUCCESS" -> Factor.createRecord.id(UUID.randomUUID().toString).factor(Factorin).save.asJValue} : JValue
 
   }
 
