@@ -21,6 +21,12 @@ object GroupsAPI extends RestHelper{
 
   def getGroupJSON(): JValue = {
 
+//    var b : groupIN
+//    b.setFieldsFromJSON("{'status':'asd'}")
+//    var a : Groups() {b}
+
+//    println(a)
+
     val DBList = Groups.findAll
     if(DBList.isEmpty)
       "ERROR" -> "Group not found" : JValue
@@ -30,7 +36,9 @@ object GroupsAPI extends RestHelper{
   }
 
   def getGroupByIdJSON(id : String): JValue = {
-
+//    val someObjectId : ObjectId = new ObjectId(id)
+//
+//    val qry = QueryBuilder.start("_id").is(someObjectId).get
     val qry = QueryBuilder.start("_id").is(id).get
 
     val DBList = Groups.findAll(qry)
@@ -53,10 +61,15 @@ object GroupsAPI extends RestHelper{
   def insertGroup(status : String, note : String, groupname : String): JValue = {
 
     val groupin = groupIN.createRecord.groupname(groupname).note(note).status(status)
+    var idItem = UUID.randomUUID()
+//    Groups.createRecord.id(idItem.toString).group(groupin).save.asJSON
+////    Thread.sleep(1000)
+//    val qry = QueryBuilder.start("_id").is(idItem).get
+//println(idItem)
+//    val DBList = Groups.findAll(qry)
+//    println(DBList)
 
-    Groups.createRecord.id(UUID.randomUUID().toString).group(groupin).save
-
-    { "SUSCESS" -> " INSERTED " } : JValue
+    {"GroupItem" -> Groups.createRecord.id(idItem.toString).group(groupin).save.asJValue} : JValue
 
   }
 

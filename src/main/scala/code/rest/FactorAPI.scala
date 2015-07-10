@@ -49,30 +49,29 @@ object FactorAPI extends RestHelper {
 
     Factor.delete(("_id" -> _id))
 
-    { "SUSCESS" -> " DELETED " } : JValue
+    { "SUCCESS" -> " DELETED " } : JValue
 
   }
 
-  def insertFactor(parentid : String, parentname : String, name : String, description : String, weigth : String): JValue = {
+  def insertFactor(parentid : String, parentname : String, name : String, description : String, weigth : String, status : String): JValue = {
 
-    val Factorin = factorIN.createRecord.parentid(parentid).parentname(parentname).name(name).description(description).weigth(weigth)
+    val Factorin = factorIN.createRecord.parentid(parentid).parentname(parentname).name(name).description(description).weigth(weigth).status(status)
 
-    Factor.createRecord.id(UUID.randomUUID().toString).factor(Factorin).save
-
-    { "SUSCESS" -> " INSERTED " } : JValue
+    {"FactorItem" -> Factor.createRecord.id(UUID.randomUUID().toString).factor(Factorin).save.asJValue} : JValue
 
   }
 
-  def updateFactor(id : String, parentid : String, parentname : String, name : String, description : String, weigth : String): JValue = {
+  def updateFactor(id : String, parentid : String, parentname : String, name : String, description : String, weigth : String, status : String): JValue = {
 
     Factor.update(("_id" -> id),
       ("$set" -> ("factor.parentid" -> parentid)
         ~ ("factor.parentname" -> parentname)
         ~ ("factor.name" -> name)
         ~ ("factor.weigth" -> weigth)
-        ~ ("factor.description" -> description)))
+        ~ ("factor.description" -> description)
+        ~ ("factor.status" -> status)))
 
-    { "SUSCESS" -> " UPDATED " } : JValue
+    { "SUCCESS" -> " UPDATED " } : JValue
 
   }
 
@@ -92,7 +91,8 @@ object FactorAPI extends RestHelper {
           JString(weigth) <- (json \\ "weigth").toOpt
           JString(description) <- (json \\ "description").toOpt
           JString(name) <- (json \\ "name").toOpt
-      } yield updateFactor(id, parentid, parentname, weigth, description, name)
+          JString(status) <- (json \\ "status").toOpt
+      } yield updateFactor(id, parentid, parentname, weigth, description, name, status)
 
     case "factor" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "factor" :: "delete" :: Nil JsonPost json -> request =>
@@ -105,7 +105,8 @@ object FactorAPI extends RestHelper {
           JString(weigth) <- (json \\ "weigth").toOpt
           JString(description) <- (json \\ "description").toOpt
           JString(name) <- (json \\ "name").toOpt
-      } yield insertFactor(parentid, parentname, weigth, description, name)
+          JString(status) <- (json \\ "status").toOpt
+      } yield insertFactor(parentid, parentname, weigth, description, name, status)
   }
 
 }

@@ -48,7 +48,7 @@ object RolesAPI extends RestHelper {
 
     Roles.delete(("_id" -> _id))
 
-    { "SUSCESS" -> " DELETED " } : JValue
+    { "SUCCESS" -> " DELETED " } : JValue
 
   }
 
@@ -56,9 +56,9 @@ object RolesAPI extends RestHelper {
 
     val rolein = roleIN.createRecord.rolename(rolename).note(note).status(status).controlid(controlid)
 
-    Roles.createRecord.id(UUID.randomUUID().toString).role(rolein).save
 
-    { "SUSCESS" -> " INSERTED " } : JValue
+
+    { "SUCCESS" -> Roles.createRecord.id(UUID.randomUUID().toString).role(rolein).save.asJValue } : JValue
 
   }
 
@@ -70,7 +70,7 @@ object RolesAPI extends RestHelper {
                   ~ ("role.status" -> status)
                   ~ ("role.controlid" -> controlid)))
 
-    { "SUSCESS" -> " UPDATED " } : JValue
+    { "SUCCESS" -> " UPDATED " } : JValue
 
   }
 

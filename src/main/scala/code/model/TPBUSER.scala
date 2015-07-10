@@ -174,6 +174,7 @@ class factorIN private () extends BsonRecord[factorIN] {
   object name extends StringField(this, 1024)
   object description extends StringField(this, 1024)
   object weigth extends StringField(this, 1024)
+  object status extends StringField(this, 1024)
 }
 
 object factorIN extends factorIN with BsonMetaRecord[factorIN]
@@ -200,9 +201,33 @@ class factoroptionIN private () extends BsonRecord[factoroptionIN] {
   object description extends StringField(this, 1024)
   object score extends StringField(this, 1024)
   object fatal extends StringField(this, 1024)
-  object ordinal extends StringField(this, 1024)
+  object status extends StringField(this, 1024)
 }
 
 object factoroptionIN extends factoroptionIN with BsonMetaRecord[factoroptionIN]
+
+//---------------------------------------------------------------------------------
+
+class ModelInfo private () extends MongoRecord[ModelInfo] with StringPk[ModelInfo] {
+
+  override def meta = ModelInfo
+
+  // An embedded document:
+  object modelinfo extends BsonRecordField(this, modelinfoIN)
+
+}
+
+object ModelInfo extends ModelInfo with MongoMetaRecord[ModelInfo] {
+  override def collectionName = "modelinfo"
+}
+
+class modelinfoIN private () extends BsonRecord[modelinfoIN] {
+  def meta = modelinfoIN
+  object name extends StringField(this, 1024)
+  object description extends StringField(this, 1024)
+  object status extends StringField(this, 1024)
+}
+
+object modelinfoIN extends modelinfoIN with BsonMetaRecord[modelinfoIN]
 
 //---------------------------------------------------------------------------------

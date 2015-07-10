@@ -3,6 +3,7 @@ package code.rest
 /**
  * Created by phong on 7/8/2015.
  */
+
 import java.util.UUID
 
 import code.model._
@@ -47,7 +48,7 @@ object GroupModuleRolesAPI extends RestHelper {
 
     GroupModuleRoles.delete(("_id" -> _id))
 
-    { "SUSCESS" -> " DELETED " } : JValue
+    { "SUCCESS" -> " DELETED " } : JValue
 
   }
 
@@ -55,9 +56,9 @@ object GroupModuleRolesAPI extends RestHelper {
 
     val groupmodulerolein = groupmoduleroleIN.createRecord.groupid(groupid).moduleid(moduleid).roleid(roleid)
 
-    GroupModuleRoles.createRecord.id(UUID.randomUUID().toString).groupmodulerole(groupmodulerolein).save
 
-    { "SUSCESS" -> " INSERTED " } : JValue
+
+    { "SUCCESS" -> GroupModuleRoles.createRecord.id(UUID.randomUUID().toString).groupmodulerole(groupmodulerolein).save.asJValue } : JValue
 
   }
 
@@ -68,7 +69,7 @@ object GroupModuleRolesAPI extends RestHelper {
         ~ ("groupmodulerole.groupid" -> groupid)
         ~ ("groupmodulerole.roleid" -> roleid)))
 
-    { "SUSCESS" -> " UPDATED " } : JValue
+    { "SUCCESS" -> " UPDATED " } : JValue
 
   }
 

@@ -49,7 +49,7 @@ object GroupUsersAPI extends RestHelper {
 
     GroupUsers.delete(("_id" -> _id))
 
-    { "SUSCESS" -> " DELETED " } : JValue
+    { "SUCCESS" -> " DELETED " } : JValue
 
   }
 
@@ -57,9 +57,9 @@ object GroupUsersAPI extends RestHelper {
 
     val groupuserin = groupuserIN.createRecord.groupid(groupid).userid(userid)
 
-    GroupUsers.createRecord.id(UUID.randomUUID().toString).groupuser(groupuserin).save
 
-    { "SUSCESS" -> " INSERTED " } : JValue
+
+    { "SUCCESS" -> GroupUsers.createRecord.id(UUID.randomUUID().toString).groupuser(groupuserin).save.asJValuerSUCCESS} : JValue
 
   }
 
@@ -69,7 +69,7 @@ object GroupUsersAPI extends RestHelper {
       ("$set" -> ("usergroup.userid" -> userid)
         ~ ("usergroup.groupid" -> groupid)))
 
-    { "SUSCESS" -> " UPDATED " } : JValue
+    { "SUCCESS" -> " UPDATED " } : JValue
 
   }
 

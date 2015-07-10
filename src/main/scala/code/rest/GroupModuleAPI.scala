@@ -3,6 +3,7 @@ package code.rest
 /**
  * Created by phong on 7/8/2015.
  */
+
 import java.util.UUID
 
 import code.model._
@@ -48,7 +49,7 @@ object GroupModuleAPI extends RestHelper {
 
     GroupModules.delete(("_id" -> _id))
 
-    { "SUSCESS" -> " DELETED " } : JValue
+    { "SUCCESS" -> " DELETED " } : JValue
 
   }
 
@@ -56,9 +57,9 @@ object GroupModuleAPI extends RestHelper {
 
     val groupmodulein = groupmoduleIN.createRecord.groupid(groupid).moduleid(moduleid)
 
-    GroupModules.createRecord.id(UUID.randomUUID().toString).groupmodule(groupmodulein).save
 
-    { "SUSCESS" -> " INSERTED " } : JValue
+
+    { "GroupModuleItem" -> GroupModules.createRecord.id(UUID.randomUUID().toString).groupmodule(groupmodulein).save.asJValue } : JValue
 
   }
 
@@ -68,7 +69,7 @@ object GroupModuleAPI extends RestHelper {
       ("$set" -> ("groupmodule.moduleid" -> moduleid)
         ~ ("groupmodule.groupid" -> groupid)))
 
-    { "SUSCESS" -> " UPDATED " } : JValue
+    { "SUCCESS" -> " UPDATED " } : JValue
 
   }
 

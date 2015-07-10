@@ -48,7 +48,7 @@ object ModulesAPI extends RestHelper {
 
     Modules.delete(("_id" -> _id))
 
-    { "SUSCESS" -> " DELETED " } : JValue
+    { "SUCCESS" -> " DELETED " } : JValue
 
   }
 
@@ -60,9 +60,9 @@ object ModulesAPI extends RestHelper {
                                         .note(note).parentname(parentname).parent(parent)
                                         .icon(icon).link(link).modulename(modulename)
 
-    Modules.createRecord.id(UUID.randomUUID().toString).module(modulein).save
 
-    { "SUSCESS" -> " INSERTED " } : JValue
+
+    { "SUCCESS" -> Modules.createRecord.id(UUID.randomUUID().toString).module(modulein).save.asJValue } : JValue
 
   }
 
@@ -80,7 +80,7 @@ object ModulesAPI extends RestHelper {
         ~ ("module.link" -> displayforguess)
         ~ ("module.modulename" -> displayforguess)))
 
-    { "SUSCESS" -> " UPDATED " } : JValue
+    { "SUCCESS" -> " UPDATED " } : JValue
 
   }
 

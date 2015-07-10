@@ -3,6 +3,7 @@ package code.rest
 /**
  * Created by phong on 7/8/2015.
  */
+
 import java.util.UUID
 
 import code.model._
@@ -48,21 +49,21 @@ object FactorOptionAPI extends RestHelper {
 
     FactorOption.delete(("_id" -> _id))
 
-    { "SUSCESS" -> " DELETED " } : JValue
+    { "SUCCESS" -> " DELETED " } : JValue
 
   }
 
-  def insertFactorOption(factorid : String, name : String, description : String, score : String, fatal : String, ordinal : String): JValue = {
+  def insertFactorOption(factorid : String, name : String, description : String, score : String, fatal : String, status : String): JValue = {
 
-    val FactorOptionin = factoroptionIN.createRecord.factorid(factorid).name(name).description(description).score(score).fatal(fatal).ordinal(ordinal)
+    val FactorOptionin = factoroptionIN.createRecord.factorid(factorid).name(name).description(description).score(score).fatal(fatal).status(status)
 
-    FactorOption.createRecord.id(UUID.randomUUID().toString).factoroption(FactorOptionin).save
 
-    { "SUSCESS" -> " INSERTED " } : JValue
+
+    { "FactorItem" -> FactorOption.createRecord.id(UUID.randomUUID().toString).factoroption(FactorOptionin).save.asJValue } : JValue
 
   }
 
-  def updateFactorOption(id : String, factorid : String, name : String, description : String, score : String, fatal : String, ordinal : String): JValue = {
+  def updateFactorOption(id : String, factorid : String, name : String, description : String, score : String, fatal : String, status : String): JValue = {
 
     FactorOption.update(("_id" -> id),
       ("$set" -> ("factoroption.factorid" -> factorid)
@@ -70,9 +71,9 @@ object FactorOptionAPI extends RestHelper {
         ~ ("factoroption.description" -> description)
         ~ ("factoroption.score" -> score)
         ~ ("factoroption.fatal" -> fatal)
-        ~ ("factoroption.ordinal" -> ordinal)))
+        ~ ("factoroption.status" -> status)))
 
-    { "SUSCESS" -> " UPDATED " } : JValue
+    { "SUCCESS" -> " UPDATED " } : JValue
 
   }
 
@@ -91,9 +92,9 @@ object FactorOptionAPI extends RestHelper {
           JString(description) <- (json \\ "description").toOpt
           JString(score) <- (json \\ "score").toOpt
           JString(fatal) <- (json \\ "fatal").toOpt
-          JString(ordinal) <- (json \\ "ordinal").toOpt
+          JString(status) <- (json \\ "status").toOpt
           JString(name) <- (json \\ "name").toOpt
-      } yield updateFactorOption(id, factorid, description, score, fatal, name, ordinal)
+      } yield updateFactorOption(id, factorid, description, score, fatal, name, status)
 
     case "factoroption" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "factoroption" :: "delete" :: Nil JsonPost json -> request =>
@@ -107,9 +108,9 @@ object FactorOptionAPI extends RestHelper {
           JString(description) <- (json \\ "description").toOpt
           JString(score) <- (json \\ "score").toOpt
           JString(fatal) <- (json \\ "fatal").toOpt
-          JString(ordinal) <- (json \\ "ordinal").toOpt
+          JString(status) <- (json \\ "status").toOpt
           JString(name) <- (json \\ "name").toOpt
-      } yield insertFactorOption(factorid, description, score, fatal, name, ordinal)
+      } yield insertFactorOption(factorid, description, score, fatal, name, status)
   }
 
 }
