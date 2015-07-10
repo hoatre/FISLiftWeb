@@ -21,7 +21,8 @@ object GroupsAPI extends RestHelper{
 
   def getGroupJSON(): JValue = {
 
-//    var b : groupIN
+//    val b : groupIN
+//    b.groupname.set("asdas")
 //    b.setFieldsFromJSON("{'status':'asd'}")
 //    var a : Groups() {b}
 
@@ -68,9 +69,14 @@ object GroupsAPI extends RestHelper{
 //println(idItem)
 //    val DBList = Groups.findAll(qry)
 //    println(DBList)
+    val b = Groups.createRecord.id(idItem.toString).group(groupin)
+    abc(b)
 
     {"SUCCESS" -> Groups.createRecord.id(idItem.toString).group(groupin).save.asJValue} : JValue
 
+  }
+  def abc(group : Groups) = {
+    println(group)
   }
 
   def updateGroup(id : String, status : String, note : String, groupname : String): JValue = {

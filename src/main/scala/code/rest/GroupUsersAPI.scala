@@ -59,7 +59,7 @@ object GroupUsersAPI extends RestHelper {
 
 
 
-    { "SUCCESS" -> GroupUsers.createRecord.id(UUID.randomUUID().toString).groupuser(groupuserin).save.asJValuerSUCCESS} : JValue
+    { "SUCCESS" -> GroupUsers.createRecord.id(UUID.randomUUID().toString).groupuser(groupuserin).save.asJValue} : JValue
 
   }
 
