@@ -60,7 +60,7 @@ object GroupsAPI extends RestHelper{
   }
 
   def insertGroup(status : String, note : String, groupname : String): JValue = {
-
+    
     val groupin = groupIN.createRecord.groupname(groupname).note(note).status(status)
     var idItem = UUID.randomUUID()
 //    Groups.createRecord.id(idItem.toString).group(groupin).save.asJSON
@@ -69,14 +69,9 @@ object GroupsAPI extends RestHelper{
 //println(idItem)
 //    val DBList = Groups.findAll(qry)
 //    println(DBList)
-    val b = Groups.createRecord.id(idItem.toString).group(groupin)
-    abc(b)
 
     {"SUCCESS" -> Groups.createRecord.id(idItem.toString).group(groupin).save.asJValue} : JValue
 
-  }
-  def abc(group : Groups) = {
-    println(group)
   }
 
   def updateGroup(id : String, status : String, note : String, groupname : String): JValue = {
