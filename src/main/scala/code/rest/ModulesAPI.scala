@@ -89,7 +89,7 @@ object ModulesAPI extends RestHelper {
     case "module" :: "getall"  :: Nil JsonGet req => getModuleJSON() : JValue
 
     case "module" :: "getbyroleid" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "module" :: "getbyroleid" :: id :: Nil JsonPost json -> request =>
+    case "module" :: "getbyroleid" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield getModuleByIdJSON(id) : JValue
 
     case "module" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue

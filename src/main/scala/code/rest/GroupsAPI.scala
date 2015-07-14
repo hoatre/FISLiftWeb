@@ -1,14 +1,15 @@
 package code.rest
 
-import java.util.UUID
-
 import code.model._
 import com.mongodb.QueryBuilder
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
-import net.liftweb.json.JsonAST._
+import net.liftweb.json._
+
+//import net.liftweb.json.JsonAST._
 import net.liftweb.mongodb.BsonDSL._
 import net.liftweb.util.Helpers._
+//import com.mongodb.casbah.Imports._
 
 /**
  * Created by phong on 7/7/2015.
@@ -59,19 +60,24 @@ object GroupsAPI extends RestHelper{
 
   }
 
-  def insertGroup(status : String, note : String, groupname : String): JValue = {
-    
-    val groupin = groupIN.createRecord.groupname(groupname).note(note).status(status)
-    var idItem = UUID.randomUUID()
-//    Groups.createRecord.id(idItem.toString).group(groupin).save.asJSON
-////    Thread.sleep(1000)
-//    val qry = QueryBuilder.start("_id").is(idItem).get
-//println(idItem)
-//    val DBList = Groups.findAll(qry)
-//    println(DBList)
+  def insertGroup[A](request : A): JValue = {
 
-    {"SUCCESS" -> Groups.createRecord.id(idItem.toString).group(groupin).save.asJValue} : JValue
 
+
+    println(request)
+
+
+    {"SUCCESS" -> "sdfds"} : JValue
+
+  }
+
+  def insertFreeFormat(json : String) : JValue = {
+
+//    Groups.insert
+//    val b : Field[StringField, Groups] = null
+//    val g = Groups.createWithMutableField[StringField](Groups, b, a).save
+
+    { "SUCCESS" -> " INSERT " } : JValue
   }
 
   def updateGroup(id : String, status : String, note : String, groupname : String): JValue = {
@@ -84,6 +90,9 @@ object GroupsAPI extends RestHelper{
   }
 
   serve {
+    case "group" :: "insertFreeFormat" :: Nil JsonPost json -> request =>
+      for{JString(model) <- (json \\ "model").toOpt} yield insertFreeFormat(model)
+
     case "group" :: "getall"  :: Nil JsonGet req => getGroupJSON() : JValue
 
     case "group" :: "getbygroupid" :: Nil Options _ => {"OK" -> "200"} :JValue
@@ -103,11 +112,8 @@ object GroupsAPI extends RestHelper{
       for{JString(id) <- (json \\ "id").toOpt} yield  deleteGroup(id)
 
     case "group" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "group" :: "insert" :: Nil JsonPost json -> request =>
-      for{JString(status) <- (json \\ "status").toOpt
-          JString(note) <- (json \\ "note").toOpt
-          JString(groupname) <- (json \\ "groupname").toOpt
-      } yield insertGroup(status, note, groupname)
+    case "group" :: "insert" :: Nil JsonPost json -> request  => insertGroup(json.values)
+
 
   }
 }

@@ -83,7 +83,9 @@ class Boot {
 
     FactorAPI.init()
 
-    FactorOptionAPI.init()
+    ModelInfoAPI.init()
+
+//    FactorOptionAPI.init()
 
   }
 
