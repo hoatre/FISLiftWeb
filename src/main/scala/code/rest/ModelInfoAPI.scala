@@ -59,7 +59,8 @@ object ModelInfoAPI extends RestHelper {
 
 
 
-    { "SUCCESS" -> ModelInfo.createRecord.id(UUID.randomUUID().toString).modelinfo(ModelInfoin).save.asJValue } : JValue
+//
+    { "SUCCESS" -> "sdfsd" } : JValue
 
   }
 
@@ -79,7 +80,7 @@ object ModelInfoAPI extends RestHelper {
     case "modelinfo" :: "getall"  :: Nil JsonGet req => getModelInfoJSON() : JValue
 
     case "modelinfo" :: "getbymodelinfoid" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "modelinfo" :: "getbymodelinfoid" :: id :: Nil JsonPost json -> request =>
+    case "modelinfo" :: "getbymodelinfoid" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield getModelInfoByIdJSON(id) : JValue
 
     case "modelinfo" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue

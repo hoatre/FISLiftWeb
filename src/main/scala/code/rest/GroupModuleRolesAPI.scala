@@ -78,7 +78,7 @@ object GroupModuleRolesAPI extends RestHelper {
     case "groupmodule" :: "getall"  :: Nil JsonGet req => getGroupModuleRoleJSON() : JValue
 
     case "groupmodule" :: "getbyroleid" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "groupmodule" :: "getbyroleid" :: id :: Nil JsonPost json -> request =>
+    case "groupmodule" :: "getbyroleid" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield getGroupModuleRoleByIdJSON(id) : JValue
 
     case "groupmodule" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue

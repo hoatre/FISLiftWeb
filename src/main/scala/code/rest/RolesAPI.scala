@@ -79,7 +79,7 @@ object RolesAPI extends RestHelper {
     case "role" :: "getall"  :: Nil JsonGet req => getRoleJSON() : JValue
 
     case "role" :: "getbyroleid" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "role" :: "getbyroleid" :: id :: Nil JsonPost json -> request =>
+    case "role" :: "getbyroleid" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield getRoleByIdJSON(id) : JValue
 
     case "role" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue

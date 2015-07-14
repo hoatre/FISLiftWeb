@@ -78,7 +78,7 @@ object GroupUsersAPI extends RestHelper {
     case "usergroup" :: "getall"  :: Nil JsonGet req => getGroupUserJSON() : JValue
 
     case "usergroup" :: "getbyroleid" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "usergroup" :: "getbyroleid" :: id :: Nil JsonPost json -> request =>
+    case "usergroup" :: "getbyroleid" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield getGroupUserByIdJSON(id) : JValue
 
     case "usergroup" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
