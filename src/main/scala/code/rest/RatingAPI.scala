@@ -4,23 +4,19 @@ import java.util.UUID
 
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
-import net.liftweb.json._
-import net.liftweb.json.JsonAST.JArray
-import net.liftweb.json.JsonAST.JDouble
-import net.liftweb.json.JsonAST.JField
-import net.liftweb.json.JsonAST.JString
 import net.liftweb.json.JsonAST.JValue
 
 import com.mongodb.{BasicDBObjectBuilder, QueryBuilder}
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
 import net.liftweb.http.{S, LiftRules}
-import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
 import code.snippet._
 import code.model.{codeIN, Rating, Users}
 import net.liftweb.json.Printer._
+import net.liftweb.json.JObject
+import net.liftweb.json.Extraction
 import net.liftweb.mongodb.JObjectParser
 import net.liftweb.http.js.JsExp
 import net.liftweb.json.JsonDSL.seq2jvalue
@@ -42,13 +38,15 @@ object RatingAPI extends RestHelper {
 
     serve {
 
+
+
       case "rating" :: "insert" :: Nil JsonPost json-> request => insert(json)
-      case "rating" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
       case "rating" :: "update" :: Nil JsonPost json-> request => update(json)
-      case "rating" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
       case "rating" :: "delete" :: Nil JsonPost json-> request => delete(json)
-      case "rating" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
       case "rating" :: "getmoduleid" :: q :: Nil JsonGet req => getbymoduleid(q)
+
+
+
 
     }
 
@@ -115,10 +113,11 @@ if (list.isInstanceOf[JArray]) {
     JString(code) <- (j \\ "code").toOpt
     JString(status) <- (j \\ "status").toOpt
     JString(statusname) <- (j \\ "statusname").toOpt
-    JDouble(scorefrom) <- (j \\ "scorefrom").toOpt
-    JDouble(scoreto) <- (j \\ "scoreto").toOpt
+    JString(scorefrom) <- (j \\ "scorefrom").toOpt
+    JString(scoreto) <- (j \\ "scoreto").toOpt
 
-    item = codeIN.createRecord.code(code).status(status).statusname(statusname).scorefrom(scorefrom).scoreto(scoreto)
+    item = codeIN.createRecord.code(code.toString).status(status.toString).statusname(statusname.toString).scorefrom(scorefrom.toString.toDouble).scoreto(scoreto.toString.toDouble)
+
 
   }yield {
 
