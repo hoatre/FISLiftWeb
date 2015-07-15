@@ -169,7 +169,7 @@ class Factor private () extends MongoRecord[Factor] with StringPk[Factor] {
   object ParentName extends StringField(this, 512)
   object FactorName extends StringField(this, 512)
   object Description extends StringField(this, 512)
-  object Weigth extends DoubleField(this)
+  object Weight extends DoubleField(this)
   object Ordinal extends IntField(this)
   object Status extends StringField(this, 512)
   object Note extends StringField(this, 512)
@@ -192,7 +192,7 @@ class FactorPath private () extends BsonRecord[FactorPath] {
     override def options = Factor.findAll.map(rd => (Full(rd.id.is), rd.FactorName.is) )
   }
 //  object FactorPathId extends StringField(this, 512)
-  object Weigth extends DoubleField(this)
+  object Weight extends DoubleField(this)
 
 }
 

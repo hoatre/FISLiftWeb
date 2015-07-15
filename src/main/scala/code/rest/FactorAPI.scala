@@ -7,7 +7,7 @@ package code.rest
 import java.util.UUID
 
 import code.model._
-import com.mongodb.QueryBuilder
+import com.mongodb.{BasicDBObject, QueryBuilder}
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST._
@@ -86,14 +86,14 @@ object FactorAPI extends RestHelper {
     for(factor <- listDBCuoi){
       val list = factor.FactorOption.value.sortWith(_.Score.toString().toDouble < _.Score.toString().toDouble)
 
-      var minIn = list(0).Score.toString().toDouble * (factor.Weigth.toString().toDouble/100)
+      var minIn = list(0).Score.toString().toDouble * (factor.Weight.toString().toDouble/100)
       for(path <- factor.PathFactor.value){
-        minIn = minIn * (path.Weigth.toString().toDouble/100)
+        minIn = minIn * (path.Weight.toString().toDouble/100)
       }
 
-      var maxIn = list(list.size-1).Score.toString().toDouble * (factor.Weigth.toString().toDouble/100)
+      var maxIn = list(list.size-1).Score.toString().toDouble * (factor.Weight.toString().toDouble/100)
       for(path <- factor.PathFactor.value){
-        maxIn = maxIn * (path.Weigth.toString().toDouble/100)
+        maxIn = maxIn * (path.Weight.toString().toDouble/100)
       }
 
       min = min + minIn
@@ -155,7 +155,7 @@ object FactorAPI extends RestHelper {
           listPathFactor = listPathFactor ::: DBList(0).PathFactor.value
           val factorPath = FactorPath.createRecord
             .FactorPathId(DBList(0).id.toString())
-            .Weigth(DBList(0).Weigth.toString().toDouble)
+            .Weight(DBList(0).Weight.toString().toDouble)
           val x: List[FactorPath] = List(factorPath)
           listPathFactor = listPathFactor ::: x
         }
@@ -171,7 +171,7 @@ object FactorAPI extends RestHelper {
         .Parentid(json.apply("Parentid").toString)
         .ParentName(json.apply("ParentName").toString)
         .FactorName(json.apply("Name").toString)
-        .Weigth(json.apply("Weigth").toString.toDouble)
+        .Weight(json.apply("Weight").toString.toDouble)
         .Ordinal(json.apply("Ordinal").toString.toInt)
         .Status(json.apply("Status").toString)
         .Note(json.apply("Note").toString)
@@ -187,19 +187,92 @@ object FactorAPI extends RestHelper {
 
   }
 
+  def updateWeightInFactor(FactorItem : Factor, Weight : Double) = {
+    FactorItem.update.Weight(Weight).save
+
+    val qryChild = QueryBuilder
+      .start("ModelId").is(FactorItem.ModelId.toString())
+      .and("PathFactor").elemMatch(new BasicDBObject("FactorPathId", FactorItem.id.toString()))
+      .get
+
+    val DBChild = Factor.findAll(qryChild)
+
+
+
+    for(factor <- DBChild){
+      for(i <- 0 to factor.PathFactor.value.size - 1){
+        if(factor.PathFactor.value(i).FactorPathId.equals(FactorItem.id.toString())){
+
+        }
+      }
+    }
+  }
+
   def updateFactor(q : JValue): JValue = {
     val json = q.asInstanceOf[JObject].values
     val qry = QueryBuilder.start("_id").is(json.apply("id").toString).get
-    var DBUpdate = Factor.findAll(qry)
+    val DBUpdate = Factor.findAll(qry)
+
+    //Get path moi theo ParentID
+    var listPathFactor: List[FactorPath] = List()
+    if (json.apply("Parentid").toString != "") {
+      val qry = QueryBuilder.start("_id").is(json.apply("Parentid").toString).get
+      val DBList = Factor.findAll(qry)
+      if (DBList != null) {
+        listPathFactor = listPathFactor ::: DBList(0).PathFactor.value
+        val factorPath = FactorPath.createRecord
+          .FactorPathId(DBList(0).id.toString())
+          .Weight(DBList(0).Weight.toString().toDouble)
+        val x: List[FactorPath] = List(factorPath)
+        listPathFactor = listPathFactor ::: x
+      }
+    }
+    //Updaet factor
+    val saveItem = DBUpdate(0).update
+      .Parentid(json.apply("Parentid").toString)
+      .ParentName(json.apply("ParentName").toString)
+      .FactorName(json.apply("Name").toString)
+      .Weight(json.apply("Weight").toString.toDouble)
+      .Ordinal(json.apply("Ordinal").toString.toInt)
+      .Status(json.apply("Status").toString)
+      .Note(json.apply("Note").toString)
+      .PathFactor(listPathFactor)
+
+
+    //Update factor con chau
 
     val qryChild = QueryBuilder
                         .start("ModelId").is(DBUpdate(0).ModelId.toString())
-                        .and("PathFactor.FactorPathId").exists(DBUpdate(0).id.toString())
+                        .and("PathFactor").elemMatch(new BasicDBObject("FactorPathId", DBUpdate(0).id.toString()))
                         .get
 
-    var DBChildList = Factor.findAll(qryChild)
+    val DBChild = Factor.findAll(qryChild)
 
-    { "SUCCESS" -> " UPDATED " } : JValue
+    for(factor <- DBChild){
+      if(factor.Parentid.toString().equals(json.apply("id").toString)){
+        factor.update.ParentName(json.apply("ParentName").toString)
+      }
+      var listPathFactorchild: List[FactorPath] = List()
+      listPathFactorchild = listPathFactorchild ::: listPathFactor
+      var j :Int=0
+      for( i <- 0 to factor.PathFactor.value.size - 1){
+
+        if(factor.PathFactor.value(i).FactorPathId.toString().equals(json.apply("id").toString)){
+          val newPath : FactorPath = FactorPath.Weight(json.apply("Weight").toString.toDouble)
+                                                .FactorPathId(json.apply("id").toString)
+          listPathFactorchild = listPathFactorchild ::: List(newPath)
+          j=i
+        }
+        if(j!=0&&i>j){
+          listPathFactorchild = listPathFactorchild ::: List(factor.PathFactor.value(i))
+        }
+
+      }
+      factor.update.PathFactor(listPathFactorchild).save
+    }
+
+
+    { "SUCCESS" -> saveItem.save.asJValue } : JValue
 
   }
 
