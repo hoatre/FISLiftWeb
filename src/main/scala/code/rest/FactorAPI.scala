@@ -7,7 +7,7 @@ package code.rest
 import java.util.UUID
 
 import code.model._
-import com.mongodb.{BasicDBObject, QueryBuilder}
+import com.mongodb.{QueryBuilder, BasicDBObject}
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST._
@@ -45,9 +45,24 @@ object FactorAPI extends RestHelper {
 
   def deleteFactor(_id : String): JValue = {
 
-    var req = Factor.delete(("_id" -> _id))
+  var msg = {"ERROR" -> "Can not delete Factor"}  :JValue
 
-    { "SUCCESS" -> " DELETED " } : JValue
+    val qry :QueryBuilder = new QueryBuilder
+    qry.or(QueryBuilder.start("PathFactor").elemMatch(new BasicDBObject("FactorPathId", _id)).get(),
+            QueryBuilder.start("Parentid").is(_id).get()
+        )
+
+//    val qhhh= QueryBuilder.start("_id").is(_id).get
+
+    val db = Factor.findAll(qry.get())
+
+    if(db.size==0) {
+
+      var req = Factor.delete(("_id" -> _id))
+
+      msg ={"SUCCESS" -> "Deleted"} :JValue
+    }
+    msg
 
   }
 

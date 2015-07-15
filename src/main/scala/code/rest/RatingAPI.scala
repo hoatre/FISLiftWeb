@@ -343,11 +343,6 @@ if (list.isInstanceOf[JArray]) {
     //    dbFind = Rating.findAll("$where" -> "function() { return this.rate.status=='AAA'}")
 
 
-
-
-
-
-
 //    listFactorOption =  dbFind(0).codein.value
 
     val JArray(rates) =   (dbFind.map(_.asJValue) \ "codein")
