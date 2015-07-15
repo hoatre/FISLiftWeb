@@ -120,6 +120,8 @@ object ModelInfoAPI extends RestHelper {
     case "modelinfo" :: "getbymodelinfoid" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield getModelInfoByIdJSON(id) : JValue
 
+    case "modelinfo" :: "getbymodelinfoid" ::q:: Nil JsonGet req => getModelInfoByIdJSON(q) : JValue
+
     case "modelinfo" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "modelinfo" :: "update" :: Nil JsonPost json -> request => updateModelInfo(json)
 
