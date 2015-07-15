@@ -4,6 +4,8 @@ import code.model._
 import com.mongodb.QueryBuilder
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
+import net.liftweb.json.JValue
+import net.liftweb.json.JsonAST.{JValue, JObject}
 import net.liftweb.json._
 
 //import net.liftweb.json.JsonAST._
@@ -88,6 +90,36 @@ object GroupsAPI extends RestHelper{
     { "SUSCESS" -> " UPDATED " } : JValue
 
   }
+  def updateGroups(q:JValue):JValue={
+    var json = q.asInstanceOf[JObject]
+
+    val qry = QueryBuilder.start("_id").is(json.values.apply("_id")).get
+
+    var dbFind = Groups.findAll(qry)
+
+    val list = (json \ "group")
+
+    var msg :JValue={"ERROR" -> "I Dont know what happen"} :JValue
+
+    val j = list.children
+    for{
+      JString(note) <- (j \\ "note").toOpt
+      JString(groupname) <- (j \\ "groupname").toOpt
+      JString(status) <- (j \\ "status").toOpt
+
+      item = groupIN.note(Option(status.toString).getOrElse(null))
+        .groupname(Option(groupname.toString).getOrElse(null))
+        .status(Option(note.toString).getOrElse(null))
+
+    }yield {
+
+      val update1 = dbFind(0).update.group(item).save
+      msg = {"SUCCESS" -> update1.asJValue}:JValue
+    }
+
+    msg
+
+  }
 
   serve {
     case "group" :: "insertFreeFormat" :: Nil JsonPost json -> request =>
@@ -106,6 +138,9 @@ object GroupsAPI extends RestHelper{
           JString(note) <- (json \\ "note").toOpt
           JString(groupname) <- (json \\ "groupname").toOpt
       } yield updateGroup(id, status, note, groupname)
+
+    case "group" :: "updates" :: Nil Options _ => {"OK" -> "200"} :JValue
+    case "group" :: "updates" :: Nil JsonPost json -> request =>updateGroups(json)
 
     case "group" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "group" :: "delete" :: Nil JsonPost json -> request =>
