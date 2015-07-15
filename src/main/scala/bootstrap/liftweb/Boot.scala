@@ -87,6 +87,8 @@ class Boot {
 
 //    FactorOptionAPI.init()
 
+    RatingAPI.init()
+
   }
 
 

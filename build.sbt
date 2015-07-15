@@ -31,7 +31,6 @@ libraryDependencies ++= {
     "com.foursquare" %% "rogue-core"          % "2.5.1" intransitive(),
     "com.foursquare" %% "rogue-lift"          % "2.5.1" intransitive(),
     "com.foursquare" %% "rogue-index"         % "2.5.1" intransitive(),
-    "com.foursquare" %% "rogue"               % "1.1.8" intransitive(),
     "org.mongodb" %% "casbah" % "2.8.1"
   )
 }
