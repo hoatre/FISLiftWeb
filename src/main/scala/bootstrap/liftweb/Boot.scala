@@ -89,6 +89,8 @@ class Boot {
 
     RatingAPI.init()
 
+    ScoreResultAPI.init()
+
   }
 
 
