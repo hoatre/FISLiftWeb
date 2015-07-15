@@ -51,6 +51,39 @@ object FactorAPI extends RestHelper {
 
   }
 
+  def deleteOptionFactor(IdFactor : String, IdFactorOption : String): JValue = {
+
+    val qry = QueryBuilder.start("_id").is(IdFactor).get
+    val DBLista = Factor.findAll(qry)
+
+    var factorOptionDelete = FactorOptionIN.FactorOptionId(IdFactorOption)
+
+    val factorOption = DBLista(0).FactorOption.value.dropWhile(ftO => ftO.FactorOptionId.toString().equals(IdFactorOption.toString))
+
+    { "SUCCESS" -> DBLista(0).update.FactorOption(factorOption).save.asJValue } : JValue
+
+  }
+  def updateFactorOption(q : JValue): JValue = {
+    val json = q.asInstanceOf[JObject].values
+    val qry = QueryBuilder.start("_id").is(json.apply("idFactor").toString).get
+    val DBLista = Factor.findAll(qry)
+    var factorOptionUpdate : List[FactorOptionIN] = List()
+    for(i <- 0 to DBLista(0).FactorOption.value.size - 1){
+      if(DBLista(0).FactorOption.value(i).FactorOptionId.toString().equals(json.apply("idFactorOption").toString)){
+        var factorOption : FactorOptionIN = FactorOptionIN.FactorOptionId(json.apply("idFactorOption").toString)
+                                                          .Fatal(json.apply("Fatal").toString)
+                                                          .Description(json.apply("Description").toString)
+                                                          .FactorOptionName(json.apply("FactorOptionName").toString)
+                                                          .Score(json.apply("Score").toString.toDouble)
+                                                          .Status(json.apply("Status").toString)
+        val factorOptionDelete = DBLista(0).FactorOption.value.dropWhile(ftO => ftO.FactorOptionId.toString().equals(json.apply("idFactorOption").toString))
+        factorOptionUpdate = factorOptionDelete ::: List(factorOption)
+      }
+    }
+
+    { "SUCCESS" -> DBLista(0).update.FactorOption(factorOptionUpdate).save.asJValue } : JValue
+
+  }
 //  def insertFactor(parentid : String, parentname : String, name : String, description : String, weigth : String, status : String): JValue = {
 //
 //    val Factorin = factorIN.createRecord.parentid(parentid).parentname(parentname).name(name).description(description).weigth(weigth).status(status)
@@ -100,7 +133,7 @@ object FactorAPI extends RestHelper {
       max = max + maxIn
     }
 
-    println("min : " + min + " - max : " + max)
+//    println("min : " + min + " - max : " + max)
 
     List(min, max)
 
@@ -187,27 +220,6 @@ object FactorAPI extends RestHelper {
 
   }
 
-  def updateWeightInFactor(FactorItem : Factor, Weight : Double) = {
-    FactorItem.update.Weight(Weight).save
-
-    val qryChild = QueryBuilder
-      .start("ModelId").is(FactorItem.ModelId.toString())
-      .and("PathFactor").elemMatch(new BasicDBObject("FactorPathId", FactorItem.id.toString()))
-      .get
-
-    val DBChild = Factor.findAll(qryChild)
-
-
-
-    for(factor <- DBChild){
-      for(i <- 0 to factor.PathFactor.value.size - 1){
-        if(factor.PathFactor.value(i).FactorPathId.equals(FactorItem.id.toString())){
-
-        }
-      }
-    }
-  }
-
   def updateFactor(q : JValue): JValue = {
     val json = q.asInstanceOf[JObject].values
     val qry = QueryBuilder.start("_id").is(json.apply("id").toString).get
@@ -291,11 +303,20 @@ object FactorAPI extends RestHelper {
     case "factor" :: "delete" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield  deleteFactor(id)
 
+    case "factor" :: "deleteOption" :: Nil Options _ => {"OK" -> "200"} :JValue
+    case "factor" :: "deleteOption" :: Nil JsonPost json -> request =>
+      for{JString(idFactor) <- (json \\ "idFactor").toOpt
+          JString(idFactorOption) <- (json \\ "idFactorOption").toOpt
+      } yield deleteOptionFactor(idFactor, idFactorOption)
+
     case "factor" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "factor" :: "insert" :: Nil JsonPost json -> request =>insertFactor(json)
 
     case "factor" :: "insertOption" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "factor" :: "insertOption" :: Nil JsonPost json -> request =>insertFactorOption(json)
+
+    case "factor" :: "updateOption" :: Nil Options _ => {"OK" -> "200"} :JValue
+    case "factor" :: "updateOption" :: Nil JsonPost json -> request =>updateFactorOption(json)
 
     case "test" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "test" :: Nil JsonPost json -> request =>test(json)
