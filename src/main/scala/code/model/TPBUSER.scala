@@ -191,6 +191,7 @@ class FactorPath private () extends BsonRecord[FactorPath] {
   object FactorPathId extends StringRefField(this, Factor, 512){
     override def options = Factor.findAll.map(rd => (Full(rd.id.is), rd.FactorName.is) )
   }
+//  object FactorPathId extends StringField(this, 512)
   object Weigth extends DoubleField(this)
 
 }
@@ -199,6 +200,7 @@ object FactorPath extends FactorPath with BsonMetaRecord[FactorPath]
 
 class FactorOptionIN private () extends BsonRecord[FactorOptionIN] {
   def meta = FactorOptionIN
+  object FactorOptionId extends StringField(this, 50)
   object FactorOptionName extends StringField(this, 512)
   object Description extends StringField(this, 512)
   object Score extends DoubleField(this)

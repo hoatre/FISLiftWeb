@@ -95,9 +95,11 @@ object ModelInfoAPI extends RestHelper {
 
   def range(id : String) : JValue = {
 
-    var range = code.rest.FactorAPI.ScoringRange(id)
+    val range = code.rest.FactorAPI.ScoringRange(id)
 
-    { "SUCCESS" -> range } : JValue
+    val json = ("min" -> range(0).toString) ~ ("max" -> range(1).toString)
+
+    { "SUCCESS" -> json } : JValue
   }
 
   def rangeAndUpdate(id : String) : JValue = {

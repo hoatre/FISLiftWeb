@@ -68,9 +68,8 @@ object FactorAPI extends RestHelper {
   }
 
   def ScoringRange (id : String) : List[Double] = {
-//    val json = q.asInstanceOf[JObject].values
-    val qry = QueryBuilder.start("ModelId").is(id)
-                          .get
+
+    val qry = QueryBuilder.start("ModelId").is(id).get
 
     val DBList = Factor.findAll(qry)
 
@@ -122,6 +121,7 @@ object FactorAPI extends RestHelper {
       val DBList = Factor.findAll(qry)
 
       val factorOption = FactorOptionIN
+                          .FactorOptionId(UUID.randomUUID().toString)
                           .Description(json.apply("Description").toString)
                           .FactorOptionName(json.apply("FactorOptionName").toString)
                           .Fatal(json.apply("Fatal").toString)
@@ -187,15 +187,17 @@ object FactorAPI extends RestHelper {
 
   }
 
-  def updateFactor(id : String, parentid : String, parentname : String, name : String, description : String, weigth : String, status : String): JValue = {
+  def updateFactor(q : JValue): JValue = {
+    val json = q.asInstanceOf[JObject].values
+    val qry = QueryBuilder.start("_id").is(json.apply("id").toString).get
+    var DBUpdate = Factor.findAll(qry)
 
-    Factor.update(("_id" -> id),
-      ("$set" -> ("parentid" -> parentid)
-        ~ ("parentname" -> parentname)
-        ~ ("name" -> name)
-        ~ ("weigth" -> weigth)
-        ~ ("description" -> description)
-        ~ ("status" -> status)))
+    val qryChild = QueryBuilder
+                        .start("ModelId").is(DBUpdate(0).ModelId.toString())
+                        .and("PathFactor.FactorPathId").exists(DBUpdate(0).id.toString())
+                        .get
+
+    var DBChildList = Factor.findAll(qryChild)
 
     { "SUCCESS" -> " UPDATED " } : JValue
 
@@ -210,15 +212,7 @@ object FactorAPI extends RestHelper {
       for{JString(id) <- (json \\ "id").toOpt} yield getFactorByIdJSON(id) : JValue
 
     case "factor" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "factor" :: "update" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt
-          JString(parentid) <- (json \\ "parentid").toOpt
-          JString(parentname) <- (json \\ "parentname").toOpt
-          JString(weigth) <- (json \\ "weigth").toOpt
-          JString(description) <- (json \\ "description").toOpt
-          JString(name) <- (json \\ "name").toOpt
-          JString(status) <- (json \\ "status").toOpt
-      } yield updateFactor(id, parentid, parentname, weigth, description, name, status)
+    case "factor" :: "update" :: Nil JsonPost json -> request => updateFactor(json)
 
     case "factor" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "factor" :: "delete" :: Nil JsonPost json -> request =>
