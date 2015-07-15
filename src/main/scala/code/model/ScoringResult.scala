@@ -17,10 +17,9 @@ class ScoringResult private () extends MongoRecord[ScoringResult] with StringPk[
     override def options = ModelInfo.findAll.map(rd => (Full(rd.id.is), rd.name.is) )
   }
   object Timestamp extends LongField
-  object ResultIN extends BsonRecordListField(this,resultIN)
   object Scoring extends DoubleField
   object RatingCode extends StringField(this, 1024)
-
+  object ResultIN extends BsonRecordListField(this,resultIN)
 }
 
 object ScoringResult extends ScoringResult with MongoMetaRecord[ScoringResult] {
