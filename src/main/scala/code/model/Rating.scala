@@ -16,7 +16,7 @@ class Rating private () extends MongoRecord[Rating] with StringPk[Rating] {
   object modelid extends StringRefField(this, ModelInfo, 512){
     override def options = ModelInfo.findAll.map(rd => (Full(rd.id.is), rd.name.is) )
   }
-  object modelidname extends StringField(this,1024)
+  object modelname extends StringField(this,1024)
   object codein extends BsonRecordListField(this,codeIN)
 
 }

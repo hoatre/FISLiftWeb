@@ -10,7 +10,7 @@ import net.liftweb.json.JsonAST.JField
 import net.liftweb.json.JsonAST.JString
 import net.liftweb.json.JsonAST.JValue
 
-import com.mongodb.{BasicDBObjectBuilder, QueryBuilder}
+import com.mongodb.{BasicDBObject, BasicDBObjectBuilder, QueryBuilder}
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
 import net.liftweb.http.{S, LiftRules}
@@ -47,6 +47,8 @@ object RatingAPI extends RestHelper {
       case "rating" :: "update" :: Nil JsonPost json-> request => update(json)
       case "rating" :: "delete" :: Nil JsonPost json-> request => delete(json)
       case "rating" :: "getmodelid" :: q :: Nil JsonGet req => getbymodelid(q)
+
+      case "rating" :: "getcode" :: q :: p:: Nil JsonGet req => getbycodelid(q,p)
       case "rating" :: "getall" :: Nil JsonGet req => getall
 
       case "rating" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
@@ -68,6 +70,43 @@ object RatingAPI extends RestHelper {
     if(db.size>0) {
 
     msg = { "SUCCESS" -> db.map(_.asJValue): JValue}:JValue
+
+    }
+
+    msg
+  }
+
+  def getbycodelid(q:String,p:String): JValue={
+    val qry = QueryBuilder.start("modelid").is(q).put("codein").elemMatch(new BasicDBObject("code", p)).get
+
+    val db = Rating.findAll(qry)
+
+    var msg : JValue= {"ERROR" -> "Not existed"} :JValue
+
+    if(db.size>0) {
+
+      val db1 = db(0).asJValue
+      val json = (db1\"codein")
+
+      val JArray(rates) = json
+      rates collect { case rate: JObject => rate } foreach myOperation
+      def myOperation(rate: JObject) = {
+        val j = rate.asInstanceOf[JObject].values
+
+        val item = codeIN.code(j.apply("code").toString).status(j.apply("status").toString)
+          .statusname(j.apply("statusname").toString).scorefrom(j.apply("scorefrom").toString.toDouble).scoreto(j.apply("scoreto").toString.toDouble)
+
+//        var listb: List[codeIN] = List(item)
+//
+//        lista = lista ::: listb
+        val db2 = Rating.modelid(db1.values.apply("modelid").toString).modelname(Option(db1.values.apply("modelname").toString).getOrElse(""))
+        .codein(List(item))
+
+        msg = { "SUCCESS" -> db2.asJValue }:JValue
+      }
+
+
+
 
     }
 
