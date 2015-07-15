@@ -47,6 +47,7 @@ object RatingAPI extends RestHelper {
       case "rating" :: "update" :: Nil JsonPost json-> request => update(json)
       case "rating" :: "delete" :: Nil JsonPost json-> request => delete(json)
       case "rating" :: "getmodelid" :: q :: Nil JsonGet req => getbymodelid(q)
+      case "rating" :: "getall" :: Nil JsonGet req => getall
 
       case "rating" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
       case "rating" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
@@ -71,6 +72,20 @@ object RatingAPI extends RestHelper {
     }
 
     msg
+  }
+  def getall :JValue={
+    val db = Rating.findAll
+
+    var msg : JValue= {"ERROR" -> "Not existed"} :JValue
+
+    if(db.size>0) {
+
+      msg = { "SUCCESS" -> db.map(_.asJValue): JValue}:JValue
+
+    }
+
+    msg
+
   }
 
   def insert(q: JValue): JValue = {
