@@ -45,7 +45,7 @@ object FactorAPI extends RestHelper {
 
   def deleteFactor(_id : String): JValue = {
 
-    Factor.delete(("_id" -> _id))
+    var req = Factor.delete(("_id" -> _id))
 
     { "SUCCESS" -> " DELETED " } : JValue
 
@@ -61,15 +61,15 @@ object FactorAPI extends RestHelper {
 
   def test(q : JValue): JValue = {
 
-    ScoringRange(q)
+//    ScoringRange(q)
 
     "test" -> "test" : JValue
 
   }
 
-  def ScoringRange (q : JValue) : List[Double] = {
-    val json = q.asInstanceOf[JObject].values
-    val qry = QueryBuilder.start("ModelId").is(json.apply("ModelId").toString)
+  def ScoringRange (id : String) : List[Double] = {
+//    val json = q.asInstanceOf[JObject].values
+    val qry = QueryBuilder.start("ModelId").is(id)
                           .get
 
     val DBList = Factor.findAll(qry)
@@ -104,6 +104,7 @@ object FactorAPI extends RestHelper {
     println("min : " + min + " - max : " + max)
 
     List(min, max)
+
   }
 
   def UpdateRangeModel (range : List[Double], ModelId : String) = {

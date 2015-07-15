@@ -188,7 +188,9 @@ object Factor extends Factor with MongoMetaRecord[Factor] {
 
 class FactorPath private () extends BsonRecord[FactorPath] {
   def meta = FactorPath
-  object FactorPathId extends StringField(this, 512)
+  object FactorPathId extends StringRefField(this, Factor, 512){
+    override def options = Factor.findAll.map(rd => (Full(rd.id.is), rd.FactorName.is) )
+  }
   object Weigth extends DoubleField(this)
 
 }
@@ -253,14 +255,5 @@ class ModelInfo private () extends MongoRecord[ModelInfo] with StringPk[ModelInf
 object ModelInfo extends ModelInfo with MongoMetaRecord[ModelInfo] {
   override def collectionName = "modelinfo"
 }
-
-class modelinfoIN private () extends BsonRecord[modelinfoIN] {
-  def meta = modelinfoIN
-  object name extends StringField(this, 1024)
-  object description extends StringField(this, 1024)
-  object status extends StringField(this, 1024)
-}
-
-object modelinfoIN extends modelinfoIN with BsonMetaRecord[modelinfoIN]
 
 //---------------------------------------------------------------------------------

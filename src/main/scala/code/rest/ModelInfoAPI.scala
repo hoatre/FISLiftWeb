@@ -53,28 +53,63 @@ object ModelInfoAPI extends RestHelper {
 
   }
 
-  def insertModelInfo(name : String, description : String, status : String): JValue = {
+  def insertModelInfo(q : JValue): JValue = {
+    val json = q.asInstanceOf[JObject].values
 
-    val ModelInfoin = modelinfoIN.createRecord.name(name).description(description).status(status)
-
-
-
-//
-    { "SUCCESS" -> "sdfsd" } : JValue
-
-  }
-
-  def updateModelInfo(id : String, name : String, description : String, status : String): JValue = {
-
-    ModelInfo.update(("_id" -> id),
-      ("$set" -> ("modelinfo.name" -> name)
-        ~ ("modelinfo.description" -> description)
-        ~ ("modelinfo.status" -> status)))
-
-    { "SUCCESS" -> " UPDATED " } : JValue
+    { "SUCCESS" -> ModelInfo.createRecord.id(UUID.randomUUID().toString)
+                            .name(json.apply("name").toString)
+                            .description(json.apply("description").toString)
+                            .status(json.apply("status").toString)
+                            .save.asJValue
+    } : JValue
 
   }
 
+  def updateModelInfo(q : JValue): JValue = {
+    val json = q.asInstanceOf[JObject].values
+
+    val qry = QueryBuilder.start("_id").is(json.apply("id").toString)
+                          .get
+
+    var update = ModelInfo.findAll(qry)
+
+    { "SUCCESS" -> update(0).update
+                            .name(json.apply("name").toString)
+                            .description(json.apply("description").toString)
+                            .status(json.apply("status").toString)
+                            .save.asJValue
+    } : JValue
+
+  }
+
+  def viewModelInfo(id : String): JValue = {
+
+    val qry = QueryBuilder.start("ModelId").is(id).get
+
+    var DBList = Factor.findAll(qry)
+
+    { "SUCCESS" -> DBList.map(_.asJValue)
+    } : JValue
+
+  }
+
+  def range(id : String) : JValue = {
+
+    var range = code.rest.FactorAPI.ScoringRange(id)
+
+    { "SUCCESS" -> range } : JValue
+  }
+
+  def rangeAndUpdate(id : String) : JValue = {
+
+    var range = code.rest.FactorAPI.ScoringRange(id)
+
+    val qry = QueryBuilder.start("_id").is(id).get
+
+    var DBList = ModelInfo.findAll(qry)
+
+    { "SUCCESS" -> DBList(0).update.min(range(0)).max(range(1)).save.asJValue } : JValue
+  }
 
   serve {
     case "modelinfo" :: "getall"  :: Nil JsonGet req => getModelInfoJSON() : JValue
@@ -84,12 +119,7 @@ object ModelInfoAPI extends RestHelper {
       for{JString(id) <- (json \\ "id").toOpt} yield getModelInfoByIdJSON(id) : JValue
 
     case "modelinfo" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "modelinfo" :: "update" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt
-          JString(description) <- (json \\ "description").toOpt
-          JString(status) <- (json \\ "status").toOpt
-          JString(name) <- (json \\ "name").toOpt
-      } yield updateModelInfo(id, description, name, status)
+    case "modelinfo" :: "update" :: Nil JsonPost json -> request => updateModelInfo(json)
 
     case "modelinfo" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "modelinfo" :: "delete" :: Nil JsonPost json -> request =>
@@ -98,11 +128,19 @@ object ModelInfoAPI extends RestHelper {
     //    case "modelinfo" :: "delete" :: id :: Nil JsonDelete req => deleteModelInfo(id)
 
     case "modelinfo" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "modelinfo" :: "insert" :: Nil JsonPost json -> request =>
-      for{JString(description) <- (json \\ "description").toOpt
-          JString(status) <- (json \\ "status").toOpt
-          JString(name) <- (json \\ "name").toOpt
-      } yield insertModelInfo(description, name, status)
+    case "modelinfo" :: "insert" :: Nil JsonPost json -> request => insertModelInfo(json)
+
+    case "modelinfo" :: "view" :: Nil Options _ => {"OK" -> "200"} :JValue
+    case "modelinfo" :: "view" :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "id").toOpt} yield viewModelInfo(id)
+
+    case "modelinfo" :: "range" :: Nil Options _ => {"OK" -> "200"} :JValue
+    case "modelinfo" :: "range" :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "id").toOpt} yield range(id)
+
+    case "modelinfo" :: "rangeandupdate" :: Nil Options _ => {"OK" -> "200"} :JValue
+    case "modelinfo" :: "rangeandupdate" :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "id").toOpt} yield rangeAndUpdate(id)
   }
 
 }
