@@ -13,6 +13,7 @@ class Rating private () extends MongoRecord[Rating] with StringPk[Rating] {
 
   // An embedded document:
   object moduleid extends StringField(this,1024)
+  object modulename extends StringField(this,1024)
   object codein extends BsonRecordListField(this,codeIN)
 
 }
@@ -27,6 +28,7 @@ class codeIN private () extends BsonRecord[codeIN] {
   object statusname extends StringField(this, 1024)
   object scorefrom extends DoubleField(this, 10)
   object scoreto extends DoubleField(this, 10)
+  object note extends StringField(this,1024)
 }
 
 object codeIN extends codeIN with BsonMetaRecord[codeIN]

@@ -4,19 +4,23 @@ import java.util.UUID
 
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
+import net.liftweb.json._
+import net.liftweb.json.JsonAST.JArray
+import net.liftweb.json.JsonAST.JDouble
+import net.liftweb.json.JsonAST.JField
+import net.liftweb.json.JsonAST.JString
 import net.liftweb.json.JsonAST.JValue
 
 import com.mongodb.{BasicDBObjectBuilder, QueryBuilder}
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
 import net.liftweb.http.{S, LiftRules}
+import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
 import code.snippet._
 import code.model.{codeIN, Rating, Users}
 import net.liftweb.json.Printer._
-import net.liftweb.json.JObject
-import net.liftweb.json.Extraction
 import net.liftweb.mongodb.JObjectParser
 import net.liftweb.http.js.JsExp
 import net.liftweb.json.JsonDSL.seq2jvalue
@@ -38,15 +42,13 @@ object RatingAPI extends RestHelper {
 
     serve {
 
-
-
       case "rating" :: "insert" :: Nil JsonPost json-> request => insert(json)
+      case "rating" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
       case "rating" :: "update" :: Nil JsonPost json-> request => update(json)
+      case "rating" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
       case "rating" :: "delete" :: Nil JsonPost json-> request => delete(json)
+      case "rating" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
       case "rating" :: "getmoduleid" :: q :: Nil JsonGet req => getbymoduleid(q)
-
-
-
 
     }
 
@@ -90,7 +92,7 @@ val qry = QueryBuilder.start("moduleid").is(moduleid).get
     if(DBquery.size ==0){
     var i = 0
     var lista : List[codeIN] =List()
-    val list = (json \ "rate")
+    val list = (json \ "codein")
 
 
 if (list.isInstanceOf[JArray]) {
