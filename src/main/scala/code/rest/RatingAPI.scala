@@ -4,19 +4,22 @@ import java.util.UUID
 
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
+import net.liftweb.json._
+import net.liftweb.json.JsonAST.JArray
+import net.liftweb.json.JsonAST.JField
+import net.liftweb.json.JsonAST.JString
 import net.liftweb.json.JsonAST.JValue
 
 import com.mongodb.{BasicDBObjectBuilder, QueryBuilder}
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
 import net.liftweb.http.{S, LiftRules}
+import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
 import code.snippet._
 import code.model.{codeIN, Rating, Users}
 import net.liftweb.json.Printer._
-import net.liftweb.json.JObject
-import net.liftweb.json.Extraction
 import net.liftweb.mongodb.JObjectParser
 import net.liftweb.http.js.JsExp
 import net.liftweb.json.JsonDSL.seq2jvalue
@@ -43,15 +46,19 @@ object RatingAPI extends RestHelper {
       case "rating" :: "insert" :: Nil JsonPost json-> request => insert(json)
       case "rating" :: "update" :: Nil JsonPost json-> request => update(json)
       case "rating" :: "delete" :: Nil JsonPost json-> request => delete(json)
-      case "rating" :: "getmoduleid" :: q :: Nil JsonGet req => getbymoduleid(q)
+      case "rating" :: "getmodelid" :: q :: Nil JsonGet req => getbymodelid(q)
+
+      case "rating" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
+      case "rating" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
+      case "rating" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
 
 
 
 
     }
 
-  def getbymoduleid(q:String): JValue={
-    val qry = QueryBuilder.start("moduleid").is(q).get
+  def getbymodelid(q:String): JValue={
+    val qry = QueryBuilder.start("modelid").is(q).get
 
     val db = Rating.findAll(qry)
 
@@ -74,7 +81,7 @@ object RatingAPI extends RestHelper {
 
 
 
-    val moduleid = json.values.apply("moduleid").toString()
+    val modelid = json.values.apply("modelid").toString()
 //    val rate = json.values.apply("rate").toString.toList
 //    val a1 = codeIN.createRecord.code(json.values.apply("rate").apply("code").toString)
 //
@@ -82,7 +89,7 @@ object RatingAPI extends RestHelper {
 
 //    val b :List(Code)
 //    println(rate)
-val qry = QueryBuilder.start("moduleid").is(moduleid).get
+val qry = QueryBuilder.start("modelid").is(modelid).get
 
     val DBquery = Rating.findAll(qry)
     var c : JValue = {"ERROR" -> "Check again"} :JValue
@@ -130,7 +137,7 @@ if (list.isInstanceOf[JArray]) {
 
 
 
-      val d = Rating.createRecord.id(UUID.randomUUID().toString()).moduleid(moduleid).codein(lista).save
+      val d = Rating.createRecord.id(UUID.randomUUID().toString()).modelid(modelid).codein(lista).save
 
       c = d.asJValue
     }else{
@@ -231,9 +238,7 @@ if (list.isInstanceOf[JArray]) {
     def getlist(rate: JObject) = {
       var listb: List[codeIN] = List()
       val j = rate.asInstanceOf[JObject].values
-      if(j.apply("code").toString.equals(json.values.apply("code").toString)){
-
-      }else{
+      if(!j.apply("code").toString.equals(json.values.apply("code").toString)){
         val item = codeIN.createRecord.code(j.apply("code").toString).status(j.apply("status").toString)
           .statusname(j.apply("statusname").toString).scorefrom(j.apply("scorefrom").toString.toDouble)
           .scoreto(j.apply("scoreto").toString.toDouble)

@@ -1,7 +1,8 @@
 package code.model
 
+import net.liftweb.common.Full
 import net.liftweb.mongodb.record.{BsonMetaRecord, BsonRecord, MongoMetaRecord, MongoRecord}
-import net.liftweb.mongodb.record.field.{BsonRecordListField, BsonRecordField, StringPk}
+import net.liftweb.mongodb.record.field.{StringRefField, BsonRecordListField, BsonRecordField, StringPk}
 import net.liftweb.record.field.{DoubleField, StringField}
 
 /**
@@ -12,8 +13,10 @@ class Rating private () extends MongoRecord[Rating] with StringPk[Rating] {
   override def meta = Rating
 
   // An embedded document:
-  object moduleid extends StringField(this,1024)
-  object modulename extends StringField(this,1024)
+  object modelid extends StringRefField(this, ModelInfo, 512){
+    override def options = ModelInfo.findAll.map(rd => (Full(rd.id.is), rd.name.is) )
+  }
+  object modelidname extends StringField(this,1024)
   object codein extends BsonRecordListField(this,codeIN)
 
 }
