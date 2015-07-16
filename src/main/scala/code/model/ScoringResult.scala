@@ -19,6 +19,7 @@ class ScoringResult private () extends MongoRecord[ScoringResult] with StringPk[
   object Timestamp extends LongField(this)
   object Scoring extends DoubleField(this)
   object RatingCode extends StringField(this, 1024)
+  object RatingStatus extends StringField(this, 1024)
   object ResultIN extends BsonRecordListField(this,resultIN)
 }
 
