@@ -46,10 +46,19 @@ object ModelInfoAPI extends RestHelper {
   }
 
   def deleteModelInfo(_id : String): JValue = {
+    val qry = QueryBuilder.start("ModelId").is(_id)
+      .get
+    val DBListCheck = Factor.findAll(qry)
+    if(DBListCheck.size == 0) {
+      ModelInfo.delete(("_id" -> _id))
 
-    ModelInfo.delete(("_id" -> _id))
-
-    { "SUCCESS" -> " DELETED " } : JValue
+      {
+        "SUCCESS" -> " DELETED "
+      }: JValue
+    }else
+      {
+        "ERROR" -> " Factor is exixts "
+      }: JValue
 
   }
 
@@ -110,7 +119,7 @@ object ModelInfoAPI extends RestHelper {
 
     var DBList = ModelInfo.findAll(qry)
 
-    { "SUCCESS" -> DBList(0).update.min(range(0)).max(range(1)).save.asJValue } : JValue
+    { "SUCCESS" -> DBList(0).update.min(range(0).toDouble).max(range(1).toDouble).save.asJValue } : JValue
   }
 
   serve {
