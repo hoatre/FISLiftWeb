@@ -133,7 +133,7 @@ object FactorAPI extends RestHelper {
 
   }
 
-  def ScoringRange(id: String): List[Double] = {
+  def ScoringRange(id: String): List[String] = {
 
     val qry = QueryBuilder.start("ModelId").is(id).get
 
@@ -168,7 +168,7 @@ object FactorAPI extends RestHelper {
 
     //    println("min : " + min + " - max : " + max)
 
-    List(min, max)
+    List(f"$min%1.2f", f"$max%1.2f")
 
   }
 
