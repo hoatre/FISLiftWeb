@@ -89,15 +89,17 @@ object FactorAPI extends RestHelper {
   def deleteOptionFactor(IdFactor: String, IdFactorOption: String): JValue = {
 
     val qry = QueryBuilder.start("_id").is(IdFactor).get
-    val DBLista = Factor.findAll(qry)
-
-    val factorOptionDelete = FactorOptionIN.FactorOptionId(IdFactorOption)
-
-    val factorOption = DBLista(0).FactorOption.value.dropWhile(ftO => ftO.FactorOptionId.toString().equals(IdFactorOption.toString))
-
-    {
-      "SUCCESS" -> DBLista(0).update.FactorOption(factorOption).save.asJValue
-    }: JValue
+    val DBListOp = Factor.findAll(qry)
+    val size = DBListOp(0).FactorOption.value.size
+    val factorOption = DBListOp(0).FactorOption.value.filterNot(ftO => ftO.FactorOptionId.toString().equals(IdFactorOption.toString()))
+    if(size == factorOption.size)
+      {
+        "ERROR" -> "DELETE ERROR"
+      }: JValue
+    else
+      {
+        "SUCCESS" -> DBListOp(0).update.FactorOption(factorOption).save.asJValue
+      }: JValue
 
   }
 
@@ -189,7 +191,7 @@ object FactorAPI extends RestHelper {
   def UpdateRangeModel(range: List[Double], ModelId: String) = {
     val qry = QueryBuilder.start("ModelId").is(ModelId).get
     val DBList = ModelInfo.findAll(qry)
-
+//    ModelInfo.
     DBList(0).update.min(range(0)).max(range(1)).save
   }
 
