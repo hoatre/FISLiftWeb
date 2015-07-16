@@ -1,3 +1,9 @@
+//import code.rest.FactorAPI._
+//import net.liftweb.http.LiftRules
+//import net.liftweb.http.rest.RestHelper
+//import net.liftweb.http.rest.RestHelper.->
+//import net.liftweb.http.rest.RestHelper.Options
+
 //package code.rest
 //
 ///**
@@ -114,3 +120,77 @@
 //  }
 //
 //}
+
+package code.rest
+import code.model._
+import com.mongodb.{QueryBuilder, BasicDBObject}
+import net.liftweb.http.LiftRules
+import net.liftweb.http.rest.RestHelper
+import net.liftweb.json.JsonAST._
+import net.liftweb.mongodb.BsonDSL._
+import net.liftweb.util.Helpers._
+
+object FactorOptionAPI extends RestHelper {
+
+
+  def init(): Unit = {
+    LiftRules.statelessDispatch.append(FactorOptionAPI)
+  }
+
+
+  serve {
+    //  case "factoroption" :: "getall" :: Nil JsonGet req => getFactorJSON(): JValue
+
+    case "factoroption" :: "getbymodelid" :: Nil Options _ => {
+      "OK" -> "200"
+    }: JValue
+    case "factoroption" :: "getbymodelid" :: Nil JsonPost json -> request => searchFactorForOption(json): JValue
+
+  }
+
+  def searchFactorForOption(q: JValue): JValue = {
+
+    val json = q.asInstanceOf[JObject]
+
+    val modelid = json.values.apply("modelid").toString
+
+    val dbFind = Factor.findAll(QueryBuilder.start("ModelId").is(modelid).get)
+    var lista : List[String] = List()
+
+    var i = 0
+   for( i <- 0 to dbFind.size -1){
+
+     for {
+       JString(parent) <- (dbFind(i).asJValue \ "Parentid").toOpt
+       item = parent.toString
+     } yield {
+       val listb: List[String] = List(item)
+
+       lista = lista ::: listb
+
+     }
+
+    }
+    val dbin = QueryBuilder.start("ModelId").is(modelid).and("_id").notIn(lista.toArray).get
+
+    val db = Factor.findAll(dbin)
+
+
+    var msg = {
+      "ERROR" -> "Not found"
+    }: JValue
+
+    if (db.size > 0) {
+
+      msg = {
+        "SUCCESS" -> db.map((_.asJValue))
+      }: JValue
+    } else {
+      msg = {
+        "ERROR" -> "No Record"
+      }: JValue
+    }
+    msg
+
+  }
+}
