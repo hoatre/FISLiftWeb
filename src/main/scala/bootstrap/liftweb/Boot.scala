@@ -91,6 +91,8 @@ class Boot {
 
     ScoreResultAPI.init()
 
+    FactorOptionAPI.init()
+
   }
 
 
