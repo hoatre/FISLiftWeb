@@ -63,32 +63,40 @@ object ModelInfoAPI extends RestHelper {
   }
 
   def insertModelInfo(q : JValue): JValue = {
-    val json = q.asInstanceOf[JObject].values
+    val mess = code.common.Message.CheckNullReturnMess(q, List("name", "description", "status"))
+    if(mess.equals("OK")) {
+      val json = q.asInstanceOf[JObject].values
 
-    { "SUCCESS" -> ModelInfo.createRecord.id(UUID.randomUUID().toString)
-                            .name(json.apply("name").toString)
-                            .description(json.apply("description").toString)
-                            .status(json.apply("status").toString)
-                            .save.asJValue
-    } : JValue
-
+      {
+        "SUCCESS" -> ModelInfo.createRecord.id(UUID.randomUUID().toString)
+          .name(json.apply("name").toString)
+          .description(json.apply("description").toString)
+          .status(json.apply("status").toString)
+          .save.asJValue
+      }: JValue
+    }else
+      return {"ERROR" -> mess} :JValue
   }
 
   def updateModelInfo(q : JValue): JValue = {
-    val json = q.asInstanceOf[JObject].values
+    val mess = code.common.Message.CheckNullReturnMess(q, List("id", "name", "description", "status"))
+    if(mess.equals("OK")) {
+      val json = q.asInstanceOf[JObject].values
 
-    val qry = QueryBuilder.start("_id").is(json.apply("id").toString)
-                          .get
+      val qry = QueryBuilder.start("_id").is(json.apply("id").toString)
+        .get
 
-    var update = ModelInfo.findAll(qry)
+      var update = ModelInfo.findAll(qry)
 
-    { "SUCCESS" -> update(0).update
-                            .name(json.apply("name").toString)
-                            .description(json.apply("description").toString)
-                            .status(json.apply("status").toString)
-                            .save.asJValue
-    } : JValue
-
+      {
+        "SUCCESS" -> update(0).update
+          .name(json.apply("name").toString)
+          .description(json.apply("description").toString)
+          .status(json.apply("status").toString)
+          .save.asJValue
+      }: JValue
+    }else
+      return{"ERROR" -> mess} : JValue
   }
 
   def viewModelInfo(id : String): JValue = {
@@ -97,8 +105,12 @@ object ModelInfoAPI extends RestHelper {
 
     var DBList = Factor.findAll(qry)
 
-    { "SUCCESS" -> DBList.map(_.asJValue)
-    } : JValue
+    if(DBList.isEmpty)
+      "ERROR" -> "ModelInfo not found" : JValue
+    else
+      {
+        "ModelInfosList" -> DBList.map(_.asJValue)
+      } : JValue
 
   }
 
