@@ -93,7 +93,7 @@ object ScoreResultAPI extends RestHelper{
 //        lista = lista ::: listb
       }
 //
-      msg ={("Score"-> scoreresult)~("Rating" -> "Not existed")} :JValue
+      msg ={("Score"-> scoreresult)~("Rating" -> "Not existed")~("Status" -> "Not existed")} :JValue
       val qry = QueryBuilder.start("modelid").is(jsonmap.values.apply("modelid").toString).get
 
       val DBquery = Rating.findAll(qry)
@@ -108,7 +108,7 @@ object ScoreResultAPI extends RestHelper{
               val j = rate.asInstanceOf[JObject].values
               if (j.apply("scorefrom").toString.toDouble < scoreresult && scoreresult < j.apply("scoreto").toString.toDouble) {
 
-                msg ={("Score"-> scoreresult)~("Rating" -> j.apply("status").toString)} :JValue
+                msg ={("Score"-> f"$scoreresult%1.2f")~("Rating" -> j.apply("code").toString)~("Status" -> j.apply("status").toString)} :JValue
               }
 
 
