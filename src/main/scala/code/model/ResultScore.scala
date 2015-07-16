@@ -27,7 +27,7 @@ object ResultScore extends ResultScore with MongoMetaRecord[ResultScore] {
 class reultIN private () extends BsonRecord[reultIN] {
   def meta = reultIN
   object factorid extends StringField(this, 1024)
-  object factoopid extends StringField(this, 1024)
+  object factoroptionid extends StringField(this, 1024)
   object factorname extends StringField(this, 1024)
   object score extends DoubleField(this, 10)
 }
