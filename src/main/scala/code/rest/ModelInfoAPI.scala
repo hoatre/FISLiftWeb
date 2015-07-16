@@ -27,7 +27,7 @@ object ModelInfoAPI extends RestHelper {
     if(DBList.isEmpty)
       "ERROR" -> "ModelInfo not found" : JValue
     else
-      {"ModelInfosList" -> DBList.map(_.asJValue)} : JValue
+      {"SUCCESS" -> DBList.map(_.asJValue)} : JValue
 
   }
 
