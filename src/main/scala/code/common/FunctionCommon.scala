@@ -5,7 +5,7 @@ package code.common
  */
 object FunctionCommon {
   def Insert[A](list : Map[String, Any], db : A) : Boolean = {
-    db
+
 
     true
   }

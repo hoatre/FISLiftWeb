@@ -45,6 +45,20 @@ object FactorAPI extends RestHelper {
 
   }
 
+  def getFactorOptionByIdJSON(factorId: String, factorOptionId: String): JValue = {
+
+    val qry = QueryBuilder.start("_id").is(factorId).get
+
+    val DBList = Factor.findAll(qry)
+
+    if (DBList(0).FactorOption.value.isEmpty)
+      "ERROR" -> "FactorOption not found": JValue
+    else {
+      "FactorsOptionItem" -> DBList(0).FactorOption.value.find(fo => fo.FactorOptionId.toString() == factorOptionId.toString).map(_.asJValue)
+    }: JValue
+
+  }
+
   def deleteFactor(_id: String): JValue = {
 
     var msg = {
@@ -410,7 +424,6 @@ object FactorAPI extends RestHelper {
         factor.update.PathFactor(listPathFactorchild).save
       }
 
-
       {
         "SUCCESS" -> saveItem.save.asJValue
       }: JValue
@@ -429,6 +442,14 @@ object FactorAPI extends RestHelper {
     }: JValue
     case "factor" :: "getbyfactorid" :: Nil JsonPost json -> request =>
       for {JString(id) <- (json \\ "id").toOpt} yield getFactorByIdJSON(id): JValue
+
+    case "factoroption" :: "getbyfactoroptionid" :: Nil Options _ => {
+      "OK" -> "200"
+    }: JValue
+    case "factoroption" :: "getbyfactoroptionid" :: Nil JsonPost json -> request =>
+      for {JString(factorId) <- (json \\ "factorId").toOpt
+           JString(factorOptionId) <- (json \\ "factorOptionId").toOpt
+      } yield getFactorOptionByIdJSON(factorId, factorOptionId): JValue
 
     case "factor" :: "update" :: Nil Options _ => {
       "OK" -> "200"

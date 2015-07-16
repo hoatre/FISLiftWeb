@@ -79,7 +79,7 @@ object ModelInfoAPI extends RestHelper {
   }
 
   def updateModelInfo(q : JValue): JValue = {
-    val mess = code.common.Message.CheckNullReturnMess(q, List("id", "name", "description", "status")
+    val mess = code.common.Message.CheckNullReturnMess(q, List("id", "name", "description", "status"))
     if(mess.equals("OK")) {
       val json = q.asInstanceOf[JObject].values
 
