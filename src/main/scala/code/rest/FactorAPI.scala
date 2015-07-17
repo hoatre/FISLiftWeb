@@ -145,7 +145,7 @@ object FactorAPI extends RestHelper {
               .Description(json.apply("Description").toString)
               .FactorOptionName(json.apply("FactorOptionName").toString)
               .Score(json.apply("Score").toString.toDouble)
-              .Status(json.apply("Status").toString)
+              .Status(json.apply("Status").toString.toLowerCase())
             val factorOptionDelete = DBLista(0).FactorOption.value.dropWhile(ftO => ftO.FactorOptionId.toString().equals(json.apply("idFactorOption").toString))
             factorOptionUpdate = factorOptionDelete ::: List(factorOption)
           }
@@ -244,7 +244,7 @@ object FactorAPI extends RestHelper {
           .FactorOptionName(json.apply("FactorOptionName").toString)
           .Fatal(json.apply("Fatal").toString)
           .Score(json.apply("Score").toString.toDouble)
-          .Status(json.apply("Status").toString)
+          .Status(json.apply("Status").toString.toLowerCase())
 
 
 
@@ -391,8 +391,8 @@ object FactorAPI extends RestHelper {
 
         if (json.exists(p => p._1 == "Status")) {
           var status: String = ""
-          if (json.apply("Status").toString != "")
-            status = json.apply("Status").toString
+          if (json.apply("Status").toString.toLowerCase() != "")
+            status = json.apply("Status").toString.toLowerCase()
           saveItem = Factor.Status(status)
         } else
           return {
@@ -464,7 +464,7 @@ object FactorAPI extends RestHelper {
         .FactorName(json.apply("Name").toString)
         .Weight(json.apply("Weight").toString.toDouble)
         .Ordinal(json.apply("Ordinal").toString.toInt)
-        .Status(json.apply("Status").toString)
+        .Status(json.apply("Status").toString.toLowerCase())
         .Note(json.apply("Note").toString)
         .Description(json.apply("Description").toString)
         .PathFactor(listPathFactor)

@@ -91,7 +91,7 @@ object ModelInfoAPI extends RestHelper {
         "SUCCESS" -> ModelInfo.createRecord.id(UUID.randomUUID().toString)
           .name(json.apply("name").toString)
           .description(json.apply("description").toString)
-          .status(json.apply("status").toString)
+          .status(json.apply("status").toString.toLowerCase())
           .save.asJValue
       }: JValue
     }else
@@ -120,7 +120,7 @@ object ModelInfoAPI extends RestHelper {
           "SUCCESS" -> update(0).update
             .name(json.apply("name").toString)
             .description(json.apply("description").toString)
-            .status(json.apply("status").toString)
+            .status(json.apply("status").toString.toLowerCase())
             .save.asJValue
         }: JValue
       } else
