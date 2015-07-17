@@ -122,6 +122,7 @@
 //}
 
 package code.rest
+
 import code.model._
 import com.mongodb.{QueryBuilder, BasicDBObject}
 import net.liftweb.http.LiftRules
@@ -145,6 +146,8 @@ object FactorOptionAPI extends RestHelper {
       "OK" -> "200"
     }: JValue
     case "factoroption" :: "getbymodelid" :: Nil JsonPost json -> request => searchFactorForOption(json): JValue
+    //    case "factoroption" :: "getbymodelid" :: Nil JsonPut json -> request => searchFactorForOption(json): JValue
+
 
   }
 
@@ -155,20 +158,22 @@ object FactorOptionAPI extends RestHelper {
     val modelid = json.values.apply("modelid").toString
 
     val dbFind = Factor.findAll(QueryBuilder.start("ModelId").is(modelid).get)
-    var lista : List[String] = List()
+    var lista: List[String] = List()
 
     var i = 0
-   for( i <- 0 to dbFind.size -1){
+    for (i <- 0 to dbFind.size - 1) {
 
-     for {
-       JString(parent) <- (dbFind(i).asJValue \ "Parentid").toOpt
-       item = parent.toString
-     } yield {
-       val listb: List[String] = List(item)
+      //     for {
+      //       JString(parent) <- (dbFind(i).asJValue \ "Parentid").toOpt
+      //       item = parent.toString
+      //     } yield {
+      if (!lista.contains(dbFind(i).Parentid.toString())) {
+        val listb: List[String] = List(dbFind(i).Parentid.toString())
 
-       lista = lista ::: listb
+        lista = lista ::: listb
+        //       }
 
-     }
+      }
 
     }
     val dbin = QueryBuilder.start("ModelId").is(modelid).and("_id").notIn(lista.toArray).get
@@ -193,4 +198,6 @@ object FactorOptionAPI extends RestHelper {
     msg
 
   }
+
+
 }

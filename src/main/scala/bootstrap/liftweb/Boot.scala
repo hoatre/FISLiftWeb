@@ -93,6 +93,8 @@ class Boot {
 
     FactorOptionAPI.init()
 
+    ValidateAPI.init()
+
   }
 
 
