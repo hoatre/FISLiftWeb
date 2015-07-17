@@ -359,6 +359,16 @@ object FactorAPI extends RestHelper {
             "ERROR" -> code.common.Message.ErrorFieldExixts("Name")
           }: JValue
 
+        if (json.exists(p => p._1 == "Description")) {
+          var description: String = ""
+          if (json.apply("Description").toString != "")
+            description = json.apply("Description").toString
+          saveItem = Factor.Description(description)
+        } else
+          return {
+            "ERROR" -> code.common.Message.ErrorFieldExixts("Description")
+          }: JValue
+
         if (json.exists(p => p._1 == "Weight")) {
           var weight: Double = 0
           if (json.apply("Weight").toString != "")
@@ -414,15 +424,19 @@ object FactorAPI extends RestHelper {
   }
 
   def updateFactor(q: JValue): JValue = {
-    val mess = code.common.Message.CheckNullReturnMess(q, List("id", "Parentid", "ParentName", "Name", "Weight", "Ordinal", "Status", "Note"))
+    val mess = code.common.Message.CheckNullReturnMess(q, List("Description","id", "Parentid", "ParentName", "Name", "Weight", "Ordinal", "Status", "Note"))
     if(mess.equals("OK")) {
       val json = q.asInstanceOf[JObject].values
       val qry = QueryBuilder.start("_id").is(json.apply("id").toString).get
       val DBUpdate = Factor.findAll(qry)
 
-      val qryM = QueryBuilder.start("_id").is(DBUpdate(0).ModelId)
+      val qryM = QueryBuilder.start("_id").is(DBUpdate(0).ModelId.toString())
         .get
       val DBM = ModelInfo.findAll(qryM)
+      if(DBM == null)
+        {
+          "ERROR" -> "ModelInfo not found"
+        }: JValue
       if(DBM.equals("publish") || DBM.equals("active")){
         {
           "ERROR" -> "Factor can't insert (model was published)"
@@ -452,6 +466,7 @@ object FactorAPI extends RestHelper {
         .Ordinal(json.apply("Ordinal").toString.toInt)
         .Status(json.apply("Status").toString)
         .Note(json.apply("Note").toString)
+        .Description(json.apply("Description").toString)
         .PathFactor(listPathFactor)
 
 
