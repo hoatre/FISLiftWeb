@@ -188,7 +188,7 @@ object ValidateAPI extends RestHelper {
     var msg :JValue = {"SUCCESS" -> "OK"} :JValue
     var check =  0
     var checkmsg : String = "No error"
-    if(s.size>0 && !h.isEmpty){
+    if(s.size>0 && h != null && !h.isEmpty ){
       msg =  {("weight" -> s) ~ ("rate" -> "Rating having a problem") ~ ("code" -> h)} :JValue
       check = 1
       checkmsg = "Weight and Rate have problems"
@@ -198,7 +198,7 @@ object ValidateAPI extends RestHelper {
       check = 2
       checkmsg = "Weight has a problem"
     }
-    else if(!h.isEmpty){
+    else if(h != null && !h.isEmpty){
       msg =  {("weight" -> "") ~("rate" -> "Rating having a problem") ~ ("code" -> h)} :JValue
       check = 3
       checkmsg = "Rate has a problem"
