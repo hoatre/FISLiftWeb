@@ -190,8 +190,8 @@ object FactorAPI extends RestHelper {
     var min: Double = 0
     var max: Double = 0
 
-    for (factor <- listDBCuoi) {
-      val list = factor.FactorOption.value.sortWith(_.Score.toString().toDouble < _.Score.toString().toDouble)
+    for (factor <- listDBCuoi.distinct) {
+      val list = factor.FactorOption.value.distinct.sortWith(_.Score.toString().toDouble < _.Score.toString().toDouble)
 
       var minIn = list(0).Score.toString().toDouble * (factor.Weight.toString().toDouble / 100)
       for (path <- factor.PathFactor.value) {
