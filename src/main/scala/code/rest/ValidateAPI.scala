@@ -70,6 +70,10 @@ object ValidateAPI extends RestHelper {
     val dbRates = Rating.findAll(QueryBuilder.start("modelid").is(modelid).get)
     val dbModel = ModelInfo.findAll(QueryBuilder.start("_id").is(modelid).get)
 
+    if(dbFind.size == 0 && dbRates.size == 0) {
+      return  msgcheckweightrate(mapAllFactor,null,0)
+    }
+
     var lista: List[String] = List()
 
     var listname: Map[String, String] = Map()
@@ -169,7 +173,7 @@ object ValidateAPI extends RestHelper {
             //            mapAllRating = {"RATEERROR" -> listratesort(x).code.toString() }: JValue
 
 
-            return  msgcheckweightrate(mapAllFactor,listratesort(x).code.toString())
+            return  msgcheckweightrate(mapAllFactor,listratesort(x).code.toString(),1)
 
           }
         }
@@ -182,9 +186,9 @@ object ValidateAPI extends RestHelper {
 
 
 
-    msgcheckweightrate(mapAllFactor,null)
+    msgcheckweightrate(mapAllFactor,null,1)
   }
-  def msgcheckweightrate(s:List[JValue],h:String) :JValue={
+  def msgcheckweightrate(s:List[JValue],h:String,v:Int) :JValue={
     var msg :JValue = {"SUCCESS" -> "OK"} :JValue
     var check =  0
     var checkmsg : String = "No error"
@@ -202,6 +206,10 @@ object ValidateAPI extends RestHelper {
       msg =  {("weight" -> "") ~("rate" -> "Rating having a problem") ~ ("code" -> h)} :JValue
       check = 3
       checkmsg = "Rate has a problem"
+    }else if(v == 0){
+      msg =  {("weight" -> "") ~ ("rate" -> "") ~ ("code" -> "")} :JValue
+      check = 4
+      checkmsg = "Model can not active"
     }
 
     {"checkweightrate" -> (("header" ->(("code"->check.toString)~("message" -> checkmsg)))~("body" -> msg))} :JValue
