@@ -275,16 +275,17 @@ object FactorAPI extends RestHelper {
         val qryM = QueryBuilder.start("_id").is(json.apply("ModelId").toString)
           .get
         val DBM = ModelInfo.findAll(qryM)
-        if(DBM.equals("publish") || DBM.equals("active")){
+        if (DBM.equals("publish") || DBM.equals("active")) {
           {
             "ERROR" -> "Factor can't insert (model was published)"
           }: JValue
         }
       }
-      else
-        return {
-          "ERROR" -> code.common.Message.ErrorFieldNull("ModelId")
-        }: JValue
+    }
+    else
+      return {
+        "ERROR" -> code.common.Message.ErrorFieldNull("ModelId")
+      }: JValue
 
       if (json != null) {
         var listPathFactor: List[FactorPath] = List()
