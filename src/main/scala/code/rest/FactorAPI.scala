@@ -455,9 +455,17 @@ object FactorAPI extends RestHelper {
           listPathFactor = listPathFactor ::: x
         }
       }
+      var saveItem = DBUpdate(0).update
+      if(json.apply("Parentid") != null){
+        saveItem
+          .Parentid(json.apply("Parentid").toString)
+      }else{
+        saveItem
+          .Parentid("")
+      }
+
       //Updaet factor
-      val saveItem = DBUpdate(0).update
-        .Parentid(json.apply("Parentid").toString)
+      saveItem
         .ParentName(json.apply("ParentName").toString)
         .FactorName(json.apply("Name").toString)
         .Weight(json.apply("Weight").toString.toDouble)
