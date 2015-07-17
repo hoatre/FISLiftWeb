@@ -186,17 +186,26 @@ object ValidateAPI extends RestHelper {
   }
   def msgcheckweightrate(s:List[JValue],h:String) :JValue={
     var msg :JValue = {"SUCCESS" -> "OK"} :JValue
+    var check =  0
+    var checkmsg : String = "No error"
     if(s.size>0 && !h.isEmpty){
-      msg =  {("ERRORWEIGHT" -> s) ~ ("RATEERROR" -> "Rating having a problem") ~ ("CODE" -> h)} :JValue
+      msg =  {("weight" -> s) ~ ("rate" -> "Rating having a problem") ~ ("code" -> h)} :JValue
+      check = 1
+      checkmsg = "Weight and Rate have problems"
     }
     else  if(s.size>0){
-      msg =  {"ERRORWEIGHT" -> s} :JValue
+      msg =  {("weight" -> s) ~ ("rate" -> "") ~ ("code" -> "")} :JValue
+      check = 2
+      checkmsg = "Weight has a problem"
     }
     else if(!h.isEmpty){
-      msg =  {("RATEERROR" -> "Rating having a problem") ~ ("CODE" -> h)} :JValue
+      msg =  {("weight" -> "") ~("rate" -> "Rating having a problem") ~ ("code" -> h)} :JValue
+      check = 3
+      checkmsg = "Rate has a problem"
     }
 
-    msg
+    {"checkweightrate" -> (("header" ->(("code"->check.toString)~("message" -> checkmsg)))~("body" -> msg))} :JValue
+
   }
 
 }
