@@ -246,8 +246,6 @@ object FactorAPI extends RestHelper {
           .Score(json.apply("Score").toString.toDouble)
           .Status(json.apply("Status").toString.toLowerCase())
 
-
-
         listFactorOption = listFactorOption ::: DBList(0).FactorOption.value
 
         listFactorOption = listFactorOption ::: List(factorOption)
@@ -445,7 +443,7 @@ object FactorAPI extends RestHelper {
 
       //Get path moi theo ParentID
       var listPathFactor: List[FactorPath] = List()
-      if (json.apply("Parentid").toString != "") {
+      if (json.apply("Parentid").toString != "" || json.apply("Parentid") != null) {
         val qry = QueryBuilder.start("_id").is(json.apply("Parentid").toString).get
         val DBList = Factor.findAll(qry)
         if (DBList != null) {
