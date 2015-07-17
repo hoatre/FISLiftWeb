@@ -443,7 +443,7 @@ object FactorAPI extends RestHelper {
 
       //Get path moi theo ParentID
       var listPathFactor: List[FactorPath] = List()
-      if (json.apply("Parentid").toString != "" || json.apply("Parentid") != null) {
+      if (json.apply("Parentid") != null || json.apply("Parentid").toString != "") {
         val qry = QueryBuilder.start("_id").is(json.apply("Parentid").toString).get
         val DBList = Factor.findAll(qry)
         if (DBList != null) {
