@@ -18,7 +18,7 @@ import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
 import code.snippet._
-import code.model.{Factor, codeIN, Rating, Users}
+import code.model._
 import net.liftweb.json.Printer._
 import net.liftweb.mongodb.JObjectParser
 import net.liftweb.http.js.JsExp
@@ -54,7 +54,7 @@ object ScoreResultAPI extends RestHelper{
     var scoreresult : Double =0
     var msg : JValue={("Score" -> "") ~ ("Rating"->"")} :JValue
 
-
+    var lista : List[resultIN] = List()
 
 
     if(listresul.isInstanceOf[JArray]){
@@ -90,10 +90,14 @@ object ScoreResultAPI extends RestHelper{
 
         }
 
-//        lista = lista ::: listb
+        lista = lista ::: List(resultIN.FactorId(factorid).FactorOptionScore(score).FactorOptionId(Option(j.apply("factoroptionid").toString).getOrElse(null)))
+
+
       }
+      var coderesul :String = null
+      var codestatus : String = null
 //
-      msg ={("Score"-> scoreresult)~("Rating" -> "Not existed")~("Status" -> "Not existed")} :JValue
+      msg ={("Score"-> f"$scoreresult%1.2f")~("Rating" -> "Not existed")~("Status" -> "Not existed")} :JValue
       val qry = QueryBuilder.start("modelid").is(jsonmap.values.apply("modelid").toString).get
 
       val DBquery = Rating.findAll(qry)
@@ -108,7 +112,12 @@ object ScoreResultAPI extends RestHelper{
               val j = rate.asInstanceOf[JObject].values
               if (j.apply("scorefrom").toString.toDouble < scoreresult && scoreresult < j.apply("scoreto").toString.toDouble) {
 
+                coderesul = j.apply("code").toString
+                codestatus = j.apply("status").toString
+
                 msg ={("Score"-> f"$scoreresult%1.2f")~("Rating" -> j.apply("code").toString)~("Status" -> j.apply("status").toString)} :JValue
+
+
               }
 
 
@@ -118,10 +127,17 @@ object ScoreResultAPI extends RestHelper{
 
 
         }
-
+      saveScoreResult(jsonmap.values.apply("modelid").toString,scoreresult,coderesul,codestatus,lista)
     }
 
+
       msg
+
+  }
+
+  def saveScoreResult(modelid :String,scoring :Double,ratingCode :String,ratingStatus :String,list : List[resultIN]){
+
+    ScoringResult.id(UUID.randomUUID().toString).modelid(modelid).Scoring(scoring).RatingCode(ratingCode).RatingStatus(ratingStatus).ResultIN(list).Timestamp(System.currentTimeMillis()).save
 
   }
 

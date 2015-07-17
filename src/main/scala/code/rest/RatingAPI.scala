@@ -92,17 +92,21 @@ object RatingAPI extends RestHelper {
       rates collect { case rate: JObject => rate } foreach myOperation
       def myOperation(rate: JObject) = {
         val j = rate.asInstanceOf[JObject].values
+        if(j.apply("code").toString.equals(p)) {
 
-        val item = codeIN.code(j.apply("code").toString).status(j.apply("status").toString)
-          .statusname(j.apply("statusname").toString).scorefrom(j.apply("scorefrom").toString.toDouble).scoreto(j.apply("scoreto").toString.toDouble)
+          val item = codeIN.code(j.apply("code").toString).status(j.apply("status").toString)
+            .statusname(j.apply("statusname").toString).scorefrom(j.apply("scorefrom").toString.toDouble).scoreto(j.apply("scoreto").toString.toDouble)
 
-//        var listb: List[codeIN] = List(item)
-//
-//        lista = lista ::: listb
-        val db2 = Rating.modelid(db1.values.apply("modelid").toString).modelname(Option(db1.values.apply("modelname").toString).getOrElse(""))
-        .codein(List(item))
+          //        var listb: List[codeIN] = List(item)
+          //
+          //        lista = lista ::: listb
+          val db2 = Rating.modelid(db1.values.apply("modelid").toString).modelname(Option(db1.values.apply("modelname").toString).getOrElse(""))
+            .codein(List(item))
 
-        msg = { "SUCCESS" -> db2.asJValue }:JValue
+          msg = {
+            "SUCCESS" -> db2.asJValue
+          }: JValue
+        }
       }
 
 
