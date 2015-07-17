@@ -2,29 +2,12 @@ package code.rest
 
 import java.util.UUID
 
+import code.model.{ModelInfo, Rating, codeIN}
+import com.mongodb.{BasicDBObject, QueryBuilder}
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
-import net.liftweb.json._
-import net.liftweb.json.JsonAST.JArray
-import net.liftweb.json.JsonAST.JField
-import net.liftweb.json.JsonAST.JString
-import net.liftweb.json.JsonAST.JValue
-
-import com.mongodb.{BasicDBObject, BasicDBObjectBuilder, QueryBuilder}
-import net.liftweb.http.rest.RestHelper
-import bootstrap.liftweb._
-import net.liftweb.http.{S, LiftRules}
-import net.liftweb.json.JsonAST.JValue
-import net.liftweb.json.JsonAST._
-import net.liftweb.json.JsonDSL._
-import code.snippet._
-import code.model.{codeIN, Rating, Users}
-import net.liftweb.json.Printer._
-import net.liftweb.mongodb.JObjectParser
-import net.liftweb.http.js.JsExp
-import net.liftweb.json.JsonDSL.seq2jvalue
-
-import scala.collection.immutable.HashMap
+import net.liftweb.json.JsonAST.{JArray, JField, JString, JValue, _}
+import net.liftweb.json.JsonDSL.{seq2jvalue, _}
 
 /**
  * Created by bacnv on 7/14/15.
@@ -137,7 +120,14 @@ object RatingAPI extends RestHelper {
 
     var json = q.asInstanceOf[JObject]
 
-
+    val qryM = QueryBuilder.start("_id").is(json.values.apply("modelid").toString())
+      .get
+    val DBM = ModelInfo.findAll(qryM)
+    if(DBM.equals("publish") || DBM.equals("active")){
+      {
+        "ERROR" -> "Factor can't delete (model was published)"
+      }: JValue
+    }
 
     val modelid = json.values.apply("modelid").toString()
 //    val rate = json.values.apply("rate").toString.toList
@@ -214,7 +204,14 @@ if (list.isInstanceOf[JArray]) {
     //    var listFactorOption : List[codeIN] = List()
     var listi  : List[codeIN] = List()
     var listu  : List[codeIN] = List()
-
+    val qryM = QueryBuilder.start("_id").is(q.asInstanceOf[JObject].values.apply("modelid").toString)
+      .get
+    val DBM = ModelInfo.findAll(qryM)
+    if(DBM.equals("publish") || DBM.equals("active")){
+      {
+        "ERROR" -> "Factor can't delete (model was published)"
+      }: JValue
+    }
     val qry = QueryBuilder.start("modelid").is(q.asInstanceOf[JObject].values.apply("modelid")).get
 
     var dbFind = Rating.findAll(qry)
@@ -275,6 +272,15 @@ if (list.isInstanceOf[JArray]) {
     var listi  : List[codeIN] = List()
     var listu  : List[codeIN] = List()
 
+    val qryM = QueryBuilder.start("_id").is(json.values.apply("modelid").toString)
+      .get
+    val DBM = ModelInfo.findAll(qryM)
+    if(DBM.equals("publish") || DBM.equals("active")){
+      {
+        "ERROR" -> "Factor can't delete (model was published)"
+      }: JValue
+    }
+
     val qry = QueryBuilder.start("modelid").is(json.values.apply("modelid")).get
 
     var dbFind = Rating.findAll(qry)
@@ -332,6 +338,14 @@ if (list.isInstanceOf[JArray]) {
   def delete(q:JValue): JValue = {
     var json = q.asInstanceOf[JObject]
 
+    val qryM = QueryBuilder.start("_id").is(json.values.apply("modelid").toString)
+      .get
+    val DBM = ModelInfo.findAll(qryM)
+    if(DBM.equals("publish") || DBM.equals("active")){
+      {
+        "ERROR" -> "Factor can't delete (model was published)"
+      }: JValue
+    }
 //    var listFactorOption : List[codeIN] = List()
     var listi  : List[codeIN] = List()
     var listu  : List[codeIN] = List()

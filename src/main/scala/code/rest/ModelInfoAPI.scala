@@ -111,7 +111,6 @@ object ModelInfoAPI extends RestHelper {
       val mess = code.common.Message.CheckNullReturnMess(q, List("id", "name", "description", "status"))
       if (mess.equals("OK")) {
 
-
         val qry = QueryBuilder.start("_id").is(json.apply("id").toString)
           .get
 

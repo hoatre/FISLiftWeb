@@ -63,7 +63,7 @@ object FactorAPI extends RestHelper {
     val qryM = QueryBuilder.start("_id").is(_id)
       .get
     val DBM = ModelInfo.findAll(qryM)
-    if(DBM.equals("publish")){
+    if(DBM.equals("publish") || DBM.equals("active")){
       {
         "ERROR" -> "Factor can't delete (model was published)"
       }: JValue
@@ -100,7 +100,7 @@ object FactorAPI extends RestHelper {
     val qryM = QueryBuilder.start("_id").is(DBListOp(0).ModelId.toString())
       .get
     val DBM = ModelInfo.findAll(qryM)
-    if(DBM.equals("publish")){
+    if(DBM.equals("publish") || DBM.equals("active")){
       {
         "ERROR" -> "FactorOption can't delete (model was published)"
       }: JValue
@@ -130,7 +130,7 @@ object FactorAPI extends RestHelper {
         val qryM = QueryBuilder.start("_id").is(DBLista(0).ModelId.toString())
           .get
         val DBM = ModelInfo.findAll(qryM)
-        if(DBM.equals("publish")){
+        if(DBM.equals("publish") || DBM.equals("active")){
           {
             "ERROR" -> "FactorOption can't update (model was published)"
           }: JValue
@@ -232,7 +232,7 @@ object FactorAPI extends RestHelper {
         val qryM = QueryBuilder.start("_id").is(DBList(0).ModelId.toString())
           .get
         val DBM = ModelInfo.findAll(qryM)
-        if(DBM.equals("publish")){
+        if(DBM.equals("publish") || DBM.equals("active")){
           {
             "ERROR" -> "FactorOption can't insert (model was published)"
           }: JValue
@@ -275,7 +275,7 @@ object FactorAPI extends RestHelper {
         val qryM = QueryBuilder.start("_id").is(json.apply("ModelId").toString)
           .get
         val DBM = ModelInfo.findAll(qryM)
-        if(DBM.equals("publish")){
+        if(DBM.equals("publish") || DBM.equals("active")){
           {
             "ERROR" -> "Factor can't insert (model was published)"
           }: JValue
@@ -422,7 +422,7 @@ object FactorAPI extends RestHelper {
       val qryM = QueryBuilder.start("_id").is(DBUpdate(0).ModelId)
         .get
       val DBM = ModelInfo.findAll(qryM)
-      if(DBM.equals("publish")){
+      if(DBM.equals("publish") || DBM.equals("active")){
         {
           "ERROR" -> "Factor can't insert (model was published)"
         }: JValue
