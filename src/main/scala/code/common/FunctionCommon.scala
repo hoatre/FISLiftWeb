@@ -1,5 +1,7 @@
 package code.common
 
+import java.util.UUID
+
 /**
  * Created by phong on 7/16/2015.
  */
@@ -11,7 +13,11 @@ object FunctionCommon {
   }
 
   def main (args: Array[String]) {
-//    val b = new GenericsTest.stack
+    val a : String = UUID.randomUUID().toString
+//    val b = (UUID)a
+
+  println(a)
+//    println(b)
   }
 
   class Stack[T] {

@@ -45,6 +45,20 @@ object ModelInfoAPI extends RestHelper {
 
   }
 
+  def getModelInfoByStatusJSON(status : String): JValue = {
+
+    val qry = QueryBuilder.start("status").is(status)
+      .get
+
+    val DBList = ModelInfo.findAll(qry)
+
+    if(DBList.isEmpty)
+      "ERROR" -> "ModelInfo not found" :JValue
+    else
+      {"SUCCESS" -> DBList.map(_.asJValue)} : JValue
+
+  }
+
   def deleteModelInfo(_id : String): JValue = {
     val qry = QueryBuilder.start("ModelId").is(_id)
       .get
@@ -140,6 +154,10 @@ object ModelInfoAPI extends RestHelper {
     case "modelinfo" :: "getbymodelinfoid" :: Nil Options _ => {"OK" -> "200"} :JValue
     case "modelinfo" :: "getbymodelinfoid" :: Nil JsonPost json -> request =>
       for{JString(id) <- (json \\ "id").toOpt} yield getModelInfoByIdJSON(id) : JValue
+
+    case "modelinfo" :: "getbymodelinfostatus" :: Nil Options _ => {"OK" -> "200"} :JValue
+    case "modelinfo" :: "getbymodelinfostatus" :: Nil JsonPost json -> request =>
+      for{JString(status) <- (json \\ "status").toOpt} yield getModelInfoByStatusJSON(status) : JValue
 
     case "modelinfo" :: "getbymodelinfoid" ::q:: Nil JsonGet req => getModelInfoByIdJSON(q) : JValue
 
