@@ -60,47 +60,61 @@ object FactorAPI extends RestHelper {
   }
 
   def deleteFactor(_id: String): JValue = {
-
-    var msg = {
-      "ERROR" -> "Can not delete Factor"
-    }: JValue
-
-    val qry: QueryBuilder = new QueryBuilder
-    qry.or(QueryBuilder.start("PathFactor").elemMatch(new BasicDBObject("FactorPathId", _id)).get(),
-      QueryBuilder.start("Parentid").is(_id).get()
-    )
-
-    //    val qhhh= QueryBuilder.start("_id").is(_id).get
-
-    val db = Factor.findAll(qry.get())
-
-    if (db.size == 0) {
-
-      var req = Factor.delete(("_id" -> _id))
-
-      msg = {
-        "SUCCESS" -> "Deleted"
+    val qryM = QueryBuilder.start("_id").is(_id)
+      .get
+    val DBM = ModelInfo.findAll(qryM)
+    if(DBM.equals("publish")){
+      {
+        "ERROR" -> "Factor can't delete (model was published)"
       }: JValue
-    }
-    msg
+    }else {
+      var msg = {
+        "ERROR" -> "Can not delete Factor"
+      }: JValue
 
+      val qry: QueryBuilder = new QueryBuilder
+      qry.or(QueryBuilder.start("PathFactor").elemMatch(new BasicDBObject("FactorPathId", _id)).get(),
+        QueryBuilder.start("Parentid").is(_id).get()
+      )
+
+      //    val qhhh= QueryBuilder.start("_id").is(_id).get
+
+      val db = Factor.findAll(qry.get())
+
+      if (db.size == 0) {
+
+        var req = Factor.delete(("_id" -> _id))
+
+        msg = {
+          "SUCCESS" -> "Deleted"
+        }: JValue
+      }
+      msg
+    }
   }
 
   def deleteOptionFactor(IdFactor: String, IdFactorOption: String): JValue = {
-
     val qry = QueryBuilder.start("_id").is(IdFactor).get
     val DBListOp = Factor.findAll(qry)
-    val size = DBListOp(0).FactorOption.value.size
-    val factorOption = DBListOp(0).FactorOption.value.filterNot(ftO => ftO.FactorOptionId.toString().equals(IdFactorOption.toString()))
-    if(size == factorOption.size)
+
+    val qryM = QueryBuilder.start("_id").is(DBListOp(0).ModelId.toString())
+      .get
+    val DBM = ModelInfo.findAll(qryM)
+    if(DBM.equals("publish")){
       {
+        "ERROR" -> "FactorOption can't delete (model was published)"
+      }: JValue
+    }else {
+
+      val size = DBListOp(0).FactorOption.value.size
+      val factorOption = DBListOp(0).FactorOption.value.filterNot(ftO => ftO.FactorOptionId.toString().equals(IdFactorOption.toString()))
+      if (size == factorOption.size) {
         "ERROR" -> "DELETE ERROR"
       }: JValue
-    else
-      {
+      else {
         "SUCCESS" -> DBListOp(0).update.FactorOption(factorOption).save.asJValue
       }: JValue
-
+    }
   }
 
   def updateFactorOption(q: JValue): JValue = {
@@ -112,6 +126,16 @@ object FactorAPI extends RestHelper {
       if (json.exists(p => p._1 == "idFactor")) {
         val qry = QueryBuilder.start("_id").is(json.apply("idFactor").toString).get
         val DBLista = Factor.findAll(qry)
+
+        val qryM = QueryBuilder.start("_id").is(DBLista(0).ModelId.toString())
+          .get
+        val DBM = ModelInfo.findAll(qryM)
+        if(DBM.equals("publish")){
+          {
+            "ERROR" -> "FactorOption can't update (model was published)"
+          }: JValue
+        }
+
         var factorOptionUpdate: List[FactorOptionIN] = List()
 
         for (i <- 0 to DBLista(0).FactorOption.value.size - 1) {
@@ -139,6 +163,7 @@ object FactorAPI extends RestHelper {
       return {
         "ERROR" -> mess
       }: JValue
+
   }
 
   def test(q: JValue): JValue = {
@@ -204,6 +229,15 @@ object FactorAPI extends RestHelper {
         val qry = QueryBuilder.start("_id").is(json.apply("FactorId").toString).get
         val DBList = Factor.findAll(qry)
 
+        val qryM = QueryBuilder.start("_id").is(DBList(0).ModelId.toString())
+          .get
+        val DBM = ModelInfo.findAll(qryM)
+        if(DBM.equals("publish")){
+          {
+            "ERROR" -> "FactorOption can't insert (model was published)"
+          }: JValue
+        }
+
         val factorOption = FactorOptionIN
           .FactorOptionId(UUID.randomUUID().toString)
           .Description(json.apply("Description").toString)
@@ -233,132 +267,149 @@ object FactorAPI extends RestHelper {
   }
 
   def insertFactor(q: JValue): JValue = {
-    val json = q.asInstanceOf[JObject].values
-    if (json != null) {
-      var listPathFactor: List[FactorPath] = List()
-      if (json.exists(p => p._1 == "Parentid")) {
-        if (json.apply("Parentid").toString != "") {
-          val qry = QueryBuilder.start("_id").is(json.apply("Parentid").toString).get
-          val DBList = Factor.findAll(qry)
-          if (DBList != null) {
-            listPathFactor = listPathFactor ::: DBList(0).PathFactor.value
-            val factorPath = FactorPath.createRecord
-              .FactorPathId(DBList(0).id.toString())
-              .Weight(DBList(0).Weight.toString().toDouble)
-            val x: List[FactorPath] = List(factorPath)
-            listPathFactor = listPathFactor ::: x
-          }
+      val json = q.asInstanceOf[JObject].values
 
-        }
-      } else
-        return {
-          "ERROR" -> code.common.Message.ErrorFieldExixts("Parenid")
-        }: JValue
-      var saveItem: Factor = Factor.createRecord
-      val listFactorOption: List[FactorOptionIN] = List()
-
-      if (json.exists(p => p._1 == "ModelId")) {
-        var modelId: String = ""
-        if (json.apply("ModelId").toString != "") {
-          modelId = json.apply("ModelId").toString
-          saveItem = Factor.ModelId(modelId)
-        }
-        else
-          return {
-            "ERROR" -> code.common.Message.ErrorFieldNull("ModelId")
+    if (json.exists(p => p._1 == "ModelId")) {
+      var modelId: String = ""
+      if (json.apply("ModelId").toString != "") {
+        val qryM = QueryBuilder.start("_id").is(json.apply("ModelId").toString)
+          .get
+        val DBM = ModelInfo.findAll(qryM)
+        if(DBM.equals("publish")){
+          {
+            "ERROR" -> "Factor can't insert (model was published)"
           }: JValue
-      } else
+        }
+      }
+      else
         return {
-          "ERROR" -> code.common.Message.ErrorFieldExixts("ModelId")
+          "ERROR" -> code.common.Message.ErrorFieldNull("ModelId")
         }: JValue
 
-      if (json.exists(p => p._1 == "Parentid")) {
-        var parentid: String = ""
-        if (json.apply("Parentid").toString != "")
-          parentid = json.apply("Parentid").toString
-        saveItem = Factor.Parentid(parentid)
-      } else
-        return {
-          "ERROR" -> code.common.Message.ErrorFieldExixts("Parentid")
-        }: JValue
+      if (json != null) {
+        var listPathFactor: List[FactorPath] = List()
+        if (json.exists(p => p._1 == "Parentid")) {
+          if (json.apply("Parentid").toString != "") {
+            val qry = QueryBuilder.start("_id").is(json.apply("Parentid").toString).get
+            val DBList = Factor.findAll(qry)
+            if (DBList != null) {
+              listPathFactor = listPathFactor ::: DBList(0).PathFactor.value
+              val factorPath = FactorPath.createRecord
+                .FactorPathId(DBList(0).id.toString())
+                .Weight(DBList(0).Weight.toString().toDouble)
+              val x: List[FactorPath] = List(factorPath)
+              listPathFactor = listPathFactor ::: x
+            }
 
-      if (json.exists(p => p._1 == "ParentName")) {
-        var parentid: String = ""
-        if (json.apply("Parentid").toString != "")
-          parentid = json.apply("Parentid").toString
-        saveItem = Factor.Parentid(parentid)
-      } else
-        return {
-          "ERROR" -> code.common.Message.ErrorFieldExixts("ParentName")
-        }: JValue
-
-      if (json.exists(p => p._1 == "Name")) {
-        var name: String = ""
-        if (json.apply("Name").toString != "") {
-          name = json.apply("Name").toString
-          saveItem = Factor.FactorName(name)
+          }
         } else
           return {
-            "ERROR" -> code.common.Message.ErrorFieldNull("Name")
+            "ERROR" -> code.common.Message.ErrorFieldExixts("Parentid")
           }: JValue
-      } else
-        return {
-          "ERROR" -> code.common.Message.ErrorFieldExixts("Name")
+        var saveItem: Factor = Factor.createRecord
+        val listFactorOption: List[FactorOptionIN] = List()
+
+        if (json.exists(p => p._1 == "ModelId")) {
+          var modelId: String = ""
+          if (json.apply("ModelId").toString != "") {
+            modelId = json.apply("ModelId").toString
+            saveItem = Factor.ModelId(modelId)
+          }
+          else
+            return {
+              "ERROR" -> code.common.Message.ErrorFieldNull("ModelId")
+            }: JValue
+        } else
+          return {
+            "ERROR" -> code.common.Message.ErrorFieldExixts("ModelId")
+          }: JValue
+
+        if (json.exists(p => p._1 == "Parentid")) {
+          var parentid: String = ""
+          if (json.apply("Parentid").toString != "")
+            parentid = json.apply("Parentid").toString
+          saveItem = Factor.Parentid(parentid)
+        } else
+          return {
+            "ERROR" -> code.common.Message.ErrorFieldExixts("Parentid")
+          }: JValue
+
+        if (json.exists(p => p._1 == "ParentName")) {
+          var parentid: String = ""
+          if (json.apply("Parentid").toString != "")
+            parentid = json.apply("Parentid").toString
+          saveItem = Factor.Parentid(parentid)
+        } else
+          return {
+            "ERROR" -> code.common.Message.ErrorFieldExixts("ParentName")
+          }: JValue
+
+        if (json.exists(p => p._1 == "Name")) {
+          var name: String = ""
+          if (json.apply("Name").toString != "") {
+            name = json.apply("Name").toString
+            saveItem = Factor.FactorName(name)
+          } else
+            return {
+              "ERROR" -> code.common.Message.ErrorFieldNull("Name")
+            }: JValue
+        } else
+          return {
+            "ERROR" -> code.common.Message.ErrorFieldExixts("Name")
+          }: JValue
+
+        if (json.exists(p => p._1 == "Weight")) {
+          var weight: Double = 0
+          if (json.apply("Weight").toString != "")
+            weight = json.apply("Weight").toString.toDouble
+          saveItem = Factor.Weight(weight)
+        } else
+          return {
+            "ERROR" -> code.common.Message.ErrorFieldExixts("Weight")
+          }: JValue
+
+        if (json.exists(p => p._1 == "Ordinal")) {
+          var ordinal: Int = 0
+          if (json.apply("Ordinal").toString != "")
+            ordinal = json.apply("Ordinal").toString.toInt
+          saveItem = Factor.Ordinal(ordinal)
+        } else
+          return {
+            "ERROR" -> code.common.Message.ErrorFieldExixts("Ordinal")
+          }: JValue
+
+        if (json.exists(p => p._1 == "Status")) {
+          var status: String = ""
+          if (json.apply("Status").toString != "")
+            status = json.apply("Status").toString
+          saveItem = Factor.Status(status)
+        } else
+          return {
+            "ERROR" -> code.common.Message.ErrorFieldExixts("Status")
+          }: JValue
+
+        if (json.exists(p => p._1 == "Note")) {
+          var note: String = ""
+          if (json.apply("Note").toString != "")
+            note = json.apply("Note").toString
+          saveItem = Factor.Note(note)
+        } else
+          return {
+            "ERROR" -> code.common.Message.ErrorFieldExixts("Note")
+          }: JValue
+
+        saveItem = Factor
+          .id(UUID.randomUUID().toString)
+          .PathFactor(listPathFactor)
+          .FactorOption(listFactorOption)
+          .save
+
+        {
+          "SUCCESS" -> saveItem.asJValue
         }: JValue
-
-      if (json.exists(p => p._1 == "Weight")) {
-        var weight: Double = 0
-        if (json.apply("Weight").toString != "")
-          weight = json.apply("Weight").toString.toDouble
-        saveItem = Factor.Weight(weight)
-      } else
-        return {
-          "ERROR" -> code.common.Message.ErrorFieldExixts("Weight")
-        }: JValue
-
-      if (json.exists(p => p._1 == "Ordinal")) {
-        var ordinal: Int = 0
-        if (json.apply("Ordinal").toString != "")
-          ordinal = json.apply("Ordinal").toString.toInt
-        saveItem = Factor.Ordinal(ordinal)
-      } else
-        return {
-          "ERROR" -> code.common.Message.ErrorFieldExixts("Ordinal")
-        }: JValue
-
-      if (json.exists(p => p._1 == "Status")) {
-        var status: String = ""
-        if (json.apply("Status").toString != "")
-          status = json.apply("Status").toString
-        saveItem = Factor.Status(status)
-      } else
-        return {
-          "ERROR" -> code.common.Message.ErrorFieldExixts("Status")
-        }: JValue
-
-      if (json.exists(p => p._1 == "Note")) {
-        var note: String = ""
-        if (json.apply("Note").toString != "")
-          note = json.apply("Note").toString
-        saveItem = Factor.Note(note)
-      } else
-        return {
-          "ERROR" -> code.common.Message.ErrorFieldExixts("Note")
-        }: JValue
-
-      saveItem = Factor
-        .id(UUID.randomUUID().toString)
-        .PathFactor(listPathFactor)
-        .FactorOption(listFactorOption)
-        .save
-
-      {
-        "SUCCESS" -> saveItem.asJValue
+      } else {
+        "ERROR" -> "INSERT FAILED"
       }: JValue
-    } else {
-      "ERROR" -> "INSERT FAILED"
-    }: JValue
-
   }
 
   def updateFactor(q: JValue): JValue = {
@@ -367,6 +418,15 @@ object FactorAPI extends RestHelper {
       val json = q.asInstanceOf[JObject].values
       val qry = QueryBuilder.start("_id").is(json.apply("id").toString).get
       val DBUpdate = Factor.findAll(qry)
+
+      val qryM = QueryBuilder.start("_id").is(DBUpdate(0).ModelId)
+        .get
+      val DBM = ModelInfo.findAll(qryM)
+      if(DBM.equals("publish")){
+        {
+          "ERROR" -> "Factor can't insert (model was published)"
+        }: JValue
+      }
 
       //Get path moi theo ParentID
       var listPathFactor: List[FactorPath] = List()

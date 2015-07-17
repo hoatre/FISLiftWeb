@@ -60,20 +60,26 @@ object ModelInfoAPI extends RestHelper {
   }
 
   def deleteModelInfo(_id : String): JValue = {
-    val qry = QueryBuilder.start("ModelId").is(_id)
+    val qryM = QueryBuilder.start("_id").is(_id)
       .get
-    val DBListCheck = Factor.findAll(qry)
-    if(DBListCheck.size == 0) {
-      ModelInfo.delete(("_id" -> _id))
+    val DBM = ModelInfo.findAll(qryM)
+    if(DBM(0).status.equals("draft") || DBM(0).status.equals("")) {
+      val qry = QueryBuilder.start("ModelId").is(_id)
+        .get
+      val DBListCheck = Factor.findAll(qry)
+      if (DBListCheck.size == 0) {
+        ModelInfo.delete(("_id" -> _id))
 
-      {
-        "SUCCESS" -> " DELETED "
-      }: JValue
-    }else
-      {
+        {
+          "SUCCESS" -> " DELETED "
+        }: JValue
+      } else {
         "ERROR" -> " Factor is exixts "
       }: JValue
-
+    }
+    {
+      "ERROR" -> " Model can't delete (not draft) "
+    }: JValue
   }
 
   def insertModelInfo(q : JValue): JValue = {
@@ -93,24 +99,36 @@ object ModelInfoAPI extends RestHelper {
   }
 
   def updateModelInfo(q : JValue): JValue = {
-    val mess = code.common.Message.CheckNullReturnMess(q, List("id", "name", "description", "status"))
-    if(mess.equals("OK")) {
-      val json = q.asInstanceOf[JObject].values
-
-      val qry = QueryBuilder.start("_id").is(json.apply("id").toString)
-        .get
-
-      var update = ModelInfo.findAll(qry)
-
+    val json = q.asInstanceOf[JObject].values
+    val qryM = QueryBuilder.start("_id").is(json.apply("id").toString)
+      .get
+    val DBM = ModelInfo.findAll(qryM)
+    if(DBM.equals("publish")){
       {
-        "SUCCESS" -> update(0).update
-          .name(json.apply("name").toString)
-          .description(json.apply("description").toString)
-          .status(json.apply("status").toString)
-          .save.asJValue
+        "ERROR" -> "Model can't update (was published)"
       }: JValue
-    }else
-      return{"ERROR" -> mess} : JValue
+    }else {
+      val mess = code.common.Message.CheckNullReturnMess(q, List("id", "name", "description", "status"))
+      if (mess.equals("OK")) {
+
+
+        val qry = QueryBuilder.start("_id").is(json.apply("id").toString)
+          .get
+
+        var update = ModelInfo.findAll(qry)
+
+        {
+          "SUCCESS" -> update(0).update
+            .name(json.apply("name").toString)
+            .description(json.apply("description").toString)
+            .status(json.apply("status").toString)
+            .save.asJValue
+        }: JValue
+      } else
+        return {
+          "ERROR" -> mess
+        }: JValue
+    }
   }
 
   def viewModelInfo(id : String): JValue = {
