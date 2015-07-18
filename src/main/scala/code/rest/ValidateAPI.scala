@@ -162,7 +162,7 @@ object ValidateAPI extends RestHelper {
           if (scoreform > scoreto
             || (x < listratesort.size - 1 && scoreto > listratesort(x + 1).scorefrom.toString().toDouble)
             || listratesort(0).scorefrom.toString().toDouble < min
-            || (x == listratesort.size - 1 && listratesort(x).scoreto.toString().toDouble > max)) {
+            || (x == listratesort.size - 1 && listratesort(x).scoreto.toString().toDouble != max)) {
 
             //            return   {
             //              ("ERROR" -> "fuck")
