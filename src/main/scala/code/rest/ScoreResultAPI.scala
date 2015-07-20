@@ -103,25 +103,45 @@ object ScoreResultAPI extends RestHelper{
       val DBquery = Rating.findAll(qry)
 
         if(DBquery.size >0 ){
+
+
           if((DBquery.map(_.asJValue) \ "codein").isInstanceOf[JArray]){
-            val JArray(rates) = (DBquery.map(_.asJValue) \ "codein")
-            rates collect { case rate: JObject => rate } foreach getlist
+            val listCodein: List[codeIN] =  DBquery(0).codein.value
 
-            def getlist(rate: JObject) = {
-              var listb: List[codeIN] = List()
-              val j = rate.asInstanceOf[JObject].values
-              if (j.apply("scorefrom").toString.toDouble < scoreresult && scoreresult < j.apply("scoreto").toString.toDouble) {
+            val listCodeinsort = listCodein.sortWith(_.scorefrom.toString().toDouble < _.scoreto.toString().toDouble)
 
-                coderesul = j.apply("code").toString
-                codestatus = j.apply("status").toString
+            val x = 0
+            for(x <-0 to listCodeinsort.size -1 ){
+              val scoreform = listCodeinsort(x).scorefrom.toString().toDouble
+              val scoreto = listCodeinsort(x).scoreto.toString().toDouble
 
-                msg ={("Score"-> f"$scoreresult%1.2f")~("Rating" -> j.apply("code").toString)~("Status" -> j.apply("status").toString)} :JValue
+              if((scoreform <= scoreresult && scoreresult < scoreto) ||( x == listCodeinsort.size -1 && scoreto == scoreresult)){
+                coderesul = listCodeinsort(x).code.toString()
+                codestatus = listCodeinsort(x).status.toString()
 
+                msg ={("Score"-> f"$scoreresult%1.2f")~("Rating" -> coderesul)~("Status" -> codestatus)} :JValue
 
               }
-
-
             }
+
+//            val JArray(rates) = (DBquery.map(_.asJValue) \ "codein")
+//            rates collect { case rate: JObject => rate } foreach getlist
+//
+//            def getlist(rate: JObject) = {
+//              var listb: List[codeIN] = List()
+//              val j = rate.asInstanceOf[JObject].values
+//              if (j.apply("scorefrom").toString.toDouble < scoreresult && scoreresult < j.apply("scoreto").toString.toDouble) {
+//
+//                coderesul = j.apply("code").toString
+//                codestatus = j.apply("status").toString
+//
+//                msg ={("Score"-> f"$scoreresult%1.2f")~("Rating" -> j.apply("code").toString)~("Status" -> j.apply("status").toString)} :JValue
+//
+//
+//              }
+//
+//
+//            }
 
           }
 
