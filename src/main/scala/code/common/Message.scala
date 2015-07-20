@@ -3,6 +3,8 @@ package code.common
 import net.liftweb.json.JsonAST.{JObject, JValue}
 
 import scala.util.control.Breaks
+import net.liftweb.json.JsonAST.JValue
+import net.liftweb.json.JsonDSL._
 
 /**
  * Created by phong on 7/16/2015.
@@ -32,5 +34,10 @@ object Message {
       }
     }
     return ErrorFieldExixts(mess)
+  }
+
+  def returnMassage(api : String,code:String, msgerr :String,body:JValue) : JValue={
+
+    {api -> (("header" ->(("code"-> code)~("message" -> msgerr)))~("body" -> body))} :JValue
   }
 }
