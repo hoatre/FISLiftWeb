@@ -182,7 +182,7 @@ object ValidateAPI extends RestHelper {
       }
 
     }else{
-      return  msgcheckweightrate(mapAllFactor,null,1)
+      return  msgcheckweightrate(mapAllFactor,"Not found",1)
 
     }
 
