@@ -94,6 +94,7 @@ object ScoreResultAPI extends RestHelper{
 
 
       }
+      scoreresult = (f"$scoreresult%1.2f").toDouble
       var coderesul :String = null
       var codestatus : String = null
 //
@@ -119,7 +120,7 @@ object ScoreResultAPI extends RestHelper{
                 coderesul = listCodeinsort(x).code.toString()
                 codestatus = listCodeinsort(x).status.toString()
 
-                msg ={("Score"-> f"$scoreresult%1.2f")~("Rating" -> coderesul)~("Status" -> codestatus)} :JValue
+                msg ={("Score"-> scoreresult)~("Rating" -> coderesul)~("Status" -> codestatus)} :JValue
 
               }
             }
