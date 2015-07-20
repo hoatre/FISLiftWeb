@@ -5,6 +5,7 @@ package code.rest
  */
 import java.util.UUID
 
+import code.common.Message
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json._
@@ -49,6 +50,13 @@ object ValidateAPI extends RestHelper {
     }: JValue
     case "validate" :: "checkweightrate" :: Nil JsonPost json -> request => checkweightrate(json)
 
+//    case "validate" :: "checkweightrate" :: Nil JsonDelete json  => test(json)
+
+
+  }
+
+  def  test(q:JValue): JValue ={
+    {"" -> ""} :JValue
 
   }
 
@@ -160,7 +168,7 @@ object ValidateAPI extends RestHelper {
           val scoreto = listratesort(x).scoreto.toString().toDouble
 
           if (scoreform > scoreto
-            || (x < listratesort.size - 1 && scoreto > listratesort(x + 1).scorefrom.toString().toDouble)
+            || (x < listratesort.size - 1 && scoreto != listratesort(x + 1).scorefrom.toString().toDouble)
             || listratesort(0).scorefrom.toString().toDouble < min
             || (x == listratesort.size - 1 && listratesort(x).scoreto.toString().toDouble != max)) {
 
@@ -215,8 +223,10 @@ object ValidateAPI extends RestHelper {
       checkmsg = "Model can not active"
     }
 
-    {"checkweightrate" -> (("header" ->(("code"->check.toString)~("message" -> checkmsg)))~("body" -> msg))} :JValue
+//    {"checkweightrate" -> (("header" ->(("code"->check.toString)~("message" -> checkmsg)))~("body" -> msg))} :JValue
 
+
+    Message.returnMassage("checkweightrate",check.toString,checkmsg,msg)
   }
 
 }
