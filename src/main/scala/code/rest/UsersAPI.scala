@@ -33,20 +33,22 @@ object UsersAPI extends RestHelper {
 
 
   serve {
-    case "users" :: "getall"  :: Nil JsonGet req => UsersSpet.getall("getall","") : JValue
+    case "user" :: "getall"  :: Nil JsonGet req => UsersSpet.getall("getall","") : JValue
 
-    case "users" :: q   JsonGet req =>
+    case "user" :: q   JsonGet req =>
       UsersSpet.getuserbyusername(q) : JValue
 
-    case "users" :: "update" :: q:: Nil Post req -> request =>
+    case "user" :: "update_user" :: q:: Nil Post req -> request =>
       for{
         JString(id) <- (q \\ "id").toOpt
         JString(username) <- (q \\ "username").toOpt} yield UsersSpet.getupdate(id,username)
 
-    case "users" :: "delete" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield UsersSpet.getDelete(id)
+    case "user" :: "delete" :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "_id").toOpt} yield UsersSpet.getDelete(id)
 
-    case "users" :: Nil JsonPost json->request => UsersSpet.insertupdatedeleteUser(json):JValue
+    case "user" ::"add"  :: Nil JsonPost json->request => UsersSpet.insert(json)
+
+    case "user" ::"update"  :: Nil JsonPost json->request => UsersSpet.update(json)
 
     case "shout" :: q:: Nil Post req => {"abc" -> "abc"} :JValue
 
