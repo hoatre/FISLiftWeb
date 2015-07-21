@@ -2,7 +2,9 @@ package code.snippet
 
 import java.util.UUID
 
+import code.common.Message
 import com.mongodb.{BasicDBObjectBuilder, QueryBuilder}
+import net.liftweb.common.Full
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
 import net.liftweb.http.{S, LiftRules}
@@ -10,13 +12,15 @@ import net.liftweb.json
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
 import code.snippet._
-import code.model.{Users => UsersModel, Groups, groupIN}
+import code.model.{Users => UsersModel, userIN, Groups, groupIN}
 import net.liftweb.json.Printer._
-import net.liftweb.json.{JsonAST, JObject, Extraction}
-import net.liftweb.mongodb.JObjectParser
+import net.liftweb.json.{JsonDSL, JsonAST, JObject, Extraction}
+import net.liftweb.mongodb.{JsonObjectId, JObjectParser}
 import net.liftweb.http.js.JsExp
 import net.liftweb.json.JsonDSL.seq2jvalue
 import code.dao.{Users => UserDAO}
+import net.liftweb.util.A
+
 /**
  * Created by bacnv on 7/8/15.
  */
@@ -58,7 +62,7 @@ object Users {
       .append("$set", BasicDBObjectBuilder.start
       .append("user.name", name).get).get
 
-    UsersModel.update(("_id" -> _id), ("$set" -> ("user.name" -> name)))
+    UsersModel.update(("_id" ->  ("$oid" -> _id)), ("$set" -> ("user.name" -> name)))
 
 
     val a = { "SUSCESS" -> " Tao update roi nhe" }
@@ -68,12 +72,11 @@ object Users {
 
   def getDelete(_id:String) :JValue ={
 
-    UsersModel.delete(("_id" -> _id))
+   val msg = UsersModel.delete(("_id" -> ("$oid" -> _id)))
+    println(msg)
 
 
-    val a = { "SUSCESS" -> " Tao xoa roi nhe" }
-
-    a:JValue
+   return Message.returnMassage("delete_user","0","Delete successed",null,0)
   }
 
   def getbyuser(username:String,key:String) : List[UsersModel]={
@@ -189,6 +192,66 @@ object Users {
     //    Groups.createRecord.id(UUID.randomUUID().toString).group(groupin).save
 
 
+
+  }
+  def insert(q:JValue) : JValue= {
+
+    val json = q.asInstanceOf[JObject].values
+
+
+
+    val user = userIN.createRecord.address(json.apply("address").toString).email(json.apply("email").toString).name(json.apply("name").toString).password(json.apply("password").toString)
+
+    val msg = UsersModel.createRecord.user(user).save
+
+    if (msg != null && msg.asJValue.isInstanceOf[JObject]) {
+    return Message.returnMassage("add_user", "0","Insert successed",msg.asJValue)
+  }else{
+      return Message.returnMassage("add_user", "1","Insert failed",null)
+    }
+
+  }
+
+  def update(q:JValue) : JValue= {
+
+    var id : String = ""
+
+    val jsonMap: Map[String,Any] = q.values.asInstanceOf[Map[String,Any]]
+
+    var lista : Map[String,String] = Map()
+    var a : Object = null
+    for ((key,value) <- jsonMap) {
+      if(key != "_id") {
+        lista += "user."+key -> value.toString
+
+      }else{
+        id = value.toString
+      }
+
+//      println(lista)
+    }
+
+//    val b = scala.util.parsing.json.JSONObject(lista)
+    val b = ("$set" -> lista)
+
+    println(b)
+//    val lstupdate : Map[String,Map] = ("$set" -> lista)
+
+
+
+//    val user = userIN.createRecord.address(json.apply("address").toString).email(json.apply("email").toString).name(json.apply("name").toString).password(json.apply("password").toString)
+
+    UsersModel.update(("_id" ->  ("$oid" -> id)), b)
+
+    val count = UsersModel.count(("_id" ->  ("$oid" -> id)))
+    val msg = UsersModel.findAll(("_id" ->  ("$oid" -> id)))
+//    val List(abc) = UsersModel.findAll
+
+    if (msg != null) {
+      return Message.returnMassage("update_user", "0","Update successed",msg(0).asJValue,count)
+    }else{
+      return Message.returnMassage("update_user", "1","Update failed",null,0)
+    }
 
   }
 
