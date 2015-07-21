@@ -24,10 +24,10 @@ object FactorAPI extends RestHelper {
   def getFactorJSON(): JValue = {
     val DBList = Factor.findAll
     if (DBList.isEmpty)
-      "ERROR" -> "Factor not found": JValue
-    else {
-      "FactorsList" -> DBList.map(_.asJValue)
-    }: JValue
+      code.common.Message.returnMassage("getall", "1", "Factor not found", null)
+    else code.common.Message.returnMassage("getall", "0", "SUCCESS", DBList.map(_.asJValue))
+
+
 
   }
 
@@ -168,7 +168,6 @@ object FactorAPI extends RestHelper {
 
   def test(q: JValue): JValue = {
 
-    //    ScoringRange(q)
 
     "test" -> "test": JValue
 
@@ -193,21 +192,91 @@ object FactorAPI extends RestHelper {
     for (factor <- listDBCuoi.distinct) {
       val list = factor.FactorOption.value.distinct.sortWith(_.Score.toString().toDouble < _.Score.toString().toDouble)
 
-      var minIn = list(0).Score.toString().toDouble * (factor.Weight.toString().toDouble / 100)
-      for (path <- factor.PathFactor.value) {
-        minIn = minIn * (path.Weight.toString().toDouble / 100)
-      }
+            var minIn = list(0).Score.toString().toDouble * (factor.Weight.toString().toDouble / 100)
+            for (path <- factor.PathFactor.value) {
+              minIn = minIn * (path.Weight.toString().toDouble / 100)
+            }
 
-      var maxIn = list(list.size - 1).Score.toString().toDouble * (factor.Weight.toString().toDouble / 100)
-      for (path <- factor.PathFactor.value) {
-        maxIn = maxIn * (path.Weight.toString().toDouble / 100)
-      }
+            var maxIn = list(list.size - 1).Score.toString().toDouble * (factor.Weight.toString().toDouble / 100)
+            for (path <- factor.PathFactor.value) {
+              maxIn = maxIn * (path.Weight.toString().toDouble / 100)
+            }
 
       min = min + minIn
       max = max + maxIn
     }
 
-    //    println("min : " + min + " - max : " + max)
+    println("min : " + min + " - max : " + max)
+
+    List(f"$min%1.2f", f"$max%1.2f")
+
+  }
+
+  def ScoringRangeAlwaysTrue(id: String): List[String] = {
+
+    val qry = QueryBuilder.start("ModelId").is(id).get
+
+    val DBList = Factor.findAll(qry)
+
+    var listDBCuoi: List[Factor] = List()
+
+    for (factor <- DBList) {
+      if (factor.FactorOption.value.size != 0)
+        listDBCuoi = listDBCuoi ::: List(factor)
+    }
+
+    for(factorC <- listDBCuoi){
+      var pathChild : List[FactorPath] = List[FactorPath]()
+      var percentTotal : Double = 0
+      var check : Boolean = true
+      var i = 0
+      var factorTemp : Factor = Factor
+      while (check == true){
+        if(i == 0){
+          if(factorC.Parentid.toString().equals("")){
+            check = false
+            factorTemp = Factor
+          }else{
+            val FC = Factor.findAll(QueryBuilder.start("_id").is(factorC.Parentid.toString()).get)
+            val t = FC(0).copy
+            factorTemp = t
+            pathChild = pathChild .::: (List(FactorPath.FactorPathId(factorTemp.copy.Parentid.toString()).Weight(factorTemp.copy.Weight.toString().toDouble)))
+            percentTotal = factorTemp.copy.Weight.toString().toDouble / 100
+            i = i + 1
+          }
+        }else{
+          if(factorTemp.Parentid.toString().equals("")){
+            check = false
+            factorTemp = Factor.createRecord
+          }else{
+            val FC2 = Factor.findAll(QueryBuilder.start("_id").is(factorTemp.copy.Parentid.toString()).get)
+            val t = FC2(0).copy
+            factorTemp = t
+            pathChild = pathChild .::: (List(FactorPath.FactorPathId(factorTemp.copy.Parentid.toString()).Weight(factorTemp.copy.Weight.toString().toDouble)))
+            percentTotal = percentTotal * factorTemp.copy.Weight.toString().toDouble/100
+          }
+        }
+      }
+      for(a <- pathChild){
+        print(a.Weight + " " + a.FactorPathId + " ")
+      }
+      percentTotal = percentTotal * factorC.Weight.toString().toDouble/100
+      factorC.update.PercentTotal(percentTotal).save
+    }
+
+    var min: Double = 0
+    var max: Double = 0
+
+    for (factor <- listDBCuoi.distinct) {
+      val list = factor.FactorOption.value.distinct.sortWith(_.Score.toString().toDouble < _.Score.toString().toDouble)
+      val minIn = list(0).Score.toString().toDouble * factor.PercentTotal.toString().toDouble
+      val maxIn = list(list.size - 1).Score.toString().toDouble * factor.PercentTotal.toString().toDouble
+
+      min = min + minIn
+      max = max + maxIn
+    }
+
+        println("min : " + min + " - max : " + max)
 
     List(f"$min%1.2f", f"$max%1.2f")
 
@@ -425,6 +494,10 @@ object FactorAPI extends RestHelper {
     val mess = code.common.Message.CheckNullReturnMess(q, List("Description","id", "Parentid", "ParentName", "Name", "Weight", "Ordinal", "Status", "Note"))
     if(mess.equals("OK")) {
       val json = q.asInstanceOf[JObject].values
+      if(json.apply("Parentid") != null && json.apply("id").toString.equals(json.apply("Parentid").toString))
+        return {
+          "ERROR" -> "Itself can not be a father !"
+        }: JValue
       val qry = QueryBuilder.start("_id").is(json.apply("id").toString).get
       val DBUpdate = Factor.findAll(qry)
 
@@ -447,6 +520,10 @@ object FactorAPI extends RestHelper {
         val qry = QueryBuilder.start("_id").is(json.apply("Parentid").toString).get
         val DBList = Factor.findAll(qry)
         if (DBList != null) {
+          if(DBList(0).FactorOption.value.size != 0)
+            return {
+              "ERROR" -> "Factor parent had factor option !"
+            }: JValue
           listPathFactor = listPathFactor ::: DBList(0).PathFactor.value
           val factorPath = FactorPath.createRecord
             .FactorPathId(DBList(0).id.toString())
@@ -455,8 +532,8 @@ object FactorAPI extends RestHelper {
           listPathFactor = listPathFactor ::: x
         }
       }
-      var saveItem = DBUpdate(0).update
-      if(json.apply("Parentid") != null){
+      val saveItem = DBUpdate(0).update
+      if(json.apply("Parentid") != null && json.apply("Parentid").toString != ""){
         saveItem
           .Parentid(json.apply("Parentid").toString)
       }else{
@@ -489,9 +566,10 @@ object FactorAPI extends RestHelper {
         if (factor.Parentid.toString().equals(json.apply("id").toString)) {
           factor.update.ParentName(json.apply("ParentName").toString)
         }
+
         var listPathFactorchild: List[FactorPath] = List()
         listPathFactorchild = listPathFactorchild ::: listPathFactor
-        var j: Int = 0
+        var j: Int = -1
         for (i <- 0 to factor.PathFactor.value.size - 1) {
 
           if (factor.PathFactor.value(i).FactorPathId.toString().equals(json.apply("id").toString)) {
@@ -500,10 +578,9 @@ object FactorAPI extends RestHelper {
             listPathFactorchild = listPathFactorchild ::: List(newPath)
             j = i
           }
-          if (j != 0 && i > j) {
+          if (j != -1 && i > j) {
             listPathFactorchild = listPathFactorchild ::: List(factor.PathFactor.value(i))
           }
-
         }
         factor.update.PathFactor(listPathFactorchild).save
       }

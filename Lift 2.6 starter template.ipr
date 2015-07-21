@@ -70,7 +70,7 @@
     <option name="vmParameters" value="" />
   </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="" />
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
   <component name="libraryTable">
     <library name="SBT: ch.qos.logback:logback-classic:1.0.6:jar">

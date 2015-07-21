@@ -1,10 +1,9 @@
 package code
 package model
 
-import net.liftweb.common.Full
 import net.liftweb.mongodb.record._
 import net.liftweb.mongodb.record.field._
-import net.liftweb.record.field.{DoubleField, IntField, StringField}
+import net.liftweb.record.field.{DoubleField, StringField}
 
 //---------------------------------------------------------------------------------
 class Groups private () extends MongoRecord[Groups] with StringPk[Groups] {
@@ -155,61 +154,7 @@ object groupuserIN extends groupuserIN with BsonMetaRecord[groupuserIN]
 
 //---------------------------------------------------------------------------------
 
-class Factor private () extends MongoRecord[Factor] with StringPk[Factor] {
 
-  override def meta = Factor
-
-  object ModelId extends StringRefField(this, ModelInfo, 512){
-    override def options = ModelInfo.findAll.map(rd => (Full(rd.id.is), rd.name.is) )
-  }
-  object Parentid extends StringRefField(this, Factor, 512){
-    override def options = Factor.findAll.map(rd => (Full(rd.id.is), rd.FactorName.is) )
-  }
-//  object Parentid extends MongoRefField(this)
-  object ParentName extends StringField(this, 512)
-  object FactorName extends StringField(this, 512)
-  object Description extends StringField(this, 512)
-  object Weight extends DoubleField(this)
-  object Ordinal extends IntField(this)
-  object Status extends StringField(this, 512)
-  object Note extends StringField(this, 512)
-  object PathFactor extends BsonRecordListField(this, FactorPath)
-
-  object FactorOption extends BsonRecordListField(this, FactorOptionIN)
-
-  // An embedded document:
-//  object factor extends BsonRecordListField(this, factorIN)
-
-}
-
-object Factor extends Factor with MongoMetaRecord[Factor] {
-  override def collectionName = "factor"
-}
-
-class FactorPath private () extends BsonRecord[FactorPath] {
-  def meta = FactorPath
-  object FactorPathId extends StringRefField(this, Factor, 512){
-    override def options = Factor.findAll.map(rd => (Full(rd.id.is), rd.FactorName.is) )
-  }
-//  object FactorPathId extends StringField(this, 512)
-  object Weight extends DoubleField(this)
-
-}
-
-object FactorPath extends FactorPath with BsonMetaRecord[FactorPath]
-
-class FactorOptionIN private () extends BsonRecord[FactorOptionIN] {
-  def meta = FactorOptionIN
-  object FactorOptionId extends StringField(this, 50)
-  object FactorOptionName extends StringField(this, 512)
-  object Description extends StringField(this, 512)
-  object Score extends DoubleField(this)
-  object Fatal extends StringField(this, 512)
-  object Status extends StringField(this, 512)
-
-}
-
-object FactorOptionIN extends FactorOptionIN with BsonMetaRecord[FactorOptionIN]
 
 //---------------------------------------------------------------------------------
 
@@ -240,22 +185,7 @@ object FactorOptionIN extends FactorOptionIN with BsonMetaRecord[FactorOptionIN]
 
 //---------------------------------------------------------------------------------
 
-class ModelInfo private () extends MongoRecord[ModelInfo] with StringPk[ModelInfo] {
 
-  override def meta = ModelInfo
-
-  // An embedded document:
-//  object modelinfo extends BsonRecordField(this, modelinfoIN)
-  object name extends StringField(this, 1024)
-  object description extends StringField(this, 1024)
-  object status extends StringField(this, 1024)
-  object min extends DoubleField(this)
-  object max extends DoubleField(this)
-
-}
-
-object ModelInfo extends ModelInfo with MongoMetaRecord[ModelInfo] {
-  override def collectionName = "modelinfo"
 }
 
 //---------------------------------------------------------------------------------
