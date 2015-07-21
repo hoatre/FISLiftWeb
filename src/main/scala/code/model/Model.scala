@@ -18,3 +18,4 @@ class ModelInfo private () extends MongoRecord[ModelInfo] with StringPk[ModelInf
 
 object ModelInfo extends ModelInfo with MongoMetaRecord[ModelInfo] {
   override def collectionName = "modelinfo"
+}
