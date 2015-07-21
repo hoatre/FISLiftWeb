@@ -3,7 +3,7 @@ package model
 
 import net.liftweb.mongodb.record._
 import net.liftweb.mongodb.record.field._
-import net.liftweb.record.field.{DoubleField, StringField}
+import net.liftweb.record.field.StringField
 
 //---------------------------------------------------------------------------------
 class Groups private () extends MongoRecord[Groups] with StringPk[Groups] {
@@ -186,6 +186,6 @@ object groupuserIN extends groupuserIN with BsonMetaRecord[groupuserIN]
 //---------------------------------------------------------------------------------
 
 
-}
+
 
 //---------------------------------------------------------------------------------
