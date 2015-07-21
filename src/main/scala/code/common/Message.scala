@@ -1,10 +1,9 @@
 package code.common
 
 import net.liftweb.json.JsonAST.{JObject, JValue}
+import net.liftweb.json.JsonDSL._
 
 import scala.util.control.Breaks
-import net.liftweb.json.JsonAST.JValue
-import net.liftweb.json.JsonDSL._
 
 /**
  * Created by phong on 7/16/2015.
@@ -12,9 +11,9 @@ import net.liftweb.json.JsonDSL._
 object Message {
   def ErrorFieldExixts(field : String) : String = {
     if(field.equals("OK"))
-      "OK"
+      return "OK"
     else
-      "Field " + field + " is not exists !"
+      return "Field " + field + " is not exists !"
   }
   def ErrorFieldNull(field : String) : String = {
     "Field " + field + " must be not null !"
@@ -33,7 +32,7 @@ object Message {
         }
       }
     }
-    return ErrorFieldExixts(mess)
+    return mess
   }
 
   def returnMassage(api : String,code:String, msgerr :String,body:JValue) : JValue={

@@ -38,11 +38,8 @@ object FactorAPI extends RestHelper {
     val DBList = Factor.findAll(qry)
 
     if (DBList.isEmpty)
-      "ERROR" -> "Factor not found": JValue
-    else {
-      "FactorsList" -> DBList.map(_.asJValue)
-    }: JValue
-
+      code.common.Message.returnMassage("getfactorbyid", "1", "Factor not found", null)
+    else code.common.Message.returnMassage("getfactorbyid", "0", "SUCCESS", DBList.map(_.asJValue))
   }
 
   def getFactorOptionByIdJSON(factorId: String, factorOptionId: String): JValue = {
@@ -51,12 +48,14 @@ object FactorAPI extends RestHelper {
 
     val DBList = Factor.findAll(qry)
 
-    if (DBList(0).FactorOption.value.isEmpty)
-      "ERROR" -> "FactorOption not found": JValue
-    else {
-      "FactorsOptionItem" -> DBList(0).FactorOption.value.find(fo => fo.FactorOptionId.toString() == factorOptionId.toString).map(_.asJValue)
-    }: JValue
-
+    if(DBList == Nil)
+      return code.common.Message.returnMassage("getFactorOptionByIdJSON", "1", "Factor not found", null)
+    val factor_option = DBList(0).FactorOption.value.find(fo => fo.FactorOptionId.toString() == factorOptionId.toString)
+    if (DBList(0).FactorOption.value.isEmpty || factor_option == None)
+      return code.common.Message.returnMassage("getFactorOptionByIdJSON", "1", "FactorOption not found", null)
+    else
+      return code.common.Message.returnMassage("getFactorOptionByIdJSON", "0", "SUCCESS",
+        factor_option.map(_.asJValue))
   }
 
   def deleteFactor(_id: String): JValue = {
@@ -64,20 +63,13 @@ object FactorAPI extends RestHelper {
       .get
     val DBM = ModelInfo.findAll(qryM)
     if(DBM.equals("publish") || DBM.equals("active")){
-      {
-        "ERROR" -> "Factor can't delete (model was published)"
-      }: JValue
+      return code.common.Message.returnMassage("deleteFactor", "1", "Factor can't delete (model was published) !", null)
     }else {
-      var msg = {
-        "ERROR" -> "Can not delete Factor"
-      }: JValue
-
+      var msg = code.common.Message.returnMassage("deleteFactor", "2", "Can not delete Factor", null)
       val qry: QueryBuilder = new QueryBuilder
       qry.or(QueryBuilder.start("PathFactor").elemMatch(new BasicDBObject("FactorPathId", _id)).get(),
         QueryBuilder.start("Parentid").is(_id).get()
       )
-
-      //    val qhhh= QueryBuilder.start("_id").is(_id).get
 
       val db = Factor.findAll(qry.get())
 
@@ -85,9 +77,7 @@ object FactorAPI extends RestHelper {
 
         var req = Factor.delete(("_id" -> _id))
 
-        msg = {
-          "SUCCESS" -> "Deleted"
-        }: JValue
+        msg = code.common.Message.returnMassage("deleteFactor", "0", "SUCCESS", "Deleted")
       }
       msg
     }
@@ -101,76 +91,61 @@ object FactorAPI extends RestHelper {
       .get
     val DBM = ModelInfo.findAll(qryM)
     if(DBM.equals("publish") || DBM.equals("active")){
-      {
-        "ERROR" -> "FactorOption can't delete (model was published)"
-      }: JValue
+      return code.common.Message.returnMassage("deleteOptionFactor", "1", "FactorOption can't delete (model was published) !", null)
     }else {
 
       val size = DBListOp(0).FactorOption.value.size
       val factorOption = DBListOp(0).FactorOption.value.filterNot(ftO => ftO.FactorOptionId.toString().equals(IdFactorOption.toString()))
-      if (size == factorOption.size) {
-        "ERROR" -> "DELETE ERROR"
-      }: JValue
-      else {
-        "SUCCESS" -> DBListOp(0).update.FactorOption(factorOption).save.asJValue
-      }: JValue
+      if (size == factorOption.size)
+        return code.common.Message.returnMassage("deleteOptionFactor","2", "DELETE ERROR", null)
+      else
+        return code.common.Message.returnMassage("deleteOptionFactor","0", "SUCCESS",
+                          DBListOp(0).update.FactorOption(factorOption).save.asJValue)
     }
   }
 
   def updateFactorOption(q: JValue): JValue = {
 
-    val mess = code.common.Message.CheckNullReturnMess(q, List("idFactor", "idFactorOption", "Fatal", "Description", "FactorOptionName", "Score", "Status"))
+    val mess = code.common.Message.CheckNullReturnMess(q, List("FactorId", "_id", "Fatal", "Description", "FactorOptionName", "Score", "Status"))
 
     if(mess.equals("OK")) {
       val json = q.asInstanceOf[JObject].values
-      if (json.exists(p => p._1 == "idFactor")) {
-        val qry = QueryBuilder.start("_id").is(json.apply("idFactor").toString).get
+      if (json.exists(p => p._1 == "FactorId")) {
+        val qry = QueryBuilder.start("_id").is(json.apply("FactorId").toString).get
         val DBLista = Factor.findAll(qry)
 
         val qryM = QueryBuilder.start("_id").is(DBLista(0).ModelId.toString())
           .get
         val DBM = ModelInfo.findAll(qryM)
         if(DBM.equals("publish") || DBM.equals("active")){
-          {
-            "ERROR" -> "FactorOption can't update (model was published)"
-          }: JValue
+          return code.common.Message.returnMassage("updateFactorOption", "1", "FactorOption can't update (model was published !)", null)
         }
 
         var factorOptionUpdate: List[FactorOptionIN] = List()
-
+        if(DBLista(0).FactorOption.value.size == 0)
+          return code.common.Message.returnMassage("updateFactorOption","3", "update failed, factor have not factor option", null)
+        var check = false
         for (i <- 0 to DBLista(0).FactorOption.value.size - 1) {
-          if (DBLista(0).FactorOption.value(i).FactorOptionId.toString().equals(json.apply("idFactorOption").toString)) {
-            var factorOption: FactorOptionIN = FactorOptionIN.FactorOptionId(json.apply("idFactorOption").toString)
+          if (DBLista(0).FactorOption.value(i).FactorOptionId.toString().equals(json.apply("_id").toString)) {
+            var factorOption: FactorOptionIN = FactorOptionIN.FactorOptionId(json.apply("_id").toString)
               .Fatal(json.apply("Fatal").toString)
               .Description(json.apply("Description").toString)
               .FactorOptionName(json.apply("FactorOptionName").toString)
               .Score(json.apply("Score").toString.toDouble)
               .Status(json.apply("Status").toString.toLowerCase())
-            val factorOptionDelete = DBLista(0).FactorOption.value.dropWhile(ftO => ftO.FactorOptionId.toString().equals(json.apply("idFactorOption").toString))
+            val factorOptionDelete = DBLista(0).FactorOption.value.dropWhile(ftO => ftO.FactorOptionId.toString().equals(json.apply("_id").toString))
             factorOptionUpdate = factorOptionDelete ::: List(factorOption)
+            check = true
           }
         }
-
-        return {
-          "SUCCESS" -> DBLista(0).update.FactorOption(factorOptionUpdate).save.asJValue
-        }: JValue
-
+        if(check == false)
+          return code.common.Message.returnMassage("updateFactorOption","3", "_id factor option not found", null)
+        return code.common.Message.returnMassage("updateFactorOption", "0", "SUCCESS"
+                    , DBLista(0).update.FactorOption(factorOptionUpdate).save.asJValue)
       } else
-        return {
-          "ERROR" -> code.common.Message.ErrorFieldExixts("idFactor")
-        }: JValue
+        return code.common.Message.returnMassage("updateFactorOption","2", code.common.Message.ErrorFieldExixts("FactorId"), null)
     }else
-      return {
-        "ERROR" -> mess
-      }: JValue
-
-  }
-
-  def test(q: JValue): JValue = {
-
-
-    "test" -> "test": JValue
-
+      return code.common.Message.returnMassage("updateFactorOption","3", mess, null)
   }
 
   def ScoringRange(id: String): List[String] = {
@@ -206,7 +181,7 @@ object FactorAPI extends RestHelper {
       max = max + maxIn
     }
 
-    println("min : " + min + " - max : " + max)
+//    println("min : " + min + " - max : " + max)
 
     List(f"$min%1.2f", f"$max%1.2f")
 
@@ -285,7 +260,6 @@ object FactorAPI extends RestHelper {
   def UpdateRangeModel(range: List[Double], ModelId: String) = {
     val qry = QueryBuilder.start("ModelId").is(ModelId).get
     val DBList = ModelInfo.findAll(qry)
-//    ModelInfo.
     DBList(0).update.min(range(0)).max(range(1)).save
   }
 
@@ -297,14 +271,15 @@ object FactorAPI extends RestHelper {
       if (json != null) {
         val qry = QueryBuilder.start("_id").is(json.apply("FactorId").toString).get
         val DBList = Factor.findAll(qry)
-
+        if(DBList == Nil)
+          return code.common.Message.returnMassage("insertFactorOption", "1", "FactorOption can't insert (factor not found)!",null)
+        if(DBList(0).PathFactor.value.size != 0)
+          return code.common.Message.returnMassage("insertFactorOption", "1", "FactorOption can't insert (factor had Children)!",null)
         val qryM = QueryBuilder.start("_id").is(DBList(0).ModelId.toString())
           .get
         val DBM = ModelInfo.findAll(qryM)
         if(DBM.equals("publish") || DBM.equals("active")){
-          {
-            "ERROR" -> "FactorOption can't insert (model was published)"
-          }: JValue
+          return code.common.Message.returnMassage("insertFactorOption", "1", "FactorOption can't insert (model was published)!",null)
         }
 
         val factorOption = FactorOptionIN
@@ -321,16 +296,11 @@ object FactorAPI extends RestHelper {
 
         val updateFactor = DBList(0).update.FactorOption(listFactorOption).save
 
-        {
-          "SUCCESS" -> updateFactor.asJValue
-        }: JValue
-      } else {
-        "ERROR" -> "INSERT FAILED"
-      }: JValue
+        return code.common.Message.returnMassage("insertFactorOption","0", "SUCCESS", updateFactor.asJValue)
+      } else
+        return code.common.Message.returnMassage("insertFactorOption", "2", "INSERT FAILED", null)
     }else
-      return {
-        "ERROR" -> mess
-      }: JValue
+      return code.common.Message.returnMassage("insertFactorOption", "3", mess, null)
   }
 
   def insertFactor(q: JValue): JValue = {
@@ -343,16 +313,12 @@ object FactorAPI extends RestHelper {
           .get
         val DBM = ModelInfo.findAll(qryM)
         if (DBM.equals("publish") || DBM.equals("active")) {
-          {
-            "ERROR" -> "Factor can't insert (model was published)"
-          }: JValue
+          return code.common.Message.returnMassage("insertFactor", "1", "Factor can't insert (model was published) !", null)
         }
       }
     }
     else
-      return {
-        "ERROR" -> code.common.Message.ErrorFieldNull("ModelId")
-      }: JValue
+      return code.common.Message.returnMassage("insertFactor", "2", code.common.Message.ErrorFieldNull("ModelId"), null)
 
       if (json != null) {
         var listPathFactor: List[FactorPath] = List()
@@ -360,7 +326,7 @@ object FactorAPI extends RestHelper {
           if (json.apply("Parentid").toString != "") {
             val qry = QueryBuilder.start("_id").is(json.apply("Parentid").toString).get
             val DBList = Factor.findAll(qry)
-            if (DBList != null) {
+            if (DBList != Nil) {
               listPathFactor = listPathFactor ::: DBList(0).PathFactor.value
               val factorPath = FactorPath.createRecord
                 .FactorPathId(DBList(0).id.toString())
@@ -371,9 +337,7 @@ object FactorAPI extends RestHelper {
 
           }
         } else
-          return {
-            "ERROR" -> code.common.Message.ErrorFieldExixts("Parentid")
-          }: JValue
+          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Parentid"), null)
         var saveItem: Factor = Factor.createRecord
         val listFactorOption: List[FactorOptionIN] = List()
 
@@ -384,23 +348,16 @@ object FactorAPI extends RestHelper {
             saveItem = Factor.ModelId(modelId)
           }
           else
-            return {
-              "ERROR" -> code.common.Message.ErrorFieldNull("ModelId")
-            }: JValue
+            return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldNull("ModelId"), null)
         } else
-          return {
-            "ERROR" -> code.common.Message.ErrorFieldExixts("ModelId")
-          }: JValue
-
+          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("ModelId"), null)
         if (json.exists(p => p._1 == "Parentid")) {
           var parentid: String = ""
           if (json.apply("Parentid").toString != "")
             parentid = json.apply("Parentid").toString
           saveItem = Factor.Parentid(parentid)
         } else
-          return {
-            "ERROR" -> code.common.Message.ErrorFieldExixts("Parentid")
-          }: JValue
+          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Parentid"), null)
 
         if (json.exists(p => p._1 == "ParentName")) {
           var parentid: String = ""
@@ -408,9 +365,7 @@ object FactorAPI extends RestHelper {
             parentid = json.apply("Parentid").toString
           saveItem = Factor.Parentid(parentid)
         } else
-          return {
-            "ERROR" -> code.common.Message.ErrorFieldExixts("ParentName")
-          }: JValue
+          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("ParentName"), null)
 
         if (json.exists(p => p._1 == "Name")) {
           var name: String = ""
@@ -418,13 +373,9 @@ object FactorAPI extends RestHelper {
             name = json.apply("Name").toString
             saveItem = Factor.FactorName(name)
           } else
-            return {
-              "ERROR" -> code.common.Message.ErrorFieldNull("Name")
-            }: JValue
+            return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldNull("Name"), null)
         } else
-          return {
-            "ERROR" -> code.common.Message.ErrorFieldExixts("Name")
-          }: JValue
+          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Name"), null)
 
         if (json.exists(p => p._1 == "Description")) {
           var description: String = ""
@@ -432,9 +383,7 @@ object FactorAPI extends RestHelper {
             description = json.apply("Description").toString
           saveItem = Factor.Description(description)
         } else
-          return {
-            "ERROR" -> code.common.Message.ErrorFieldExixts("Description")
-          }: JValue
+          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Description"), null)
 
         if (json.exists(p => p._1 == "Weight")) {
           var weight: Double = 0
@@ -442,9 +391,7 @@ object FactorAPI extends RestHelper {
             weight = json.apply("Weight").toString.toDouble
           saveItem = Factor.Weight(weight)
         } else
-          return {
-            "ERROR" -> code.common.Message.ErrorFieldExixts("Weight")
-          }: JValue
+          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Weight"), null)
 
         if (json.exists(p => p._1 == "Ordinal")) {
           var ordinal: Int = 0
@@ -452,9 +399,7 @@ object FactorAPI extends RestHelper {
             ordinal = json.apply("Ordinal").toString.toInt
           saveItem = Factor.Ordinal(ordinal)
         } else
-          return {
-            "ERROR" -> code.common.Message.ErrorFieldExixts("Ordinal")
-          }: JValue
+          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Ordinal"), null)
 
         if (json.exists(p => p._1 == "Status")) {
           var status: String = ""
@@ -462,9 +407,7 @@ object FactorAPI extends RestHelper {
             status = json.apply("Status").toString.toLowerCase()
           saveItem = Factor.Status(status)
         } else
-          return {
-            "ERROR" -> code.common.Message.ErrorFieldExixts("Status")
-          }: JValue
+          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Status"), null)
 
         if (json.exists(p => p._1 == "Note")) {
           var note: String = ""
@@ -472,9 +415,7 @@ object FactorAPI extends RestHelper {
             note = json.apply("Note").toString
           saveItem = Factor.Note(note)
         } else
-          return {
-            "ERROR" -> code.common.Message.ErrorFieldExixts("Note")
-          }: JValue
+          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Note"), null)
 
         saveItem = Factor
           .id(UUID.randomUUID().toString)
@@ -482,36 +423,27 @@ object FactorAPI extends RestHelper {
           .FactorOption(listFactorOption)
           .save
 
-        {
-          "SUCCESS" -> saveItem.asJValue
-        }: JValue
-      } else {
-        "ERROR" -> "INSERT FAILED"
-      }: JValue
+        return code.common.Message.returnMassage("insertFactor", "0", "SUCCESS", saveItem.asJValue)
+      } else
+        return code.common.Message.returnMassage("insertFactor", "4", "INSERT FAILED", null)
   }
 
   def updateFactor(q: JValue): JValue = {
-    val mess = code.common.Message.CheckNullReturnMess(q, List("Description","id", "Parentid", "ParentName", "Name", "Weight", "Ordinal", "Status", "Note"))
+    val mess = code.common.Message.CheckNullReturnMess(q, List("Description","_id", "Parentid", "ParentName", "Name", "Weight", "Ordinal", "Status", "Note"))
     if(mess.equals("OK")) {
       val json = q.asInstanceOf[JObject].values
-      if(json.apply("Parentid") != null && json.apply("id").toString.equals(json.apply("Parentid").toString))
-        return {
-          "ERROR" -> "Itself can not be a father !"
-        }: JValue
-      val qry = QueryBuilder.start("_id").is(json.apply("id").toString).get
+      if(json.apply("Parentid") != null && json.apply("_id").toString.equals(json.apply("Parentid").toString))
+        return code.common.Message.returnMassage("updateFactor", "1", "Itself can not be a father !", null)
+      val qry = QueryBuilder.start("_id").is(json.apply("_id").toString).get
       val DBUpdate = Factor.findAll(qry)
 
       val qryM = QueryBuilder.start("_id").is(DBUpdate(0).ModelId.toString())
         .get
       val DBM = ModelInfo.findAll(qryM)
       if(DBM == null)
-        {
-          "ERROR" -> "ModelInfo not found"
-        }: JValue
+        return code.common.Message.returnMassage("updateFactor", "1", "ModelInfo not found", null)
       if(DBM.equals("publish") || DBM.equals("active")){
-        {
-          "ERROR" -> "Factor can't insert (model was published)"
-        }: JValue
+        return code.common.Message.returnMassage("updateFactor", "1", "Factor can't insert (model was published)", null)
       }
 
       //Get path moi theo ParentID
@@ -521,9 +453,7 @@ object FactorAPI extends RestHelper {
         val DBList = Factor.findAll(qry)
         if (DBList != null) {
           if(DBList(0).FactorOption.value.size != 0)
-            return {
-              "ERROR" -> "Factor parent had factor option !"
-            }: JValue
+            return code.common.Message.returnMassage("updateFactor", "1", "Factor parent had factor option !", null)
           listPathFactor = listPathFactor ::: DBList(0).PathFactor.value
           val factorPath = FactorPath.createRecord
             .FactorPathId(DBList(0).id.toString())
@@ -563,7 +493,7 @@ object FactorAPI extends RestHelper {
       val DBChild = Factor.findAll(qryChild)
 
       for (factor <- DBChild) {
-        if (factor.Parentid.toString().equals(json.apply("id").toString)) {
+        if (factor.Parentid.toString().equals(json.apply("_id").toString)) {
           factor.update.ParentName(json.apply("ParentName").toString)
         }
 
@@ -572,9 +502,9 @@ object FactorAPI extends RestHelper {
         var j: Int = -1
         for (i <- 0 to factor.PathFactor.value.size - 1) {
 
-          if (factor.PathFactor.value(i).FactorPathId.toString().equals(json.apply("id").toString)) {
+          if (factor.PathFactor.value(i).FactorPathId.toString().equals(json.apply("_id").toString)) {
             val newPath: FactorPath = FactorPath.Weight(json.apply("Weight").toString.toDouble)
-              .FactorPathId(json.apply("id").toString)
+              .FactorPathId(json.apply("_id").toString)
             listPathFactorchild = listPathFactorchild ::: List(newPath)
             j = i
           }
@@ -585,13 +515,9 @@ object FactorAPI extends RestHelper {
         factor.update.PathFactor(listPathFactorchild).save
       }
 
-      {
-        "SUCCESS" -> saveItem.save.asJValue
-      }: JValue
+      return code.common.Message.returnMassage("updateFactor", "0", "SUCCESS", saveItem.save.asJValue)
     }else
-      {
-        "ERROR" -> mess
-      } : JValue
+      return code.common.Message.returnMassage("updateFactor", "1", mess, null)
   }
 
 
@@ -602,15 +528,7 @@ object FactorAPI extends RestHelper {
       "OK" -> "200"
     }: JValue
     case "factor" :: "getbyfactorid" :: Nil JsonPost json -> request =>
-      for {JString(id) <- (json \\ "id").toOpt} yield getFactorByIdJSON(id): JValue
-
-    case "factoroption" :: "getbyfactoroptionid" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
-    case "factoroption" :: "getbyfactoroptionid" :: Nil JsonPost json -> request =>
-      for {JString(factorId) <- (json \\ "factorId").toOpt
-           JString(factorOptionId) <- (json \\ "factorOptionId").toOpt
-      } yield getFactorOptionByIdJSON(factorId, factorOptionId): JValue
+      for {JString(id) <- (json \\ "_id").toOpt} yield getFactorByIdJSON(id): JValue
 
     case "factor" :: "update" :: Nil Options _ => {
       "OK" -> "200"
@@ -621,35 +539,40 @@ object FactorAPI extends RestHelper {
       "OK" -> "200"
     }: JValue
     case "factor" :: "delete" :: Nil JsonPost json -> request =>
-      for {JString(id) <- (json \\ "id").toOpt} yield deleteFactor(id)
-
-    case "factor" :: "deleteOption" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
-    case "factor" :: "deleteOption" :: Nil JsonPost json -> request =>
-      for {JString(idFactor) <- (json \\ "idFactor").toOpt
-           JString(idFactorOption) <- (json \\ "idFactorOption").toOpt
-      } yield deleteOptionFactor(idFactor, idFactorOption)
+      for {JString(id) <- (json \\ "_id").toOpt} yield deleteFactor(id)
 
     case "factor" :: "insert" :: Nil Options _ => {
       "OK" -> "200"
     }: JValue
     case "factor" :: "insert" :: Nil JsonPost json -> request => insertFactor(json)
 
-    case "factor" :: "insertOption" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
-    case "factor" :: "insertOption" :: Nil JsonPost json -> request => insertFactorOption(json)
+//--------------------------------------------------------------------------------------------------------------------
 
-    case "factor" :: "updateOption" :: Nil Options _ => {
+    case "factoroption" :: "getbyfactoroptionid" :: Nil Options _ => {
       "OK" -> "200"
     }: JValue
-    case "factor" :: "updateOption" :: Nil JsonPost json -> request => updateFactorOption(json)
+    case "factoroption" :: "getbyfactoroptionid" :: Nil JsonPost json -> request =>
+      for {JString(factorId) <- (json \\ "FactorId").toOpt
+           JString(factorOptionId) <- (json \\ "_id").toOpt
+      } yield getFactorOptionByIdJSON(factorId, factorOptionId): JValue
 
-    case "test" :: Nil Options _ => {
+    case "factoroption" :: "deleteoption" :: Nil Options _ => {
       "OK" -> "200"
     }: JValue
-    case "test" :: Nil JsonPost json -> request => test(json)
+    case "factoroption" :: "deleteoption" :: Nil JsonPost json -> request =>
+      for {JString(idFactor) <- (json \\ "FactorId").toOpt
+           JString(idFactorOption) <- (json \\ "_id").toOpt
+      } yield deleteOptionFactor(idFactor, idFactorOption)
+
+    case "factoroption" :: "insertoption" :: Nil Options _ => {
+      "OK" -> "200"
+    }: JValue
+    case "factoroption" :: "insertoption" :: Nil JsonPost json -> request => insertFactorOption(json)
+
+    case "factoroption" :: "updateoption" :: Nil Options _ => {
+      "OK" -> "200"
+    }: JValue
+    case "factoroption" :: "updateoption" :: Nil JsonPost json -> request => updateFactorOption(json)
 
   }
 
