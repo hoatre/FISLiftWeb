@@ -23,6 +23,7 @@ import net.liftweb.json.Printer._
 import net.liftweb.mongodb.JObjectParser
 import net.liftweb.http.js.JsExp
 import net.liftweb.json.JsonDSL.seq2jvalue
+import org.bson.types.ObjectId
 
 /**
  * Created by bacnv on 7/15/15.
@@ -90,7 +91,7 @@ object ScoreResultAPI extends RestHelper{
 
         }
 
-        lista = lista ::: List(resultIN.FactorId(factorid).FactorOptionScore(score).FactorOptionId(Option(j.apply("factoroptionid").toString).getOrElse(null)))
+        lista = lista ::: List(resultIN.createRecord.factor_id(factorid).factor_option_score(score).factor_option_id(Option(j.apply("factoroptionid").toString).getOrElse(null)))
 
 
       }
@@ -158,7 +159,7 @@ object ScoreResultAPI extends RestHelper{
 
   def saveScoreResult(modelid :String,scoring :Double,ratingCode :String,ratingStatus :String,list : List[resultIN]){
 
-    ScoringResult.id(UUID.randomUUID().toString).modelid(modelid).Scoring(scoring).RatingCode(ratingCode).RatingStatus(ratingStatus).ResultIN(list).Timestamp(System.currentTimeMillis()).save
+    ScoringResult.createRecord.id(ObjectId.get).modelid(modelid).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resulin(list).time_stamp(System.currentTimeMillis()).factor(Factor.findAll("ModelId" -> modelid)).save
 
   }
 
