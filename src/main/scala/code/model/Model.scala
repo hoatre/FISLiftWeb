@@ -1,3 +1,5 @@
+package code.model
+
 import net.liftweb.mongodb.record.{MongoMetaRecord, MongoRecord}
 import net.liftweb.mongodb.record.field.StringPk
 import net.liftweb.record.field.{DoubleField, StringField}

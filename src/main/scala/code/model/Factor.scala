@@ -1,3 +1,5 @@
+package code.model
+
 import net.liftweb.common.Full
 import net.liftweb.mongodb.record.{BsonMetaRecord, BsonRecord, MongoMetaRecord, MongoRecord}
 import net.liftweb.mongodb.record.field.{BsonRecordListField, StringRefField, StringPk}

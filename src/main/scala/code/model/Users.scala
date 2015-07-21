@@ -1,14 +1,14 @@
 package code.model
 
+import net.liftweb.mongodb.record.field.{BsonRecordField, StringPk}
 import net.liftweb.mongodb.record.{BsonMetaRecord, BsonRecord, MongoMetaRecord, MongoRecord}
-import net.liftweb.mongodb.record.field.{ObjectIdPk, BsonRecordField, StringPk}
-import net.liftweb.record.field.{IntField, StringField}
+import net.liftweb.record.field.StringField
 
 
 /**
  * Created by bacnv on 7/7/15.
  */
-class Users private () extends MongoRecord[Users] with ObjectIdPk[Users] {
+class Users private () extends MongoRecord[Users] with StringPk[Users] {
 
   override def meta = Users
 
