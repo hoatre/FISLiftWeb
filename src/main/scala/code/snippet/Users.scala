@@ -2,8 +2,8 @@ package code.snippet
 
 import java.util.UUID
 
-import code.common.Message
-import com.mongodb.{BasicDBObjectBuilder, QueryBuilder}
+import code.common.{Message}
+import com.mongodb.{BulkWriteOperation, BasicDBObjectBuilder, QueryBuilder}
 import net.liftweb.common.Full
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
@@ -20,6 +20,11 @@ import net.liftweb.http.js.JsExp
 import net.liftweb.json.JsonDSL.seq2jvalue
 import code.dao.{Users => UserDAO}
 import net.liftweb.util.A
+import org.bson.types.ObjectId
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{ExecutionContext, Await, Future}
+import scala.util.Success
 
 /**
  * Created by bacnv on 7/8/15.
@@ -255,5 +260,128 @@ object Users {
 
   }
 
+  def insertUser(q:JValue) : JValue = {
+    var a :JValue = {"" ->""} :JValue
 
+
+//    val p = new library.Processor {
+//      def process(i: Future[Int]) = for (x <- i) yield 9 * x
+//    }
+//    val res = library submit  p
+//    println(res)
+//    val z = Await result (res, Duration(10000, "millis"))
+//    Console println z
+//    val f = Future{
+//      var b :JValue = null
+//      val json = q.asInstanceOf[JObject].values
+//
+//      val user = userIN.createRecord.address(json.apply("address").toString).email(json.apply("email").toString).name(json.apply("name").toString).password(json.apply("password").toString)
+//
+//      val msg = UsersModel.createRecord.user(user).save
+//
+//      if (msg != null && msg.asJValue.isInstanceOf[JObject]) {
+//        b = Message.returnMassage("add_user", "0","Insert successed",msg.asJValue)
+//      }else{
+//        b = Message.returnMassage("add_user", "1","Insert failed",null)
+//      }
+//      b
+//    }
+
+//    val s = "Hello"
+//    val f: Future[String] = Future {
+//     " future!"
+//    }
+//    f.onSuccess {
+//      case msg => println(msg)
+//    }
+//    f.onSuccess{
+//      case _ => a = Message.returnMassage("insertUser","0","No error",null,1)
+//    }
+
+
+//    val f = grind()
+
+//     implicit val xc: ExecutionContext = ExecutionContext.global
+////    val id = UUID.randomUUID().toString
+    val f = grind(q)
+//
+//    f.onComplete{
+//      case Success(q) => return q
+//
+//    }
+//    f.onSuccess{
+//      case _ => a = {"aaa" -> ""} :JValue
+//    }
+
+//  println(id)
+//  val  Full(b) = UsersModel.find("_id" -> id)
+//    println(b)
+//    return b.asJValue
+  a
+  }
+  def grind(q:JValue)(implicit xc: ExecutionContext = ExecutionContext.global): Future[JValue] = Future {
+    val time = System.currentTimeMillis()
+    println(time)
+    var i = 0
+    var b: JValue = null
+//    val bulk : BulkWriteOperation =  db
+    var list : List[UsersModel] = List()
+
+
+
+//    val tasks: Seq[Future[UsersModel]] = for (i <- 1 to 1000000) yield Future {
+//      val json = q.asInstanceOf[JObject].values
+//
+//      val user = userIN.createRecord.address(json.apply("address").toString).email(json.apply("email").toString).name(json.apply("name").toString).password(json.apply("password").toString)
+//
+//      val id = ObjectId.get()
+//
+//      println(i)
+//       UsersModel.createRecord.id(id).user(user)
+//
+//
+//    }
+//
+//
+//
+//    val aggregated: Future[Seq[UsersModel]] = Future.sequence(tasks)
+//
+//    val squares : Seq[UsersModel] = Await.result(aggregated,Duration(1, "millis"))
+//
+//  println(squares)
+
+    for(i <- 0 to 1000000) {
+
+
+      val json = q.asInstanceOf[JObject].values
+
+      val user = userIN.createRecord.address(json.apply("address").toString).email(json.apply("email").toString).name(json.apply("name").toString).password(json.apply("password").toString)
+
+      val id = ObjectId.get()
+      val msg = UsersModel.createRecord.id(id).user(user)
+
+       grind1(msg,time)
+
+
+//      list = list ::: List(msg)
+      println(i)
+
+//      if (msg != null && msg.asJValue.isInstanceOf[JObject]) {
+//        b = Message.returnMassage("add_user", "0", "Insert successed", msg.asJValue)
+//      } else {
+//        b = Message.returnMassage("add_user", "1", "Insert failed", null)
+//      }
+    }
+
+//    UsersModel.insertAll(list)
+//    println(System.currentTimeMillis() - time)
+    return Future(b)
+  }
+
+
+  def grind1(q:UsersModel,time :Long )(implicit xc: ExecutionContext = ExecutionContext.global)= Future {
+    q.save
+    println(System.currentTimeMillis() - time)
+
+  }
 }

@@ -48,6 +48,8 @@ object UsersAPI extends RestHelper {
 
     case "user" ::"add"  :: Nil JsonPost json->request => UsersSpet.insert(json)
 
+    case "user" ::"test"  :: Nil JsonPost json->request => UsersSpet.insertUser(json)
+
     case "user" ::"update"  :: Nil JsonPost json->request => UsersSpet.update(json)
 
     case "shout" :: q:: Nil Post req => {"abc" -> "abc"} :JValue
