@@ -2,6 +2,7 @@ package code.rest
 
 import java.util.UUID
 
+import code.common.Message
 import code.model.{ModelInfo, Rating, codeIN}
 import com.mongodb.{BasicDBObject, QueryBuilder}
 import net.liftweb.http.LiftRules
@@ -25,7 +26,7 @@ object RatingAPI extends RestHelper {
   serve {
 
 
-    case "rating" :: "insert" :: Nil JsonPost json -> request => insert(json)
+    case "rating" :: "add" :: Nil JsonPost json -> request => insert(json)
     case "rating" :: "update" :: Nil JsonPost json -> request => updates(json)
     case "rating" :: "delete" :: Nil JsonPost json -> request => delete(json)
     case "rating" :: "getmodelid" :: q :: Nil JsonGet req => getbymodelid(q)
@@ -33,7 +34,7 @@ object RatingAPI extends RestHelper {
     case "rating" :: "getcode" :: q :: p :: Nil JsonGet req => getbycodelid(q, p)
     case "rating" :: "getall" :: Nil JsonGet req => getall
 
-    case "rating" :: "insert" :: Nil Options _ => {
+    case "rating" :: "add" :: Nil Options _ => {
       "OK" -> "200"
     }: JValue
     case "rating" :: "update" :: Nil Options _ => {
@@ -51,19 +52,15 @@ object RatingAPI extends RestHelper {
 
     val db = Rating.findAll(qry)
 
-    var msg: JValue = {
-      "ERROR" -> "Not existed"
-    }: JValue
+
 
     if (db.size > 0) {
 
-      msg = {
-        "SUCCESS" -> db.map(_.asJValue): JValue
-      }: JValue
 
+   return Message.returnMassage("getbymodelid","0","No error",db.map(_.asJValue),db.size)
     }
 
-    msg
+   return  Message.returnMassage("getbymodelid","1","Not Found",db.map(_.asJValue),db.size)
   }
 
   def getbycodelid(q: String, p: String): JValue = {
@@ -95,13 +92,14 @@ object RatingAPI extends RestHelper {
           val db2 = Rating.modelid(db1.values.apply("modelid").toString).modelname(Option(db1.values.apply("modelname").toString).getOrElse(""))
             .codein(List(item))
 
-          msg = {
-            "SUCCESS" -> db2.asJValue
-          }: JValue
+          msg =  db2.asJValue
+
         }
       }
 
-
+    return  Message.returnMassage("getbycode","0","No error",msg,1)
+    }else{
+      return  Message.returnMassage("getbycode","1","Not found",null,0)
     }
 
     msg
