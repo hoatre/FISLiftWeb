@@ -179,8 +179,7 @@ object ScoreResultAPI extends RestHelper{
 
     val db = ModelInfo.findAll("_id" -> modelid)
     if(db.size == 1) {
-
-      ScoringResult.createRecord.id(ObjectId.get).modelid(modelid).model_name(db(0).name.toString()).customer_name(custumer_name).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).time_stamp(System.currentTimeMillis()).factor(Factor.findAll("ModelId" -> modelid)).save
+      ScoringResult.createRecord.id(ObjectId.get).modelid(modelid).model_name(db(0).name.toString()).customer_name(ObjectId.get().toString).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).time_stamp(System.currentTimeMillis()).factor(Factor.findAll("ModelId" -> modelid)).save
     }
   }
 

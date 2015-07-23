@@ -9,6 +9,7 @@ import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.{JArray, JField, JString, JValue, _}
 import net.liftweb.json.JsonDSL.{seq2jvalue, _}
+import net.liftweb.mongodb.{Limit, Skip}
 
 /**
  * Created by bacnv on 7/14/15.
@@ -31,6 +32,8 @@ object RatingAPI extends RestHelper {
     case "rating" :: "delete" :: Nil JsonPost json -> request => delete(json)
     case "rating" :: "getmodelid" :: q :: Nil JsonGet req => getbymodelid(q)
 
+    case "rating" :: "search"  :: Nil JsonPost json -> request => searchAvand(json)
+
     case "rating" :: "getcode" :: q :: p :: Nil JsonGet req => getbycodelid(q, p)
     case "rating" :: "getall" :: Nil JsonGet req => getall
 
@@ -45,6 +48,33 @@ object RatingAPI extends RestHelper {
     }: JValue
 
 
+  }
+
+  def searchAvand(q:JValue):JValue ={
+//    println(q.values.asInstanceOf[Map[String,JObject]])
+//    var lista : JValue = null
+//    lista.add(("" -> "":JValue)
+//
+//   val a =  { ~ ("codein" -> { "$elemMatch" -> {"code" -> "AAA" }})}:JValue
+////   val List(a) = lista
+//
+//    println(q)
+try {
+  val count = ModelInfo.count(q.asInstanceOf[JObject])
+
+  val b = ModelInfo.findAll(q.asInstanceOf[JObject], ({
+    ("min" -> 1) ~ ("name" -> 1)
+  }: JValue).asInstanceOf[JObject], Skip(5*(1-1)), Limit(5))
+
+
+  if (b.size > 0)
+
+    return Message.returnMassage("search", "0", "No error", b.map(_.asJValue), count)
+  else return Message.returnMassage("search", "1", "No record found", b.map(_.asJValue), count)
+}catch {
+
+  case unknow => Message.returnMassage("search", "2", unknow.toString, null,0)
+}
   }
 
   def getbymodelid(q: String): JValue = {
@@ -199,6 +229,7 @@ object RatingAPI extends RestHelper {
       val d = Rating.createRecord.id(UUID.randomUUID().toString()).modelid(modelid).codein(lista).save
 
       c = d.asJValue
+      return Message.returnMassage("Rating","1","Cannot find model",c,1)
     } else {
       c = updates(q)
 
@@ -267,29 +298,17 @@ object RatingAPI extends RestHelper {
 
       val updateFactor = dbFind(0).update.codein(listi ::: listu ::: List(factorOption)).save
 
-      msg = {
-        "SUCCESS" -> dbFind.map(_.asJValue)
-      }: JValue
-
+//      msg = {
+//        "SUCCESS" -> dbFind.map(_.asJValue)
+//      }: JValue
+      return Message.returnMassage("Rating","0","Success",dbFind.map(_.asJValue),dbFind.size)
     } else {
-      msg = {
-        "ERROR" -> "Cannot find model"
-      }: JValue
+//      msg = {
+//        "ERROR" -> "Cannot find model"
+//      }: JValue
+
+      return Message.returnMassage("Rating","1","Cannot find model",null,dbFind.size)
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -311,9 +330,10 @@ object RatingAPI extends RestHelper {
       .get
     val DBM = ModelInfo.findAll(qryM)
     if (DBM.equals("publish") || DBM.equals("active")) {
-      {
-        "ERROR" -> "Factor can't delete (model was published)"
-      }: JValue
+//      {
+//        "ERROR" -> "Factor can't delete (model was published)"
+//      }: JValue
+      return Message.returnMassage("updateRating","2","Factor can't delete (model was published)",null,0)
     }
 
     val qry = QueryBuilder.start("modelid").is(json.values.apply("modelid")).get
@@ -358,14 +378,14 @@ object RatingAPI extends RestHelper {
 
       val updateFactor = dbFind(0).update.codein(listi ::: listu ::: List(factorOption)).save
 
-      msg = {
-        "SUCCESS" -> dbFind.map(_.asJValue)
-      }: JValue
 
+     return Message.returnMassage("updateRating","0","Success",dbFind.map(_.asJValue),dbFind.size)
     } else {
-      msg = {
-        "ERROR" -> "Cannot find model"
-      }: JValue
+//      msg = {
+//        "ERROR" -> "Cannot find model"
+//      }: JValue
+
+      return Message.returnMassage("updateRating","1","Cannot find model",null,0)
     }
 
     msg
@@ -420,9 +440,56 @@ object RatingAPI extends RestHelper {
 
     val updateFactor = dbFind(0).update.codein(listi ::: listu).save
 
+//
+//    {
+//      "SUCCESS" -> dbFind.map(_.asJValue)
+//    }: JValue
 
-    {
-      "SUCCESS" -> dbFind.map(_.asJValue)
-    }: JValue
+    Message.returnMassage("deleteRating","0","Success",dbFind.map(_.asJValue),dbFind.size)
+  }
+
+  class searchTheard(q:String,p:String) extends Runnable{
+    def run {
+      val qry = QueryBuilder.start("modelid").is(q).put("codein").elemMatch(new BasicDBObject("code", p)).get
+
+      val db = Rating.findAll(qry)
+
+      var msg: JValue = {
+        "ERROR" -> "Not existed"
+      }: JValue
+
+      if (db.size > 0) {
+
+        val db1 = db(0).asJValue
+        val json = (db1 \ "codein")
+
+        val JArray(rates) = json
+        rates collect { case rate: JObject => rate } foreach myOperation
+        def myOperation(rate: JObject) = {
+          val j = rate.asInstanceOf[JObject].values
+          if (j.apply("code").toString.equals(p)) {
+
+            val item = codeIN.code(j.apply("code").toString).status(j.apply("status").toString)
+              .statusname(j.apply("statusname").toString).scorefrom(j.apply("scorefrom").toString.toDouble).scoreto(j.apply("scoreto").toString.toDouble)
+
+            //        var listb: List[codeIN] = List(item)
+            //
+            //        lista = lista ::: listb
+            val db2 = Rating.modelid(db1.values.apply("modelid").toString).modelname(Option(db1.values.apply("modelname").toString).getOrElse(""))
+              .codein(List(item))
+
+
+
+         msg = Message.returnMassage("searchRating","0","success",db2.asJValue,db.size)
+          }
+        }
+
+
+      }
+      msg
+    }
+
+
   }
 }
+

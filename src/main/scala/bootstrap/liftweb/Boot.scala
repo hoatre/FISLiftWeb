@@ -3,7 +3,7 @@ package bootstrap.liftweb
 import java.net.URI
 
 import code.rest._
-import com.mongodb.{Mongo, ServerAddress}
+import com.mongodb.{DBCollection, Mongo, ServerAddress}
 import net.liftmodules.JQueryModule
 import net.liftweb.common._
 import net.liftweb.http._
@@ -95,6 +95,8 @@ class Boot {
 
     ValidateAPI.init()
 
+    csvAPI.init()
+
   }
 
 
@@ -113,4 +115,5 @@ object MongoUrl {
       case _ => MongoDB.defineDb(id, server, db)
     }
   }
+
 }

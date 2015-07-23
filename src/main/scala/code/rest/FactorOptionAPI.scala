@@ -196,8 +196,10 @@ object FactorOptionAPI extends RestHelper {
       }: JValue
     }
     msg
-
+//val a :List[Factor] = Factor.findAll("ModelId" -> "")
   }
+
+
 
 
 }
