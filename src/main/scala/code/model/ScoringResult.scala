@@ -2,7 +2,7 @@ package code.model
 
 import net.liftweb.common.Full
 import net.liftweb.mongodb.record.{MongoRecord, BsonMetaRecord, BsonRecord, MongoMetaRecord}
-import net.liftweb.mongodb.record.field.{ObjectIdPk, StringPk, BsonRecordListField, StringRefField}
+import net.liftweb.mongodb.record.field._
 import net.liftweb.record.field.{LongField, DateTimeField, DoubleField, StringField}
 
 /**
@@ -25,6 +25,8 @@ class ScoringResult private () extends MongoRecord[ScoringResult] with ObjectIdP
   object rating_status extends StringField(this, 1024)
   object resultin extends BsonRecordListField(this,resultIN)
   object factor extends BsonRecordListField(this,Factor)
+  object model  extends BsonRecordField(this,ModelInfo)
+  object rate extends BsonRecordField(this,Rating)
 }
 
 object ScoringResult extends ScoringResult with MongoMetaRecord[ScoringResult] {
