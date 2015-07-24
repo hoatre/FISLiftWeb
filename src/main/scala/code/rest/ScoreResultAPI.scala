@@ -1,33 +1,19 @@
 package code.rest
 
-import java.util.UUID
-import java.util.concurrent.{Callable, FutureTask, ExecutorService, Executors}
+import java.util.Properties
+import java.util.concurrent.{Callable, ExecutorService, Executors, FutureTask}
 
 import code.common.Message
+import code.model._
+import com.mongodb.QueryBuilder
+import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
-import net.liftweb.json._
-import net.liftweb.json.JsonAST.JArray
-import net.liftweb.json.JsonAST.JField
-import net.liftweb.json.JsonAST.JString
-import net.liftweb.json.JsonAST.JValue
-
-import com.mongodb.{BasicDBObject, BasicDBObjectBuilder, QueryBuilder}
-import net.liftweb.http.rest.RestHelper
-import bootstrap.liftweb._
-import net.liftweb.http.{S, LiftRules}
-import net.liftweb.json.JsonAST.JValue
-import net.liftweb.json.JsonAST._
-import net.liftweb.json.JsonDSL._
-import code.snippet._
-import code.model._
-import net.liftweb.json.Printer._
-import net.liftweb.mongodb.JObjectParser
-import net.liftweb.http.js.JsExp
-import net.liftweb.json.JsonDSL.seq2jvalue
+import net.liftweb.json.JsonAST.{JArray, JValue, _}
+import net.liftweb.json.JsonDSL.{seq2jvalue, _}
 import org.bson.types.ObjectId
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * Created by bacnv on 7/15/15.
@@ -187,8 +173,18 @@ object ScoreResultAPI extends RestHelper{
 
     val db = ModelInfo.findAll("_id" -> modelid)
     if(db.size == 1) {
-      ScoringResult.createRecord.id(ObjectId.get).session(ses).modelid(modelid).model_name(db(0).name.toString()).customer_name(ObjectId.get().toString).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).time_stamp(System.currentTimeMillis()).factor(Factor.findAll("ModelId" -> modelid))
+      val result = ScoringResult.createRecord.id(ObjectId.get).session(ses).modelid(modelid).model_name(db(0).name.toString()).customer_name(ObjectId.get().toString).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).time_stamp(System.currentTimeMillis()).factor(Factor.findAll("ModelId" -> modelid))
         .model(ModelInfo.find("_id" -> modelid)).rate(Rating.find("modelid" -> modelid)).save
+
+      val props = new Properties()
+      props.put("metadata.broker.list", "10.15.171.36:9092")
+      props.put("serializer.class", "kafka.serializer.StringEncoder")
+      props.put("producer.type", "async")
+      val config = new ProducerConfig(props)
+      val producer = new Producer[String, String](config)
+      val data = new KeyedMessage[String, String]("Camus", result.asJSON.toString())
+      producer.send(data)
+      producer.close()
     }
   }
 

@@ -32,6 +32,7 @@ libraryDependencies ++= {
     "com.foursquare" %% "rogue-lift"          % "2.5.1" intransitive(),
     "com.foursquare" %% "rogue-index"         % "2.5.1" intransitive(),
     "org.mongodb" %% "casbah" % "2.8.1",
-    "com.github.tototoshi" %% "scala-csv" % "1.2.1" intransitive()
+    "com.github.tototoshi" %% "scala-csv" % "1.2.1" intransitive(),
+    "org.apache.kafka" % "kafka_2.11" % "0.8.2.1" % "provided"
   )
 }
