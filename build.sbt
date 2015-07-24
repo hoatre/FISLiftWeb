@@ -4,7 +4,7 @@ version := "0.0.4"
 
 organization := "net.liftweb"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.2"
 
 resolvers ++= Seq("snapshots"     at "https://oss.sonatype.org/content/repositories/snapshots",
                 "releases"        at "https://oss.sonatype.org/content/repositories/releases"
@@ -31,6 +31,7 @@ libraryDependencies ++= {
     "com.foursquare" %% "rogue-core"          % "2.5.1" intransitive(),
     "com.foursquare" %% "rogue-lift"          % "2.5.1" intransitive(),
     "com.foursquare" %% "rogue-index"         % "2.5.1" intransitive(),
-    "org.mongodb" %% "casbah" % "2.8.1"
+    "org.mongodb" %% "casbah" % "2.8.1",
+    "com.github.tototoshi" %% "scala-csv" % "1.2.1" intransitive()
   )
 }
