@@ -116,25 +116,27 @@ object ScoreResultAPI extends RestHelper{
 
           val DBquery = Rating.findAll(qry)
 
-          if(DBquery.size >0 ){
+          if(DBquery.size >0 ) {
 
 
-            if((DBquery.map(_.asJValue) \ "codein").isInstanceOf[JArray]){
-              val listCodein: List[codeIN] =  DBquery(0).codein.value
+            if ((DBquery.map(_.asJValue) \ "codein").isInstanceOf[JArray]) {
+              val listCodein: List[codeIN] = DBquery(0).codein.value
 
               val listCodeinsort = listCodein.sortWith(_.scorefrom.toString().toDouble < _.scoreto.toString().toDouble)
 
               val x = 0
-              for(x <-0 to listCodeinsort.size -1 ){
+              for (x <- 0 to listCodeinsort.size - 1) {
                 val scoreform = listCodeinsort(x).scorefrom.toString().toDouble
                 val scoreto = listCodeinsort(x).scoreto.toString().toDouble
 
-                if((scoreform <= scoreresult && scoreresult < scoreto) ||( x == listCodeinsort.size -1 && scoreto == scoreresult)){
+                if ((scoreform <= scoreresult && scoreresult < scoreto) || (x == listCodeinsort.size - 1 && scoreto == scoreresult)) {
                   coderesul = listCodeinsort(x).code.toString()
                   codestatus = listCodeinsort(x).status.toString()
 
-                  msg = Message.returnMassage("scoreResult","0","No error"
-                    ,{("Score"-> scoreresult)~("Rating" -> coderesul)~("Status" -> codestatus)} :JValue,1)
+                  msg = Message.returnMassage("scoreResult", "0", "No error"
+                    , {
+                      ("Score" -> scoreresult) ~ ("Rating" -> coderesul) ~ ("Status" -> codestatus)
+                    }: JValue, 1)
 
                 }
               }
@@ -162,9 +164,8 @@ object ScoreResultAPI extends RestHelper{
 
 
           }
-          for(i <-0 to 5000) {
             saveScoreResult(null, jsonmap.values.apply("modelid").toString, Option(jsonmap.values.apply("custumer_name")).getOrElse(null).toString, scoreresult, coderesul, codestatus, lista)
-          }
+
           }
 
 
