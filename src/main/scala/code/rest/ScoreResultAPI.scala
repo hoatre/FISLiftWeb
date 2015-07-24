@@ -162,7 +162,7 @@ object ScoreResultAPI extends RestHelper{
 
 
           }
-          saveScoreResult(jsonmap.values.apply("modelid").toString,Option(jsonmap.values.apply("custumer_name")).getOrElse(null).toString,scoreresult,coderesul,codestatus,lista)
+          saveScoreResult(null,jsonmap.values.apply("modelid").toString,Option(jsonmap.values.apply("custumer_name")).getOrElse(null).toString,scoreresult,coderesul,codestatus,lista)
         }
 
 
@@ -175,11 +175,16 @@ object ScoreResultAPI extends RestHelper{
     return  mes
   }
 
-  def saveScoreResult(modelid :String,custumer_name:String, scoring :Double,ratingCode :String,ratingStatus :String,list : List[resultIN])(implicit xc: ExecutionContext = ExecutionContext.global): Future[Unit] = Future {
+  def saveScoreResult(session:String, modelid :String,custumer_name:String, scoring :Double,ratingCode :String,ratingStatus :String,list : List[resultIN])(implicit xc: ExecutionContext = ExecutionContext.global): Future[Unit] = Future {
+    var ses = session
+    if (session.isEmpty || session == null){
+       ses = ObjectId.get().toString
+    }
+
 
     val db = ModelInfo.findAll("_id" -> modelid)
     if(db.size == 1) {
-      ScoringResult.createRecord.id(ObjectId.get).modelid(modelid).model_name(db(0).name.toString()).customer_name(ObjectId.get().toString).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).time_stamp(System.currentTimeMillis()).factor(Factor.findAll("ModelId" -> modelid)).save
+      ScoringResult.createRecord.id(ObjectId.get).session(ses).modelid(modelid).model_name(db(0).name.toString()).customer_name(ObjectId.get().toString).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).time_stamp(System.currentTimeMillis()).factor(Factor.findAll("ModelId" -> modelid)).save
     }
   }
 
