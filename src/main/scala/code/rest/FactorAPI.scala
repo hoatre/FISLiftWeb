@@ -133,8 +133,13 @@ object FactorAPI extends RestHelper {
               .FactorOptionName(json.apply("FactorOptionName").toString)
               .Score(json.apply("Score").toString.toDouble)
               .Status(json.apply("Status").toString.toLowerCase())
-            val factorOptionDelete = DBLista(0).FactorOption.value.dropWhile(ftO => ftO.FactorOptionId.toString().equals(json.apply("_id").toString))
-            factorOptionUpdate = factorOptionDelete ::: List(factorOption)
+//            val factorOptionDelete = DBLista(0).FactorOption.value.dropWhile(ftO => ftO.FactorOptionId.toString().equals(json.apply("_id").toString))
+            var listFactorOptionDelete : List[FactorOptionIN] = List()
+            for(fd <- DBLista(0).FactorOption.value){
+              if(!fd.FactorOptionId.toString().equals(json.apply("_id").toString))
+                listFactorOptionDelete = listFactorOptionDelete ::: List(fd)
+            }
+            factorOptionUpdate = listFactorOptionDelete ::: List(factorOption)
             check = true
           }
         }
