@@ -292,7 +292,7 @@ object FactorAPI extends RestHelper {
           .get
         val DBM = ModelInfo.findAll(qryM)
         if(DBM.equals("publish") || DBM.equals("active")){
-          return code.common.Message.returnMassage("insertFactorOption", "1", "FactorOption can't insert (model was published)!",null)
+          return code.common.Message.returnMassage("insertFactorOption", "1", "FactorOption can't insert (model is not draft)!",null)
         }
 
         val factorOption = FactorOptionIN
@@ -326,7 +326,7 @@ object FactorAPI extends RestHelper {
           .get
         val DBM = ModelInfo.findAll(qryM)
         if (DBM.equals("publish") || DBM.equals("active")) {
-          return code.common.Message.returnMassage("insertFactor", "1", "Factor can't insert (model was published) !", null)
+          return code.common.Message.returnMassage("insertFactor", "1", "Factor can't insert (model is not draft) !", null)
         }
       }
     }
@@ -456,7 +456,7 @@ object FactorAPI extends RestHelper {
       if(DBM == null)
         return code.common.Message.returnMassage("updateFactor", "1", "ModelInfo not found", null)
       if(DBM.equals("publish") || DBM.equals("active")){
-        return code.common.Message.returnMassage("updateFactor", "1", "Factor can't insert (model was published)", null)
+        return code.common.Message.returnMassage("updateFactor", "1", "Factor can't insert (model is not draft)", null)
       }
 
       //Get path moi theo ParentID
