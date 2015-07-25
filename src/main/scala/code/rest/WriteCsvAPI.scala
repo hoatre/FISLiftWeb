@@ -57,5 +57,7 @@ object csvAPI extends RestHelper {
     case "csv" :: "test"::q:: Nil JsonGet req => CsvModule.writetoCSV(q)
 
     case "csv" :: "read"::q:: Nil JsonGet req => CsvModule.readCSV(q)
+
+    case "csv" ::q:: Nil JsonGet req => CsvModule.search(q)
   }
 }

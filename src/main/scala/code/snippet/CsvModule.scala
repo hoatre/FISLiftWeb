@@ -3,6 +3,7 @@ package code.snippet
 import java.io.File
 import java.util.concurrent.{Callable, FutureTask, Executors, ExecutorService}
 
+import code.rest.ScoreResultAPI
 import com.github.tototoshi.csv._
 import java.util.UUID
 
@@ -41,6 +42,11 @@ object CsvModule {
   implicit object MyFormat extends DefaultCSVFormat {
     override val delimiter = '#'
   }
+  def search(q:String) : JValue = {
+    val db = CSVsave.findAll("session" -> ("$oid" -> q))
+    val count = CSVsave.count("session" -> ("$oid" -> q))
+    Message.returnMassage("uploadfile","0","No error",db.map(_.asJValue),count)
+  }
 
   def writetoCSV(q: String): JValue = {
     val executor: ExecutorService = Executors.newSingleThreadExecutor()
@@ -75,12 +81,12 @@ object CsvModule {
   def readCSV(q: String): JValue = {
     val reader = CSVReader.open(new File(q + ".csv"), "UTF-8")
     val a = reader.toStream
-//    println(a)
+    //    println(a)
 
-//    val it2 = a.iterator
-//    loop("Iterator2: ", it2.next, it2){
-//
-//    }
+    //    val it2 = a.iterator
+    //    loop("Iterator2: ", it2.next, it2){
+    //
+    //    }
     val model_id = "c69f764e-d651-42ab-8046-b09e9e2c412e"
     val list = a.head
     val model_name :String = list(1)
@@ -90,9 +96,9 @@ object CsvModule {
 
     val check = ModelInfo.findAll("_id" -> model_id)
     if(!(check.size > 0 && check(0).name.toString.equals(model_name))){
-        return  Message.returnMassage("uploadcsv","1","Error",null,0)
+      return  Message.returnMassage("uploadcsv","1","Error",null,0)
     }
-//    val b = {("FactorOption" -> ("$elemMatch" -> ("FactorOptionName" -> factor_option_name))) ~ ("ModelId" -> model_id) ~ ("FactorName" -> factor_name)} : JValue
+    //    val b = {("FactorOption" -> ("$elemMatch" -> ("FactorOptionName" -> factor_option_name))) ~ ("ModelId" -> model_id) ~ ("FactorName" -> factor_name)} : JValue
 
     val qry = QueryBuilder.start("ModelId").is(model_id).and("FactorName").is(factor_name).and("FactorOption").elemMatch(new BasicDBObject("FactorOptionName", factor_option_name))
       .get
@@ -106,6 +112,7 @@ object CsvModule {
     val dbrating = Rating.findAll("modelid"-> model_id)
 
     var count = 0
+    //    val session = ObjectId.get().toString
     a foreach {
       x => getvalue(x,db,dbrating,session)
         count +=1
@@ -114,7 +121,7 @@ object CsvModule {
 
     //    val portfolio =
     //      <portfolio>
-    //        <stocks>
+    //        <stockss>
     //          <stock>AAPL</stock>
     //          <stock>AMZN</stock>
     //          <stock>GOOG</stock>
@@ -125,19 +132,23 @@ object CsvModule {
     //      </portfolio>
     //    scala.xml.XML.save("portfolio.xml", portfolio)
 
-    {
-      "OK" -> "OK"
-    }: JValue
+    Message.returnMassage("readfile","0","No error",("session" -> session.toString),1)
   }
-  def getvalue(listString :List[String],db : List[Factor],rates : List[Rating],objid : ObjectId): Unit ={
-    var lista : List[resultIN] = List()
-    var factor_name =""
-    var factor_option_name =""
-    var factor_option_score :Double = 0
-    var scoreresult  : Double =0
+  def getvalue(listString :List[String],db : List[Factor],rates : List[Rating],session : ObjectId)(implicit xc: ExecutionContext = ExecutionContext.global): Future[Unit] = Future {
+    var lista: List[resultIN] = List()
+    var factor_name = ""
+    var factor_option_name = ""
+    var factor_option_score: Double = 0
+    var scoreresult: Double = 0
     var j = 1
     var listDBCuoi: List[Factor] = List()
-    var score :Double = 0
+    var score: Double = 0
+    var coderesul: String = null
+    var codestatus: String = null
+
+    //    if(listString == null){
+    //      return
+    //    }
 
     for (factor <- db) {
       if (factor.FactorOption.value.size != 0)
@@ -145,42 +156,77 @@ object CsvModule {
     }
 
 
-    for(i<- 2 to listString.size -1){
-        if(j==1){
-          factor_name = listString(i).toString
-        }else if(j == 2){
-          factor_option_name = listString(i).toString
-        }else if(j == 3){
-          factor_option_score = listString(i).toString.toDouble
-          for(x <- 0 to listDBCuoi.size -1){
-            if(listDBCuoi(x).FactorName.toString().equals(factor_name)){
+    for (i <- 2 to listString.size - 1) {
+      if (j == 1) {
+        factor_name = listString(i).toString
+      } else if (j == 2) {
+        factor_option_name = listString(i).toString
+      } else if (j == 3) {
+        factor_option_score = listString(i).toString.toDouble
+        for (x <- 0 to listDBCuoi.size - 1) {
+          if (listDBCuoi(x).FactorName.toString().equals(factor_name)) {
 
-              for(z <-  listDBCuoi(x).FactorOption.value){
-//                val j = z.asInstanceOf[JObject].values
-                if(z.FactorOptionName.toString().equals(factor_option_name)){
-                  score = z.Score.toString.toDouble
+            for (z <- listDBCuoi(x).FactorOption.value) {
+              //                val j = z.asInstanceOf[JObject].values
+              if (z.FactorOptionName.toString().equals(factor_option_name)) {
+                score = z.Score.toString.toDouble
 
-                  score = score * (listDBCuoi(x).Weight.toString().toDouble/100)
-                  for(path <- listDBCuoi(x).PathFactor.value){
-                    score = score * (path.Weight.toString().toDouble/100)
-                  }
-                  scoreresult = scoreresult + score
-
+                score = score * (listDBCuoi(x).Weight.toString().toDouble / 100)
+                for (path <- listDBCuoi(x).PathFactor.value) {
+                  score = score * (path.Weight.toString().toDouble / 100)
                 }
+                scoreresult = scoreresult + score
+                lista = lista ::: List(resultIN.createRecord.factor_id(listDBCuoi(x).id.toString()).factor_name(listDBCuoi(x).FactorName.toString()).
+                  factor_score(score).factor_option_id(z.FactorOptionId.toString()).factor_option_name(z.FactorOptionName.toString()).
+                  factor_option_score(z.Score.toString().toDouble))
               }
-
             }
-
 
           }
 
-          j = 0
+
         }
+
+        j = 0
+      }
       j += 1
 
     }
+    if (rates.size > 0) {
+      scoreresult = (f"$scoreresult%1.2f").toDouble
+
+      if ((rates.map(_.asJValue) \ "codein").isInstanceOf[JArray]) {
+        val listCodein: List[codeIN] = rates(0).codein.value
+
+        val listCodeinsort = listCodein.sortWith(_.scorefrom.toString().toDouble < _.scoreto.toString().toDouble)
+
+        val x = 0
+        for (x <- 0 to listCodeinsort.size - 1) {
+          val scoreform = listCodeinsort(x).scorefrom.toString().toDouble
+          val scoreto = listCodeinsort(x).scoreto.toString().toDouble
+
+          if ((scoreform <= scoreresult && scoreresult < scoreto) || (x == listCodeinsort.size - 1 && scoreto == scoreresult)) {
+            coderesul = listCodeinsort(x).code.toString()
+            codestatus = listCodeinsort(x).status.toString()
+          }
+
+
+        }
+      }
+    }
+
+    //    val msg = (("Customer"-> listString(0).toString) ~ ("Score" -> scoreresult) ~ ("Rating" -> coderesul) ~ ("Status" -> codestatus))
+
+
+    saveResult(CSVsave.createRecord.session(session).customer(listString(0).toString).score(scoreresult).rating(coderesul).status(codestatus))
+    //
+    //    ScoreResultAPI.saveScoreResult(session, db(0).ModelId.toString(), listString(0).toString, scoreresult, coderesul, codestatus, lista)
 
   }
+  def saveResult(csv : CSVsave)(implicit xc: ExecutionContext = ExecutionContext.global): Future[Unit] = Future {
+    csv.save
+  }
+
 
   def savefilecsv(q: String, count: Int)(implicit xc: ExecutionContext = ExecutionContext.global): Future[Unit] = Future {
     var index = 1
@@ -208,20 +254,20 @@ object CsvModule {
             list = list ::: List(a.apply("factor_name").toString) ::: List(a.apply("factor_option_name").toString) ::: List(a.apply("factor_option_score").toString)
 
 
-//          listModel = listModel ::: List(list)
+            //          listModel = listModel ::: List(list)
 
 
 
 
 
-//          }
+            //          }
             //            x = 0
           }
           writer.writeRow(list)
 
           list = List()
           x += 1
-        println(i)
+          println(i)
         }
         index += 1
       }
@@ -240,4 +286,5 @@ object CsvModule {
   //  }
 
 }
+
 
