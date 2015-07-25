@@ -278,8 +278,16 @@ object FactorAPI extends RestHelper {
         val DBList = Factor.findAll(qry)
         if(DBList == Nil)
           return code.common.Message.returnMassage("insertFactorOption", "1", "FactorOption can't insert (factor not found)!",null)
-        if(DBList(0).PathFactor.value.size != 0)
+
+        val qryChild = QueryBuilder
+          .start("ModelId").is(DBList(0).ModelId.toString())
+          .and("PathFactor").elemMatch(new BasicDBObject("FactorPathId", DBList(0).id.toString()))
+          .get
+
+        val DBChild = Factor.findAll(qryChild)
+        if(DBChild.size != 0)
           return code.common.Message.returnMassage("insertFactorOption", "1", "FactorOption can't insert (factor had Children)!",null)
+
         val qryM = QueryBuilder.start("_id").is(DBList(0).ModelId.toString())
           .get
         val DBM = ModelInfo.findAll(qryM)
