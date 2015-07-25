@@ -162,10 +162,15 @@ try {
     val qryM = QueryBuilder.start("_id").is(json.values.apply("modelid").toString())
       .get
     val DBM = ModelInfo.findAll(qryM)
+    if(DBM.size == 0){
+      return Message.returnMassage("Rating","2","Model not existed)","")
+    }
     if (DBM.equals("publish") || DBM.equals("active")) {
-      {
-        "ERROR" -> "Factor can't delete (model was published)"
-      }: JValue
+//      {
+//        "ERROR" -> "Factor can't delete (model was published)"
+//      }: JValue
+
+      return Message.returnMassage("Rating","1","Factor can't delete (model was published)","")
     }
 
     val modelid = json.values.apply("modelid").toString()
@@ -229,7 +234,7 @@ try {
       val d = Rating.createRecord.id(UUID.randomUUID().toString()).modelid(modelid).codein(lista).save
 
       c = d.asJValue
-      return Message.returnMassage("Rating","1","Cannot find model",c,1)
+      return Message.returnMassage("Rating","0","Success",c,1)
     } else {
       c = updates(q)
 
@@ -252,9 +257,10 @@ try {
       .get
     val DBM = ModelInfo.findAll(qryM)
     if (DBM.equals("publish") || DBM.equals("active")) {
-      {
-        "ERROR" -> "Factor can't delete (model was published)"
-      }: JValue
+//      {
+//        "ERROR" -> "Factor can't delete (model was published)"
+//      }: JValue
+      return Message.returnMassage("Rating","1","Factor can't delete (model was published)","")
     }
     val qry = QueryBuilder.start("modelid").is(q.asInstanceOf[JObject].values.apply("modelid")).get
 
@@ -307,7 +313,7 @@ try {
 //        "ERROR" -> "Cannot find model"
 //      }: JValue
 
-      return Message.returnMassage("Rating","1","Cannot find model",null,dbFind.size)
+      return Message.returnMassage("Rating","1","Model not existed",null,dbFind.size)
     }
 
 
