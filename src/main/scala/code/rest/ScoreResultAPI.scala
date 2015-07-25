@@ -164,10 +164,10 @@ object ScoreResultAPI extends RestHelper{
     return  mes
   }
 
-  def saveScoreResult(session:String, modelid :String,custumer_name:String, scoring :Double,ratingCode :String,ratingStatus :String,list : List[resultIN])(implicit xc: ExecutionContext = ExecutionContext.global): Future[Unit] = Future {
+  def saveScoreResult(session:ObjectId, modelid :String,custumer_name:String, scoring :Double,ratingCode :String,ratingStatus :String,list : List[resultIN])(implicit xc: ExecutionContext = ExecutionContext.global): Future[Unit] = Future {
     var ses = session
-    if (session == null || session.isEmpty){
-       ses = ObjectId.get().toString
+    if (session == null){
+       ses = ObjectId.get()
     }
 
 
