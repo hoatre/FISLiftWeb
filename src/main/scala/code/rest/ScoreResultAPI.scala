@@ -173,11 +173,11 @@ object ScoreResultAPI extends RestHelper{
 
     val db = ModelInfo.findAll("_id" -> modelid)
     if(db.size == 1) {
-      val result = ScoringResult.createRecord.id(ObjectId.get).session(ses).modelid(modelid).model_name(db(0).name.toString()).customer_name(ObjectId.get().toString).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).time_stamp(System.currentTimeMillis()).factor(Factor.findAll("ModelId" -> modelid))
+      val result = ScoringResult.createRecord.id(ObjectId.get).session(ses).modelid(modelid).model_name(db(0).name.toString()).customer_name(ObjectId.get().toString).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).timestamp(System.currentTimeMillis()).factor(Factor.findAll("ModelId" -> modelid))
         .model(ModelInfo.find("_id" -> modelid)).rate(Rating.find("modelid" -> modelid)).save
 
       val props = new Properties()
-      props.put("metadata.broker.list", "10.15.171.36:9092")
+      props.put("metadata.broker.list", "10.15.171.36:9092,10.15.171.36:9093")
       props.put("serializer.class", "kafka.serializer.StringEncoder")
       props.put("producer.type", "async")
       val config = new ProducerConfig(props)

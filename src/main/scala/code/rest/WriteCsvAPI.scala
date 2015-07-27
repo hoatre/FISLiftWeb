@@ -1,14 +1,14 @@
 package code.rest
 
 import code.rest.ValidateAPI._
-import net.liftweb.http.LiftRules
+import net.liftweb.common.Full
+import net.liftweb.http._
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.JValue
 
 import java.util.UUID
 
 import code.common.Message
-import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json._
 import net.liftweb.json.JsonAST.JArray
@@ -19,7 +19,6 @@ import net.liftweb.json.JsonAST.JValue
 import com.mongodb.{BasicDBObject, BasicDBObjectBuilder, QueryBuilder}
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
-import net.liftweb.http.{S, LiftRules}
 import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
@@ -56,7 +55,12 @@ object csvAPI extends RestHelper {
 
     case "csv" :: "test"::q:: Nil JsonGet req => CsvModule.writetoCSV(q)
 
-    case "csv" :: "read"::q:: Nil JsonGet req => CsvModule.readCSV(q)
+    case "csv" :: "read"::q:: Nil JsonGet req => {
+      S.respondAsync {
+      val s=    CsvModule.readCSV(q)
+        Full(JsonResponse(s))
+      }
+    }
 
     case "csv" ::q:: Nil JsonGet req => CsvModule.search(q)
   }
