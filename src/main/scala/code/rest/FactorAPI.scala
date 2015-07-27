@@ -106,7 +106,7 @@ object FactorAPI extends RestHelper {
 
   def updateFactorOption(q: JValue): JValue = {
 
-    val mess = code.common.Message.CheckNullReturnMess(q, List("FactorId", "_id", "Fatal", "Description", "FactorOptionName", "Score", "Status"))
+    val mess = code.common.Message.CheckNullReturnMess(q, List("FactorId", "_id", "FactorOptionName", "Score"))
 
     if(mess.equals("OK")) {
       val json = q.asInstanceOf[JObject].values
@@ -128,12 +128,11 @@ object FactorAPI extends RestHelper {
         for (i <- 0 to DBLista(0).FactorOption.value.size - 1) {
           if (DBLista(0).FactorOption.value(i).FactorOptionId.toString().equals(json.apply("_id").toString)) {
             var factorOption: FactorOptionIN = FactorOptionIN.FactorOptionId(json.apply("_id").toString)
-              .Fatal(json.apply("Fatal").toString)
-              .Description(json.apply("Description").toString)
+              .Fatal(if(json.exists(j => j._1.toString.equals("Fatal"))) json.apply("Fatal").toString else DBLista(0).FactorOption.value(i).Fatal.toString())
+              .Description(if(json.exists(j => j._1.toString.equals("Description"))) json.apply("Description").toString else DBLista(0).FactorOption.value(i).Description.toString())
               .FactorOptionName(json.apply("FactorOptionName").toString)
               .Score(json.apply("Score").toString.toDouble)
-              .Status(json.apply("Status").toString.toLowerCase())
-//            val factorOptionDelete = DBLista(0).FactorOption.value.dropWhile(ftO => ftO.FactorOptionId.toString().equals(json.apply("_id").toString))
+              .Status(if(json.exists(j => j._1.toString.equals("Status"))) json.apply("Status").toString else DBLista(0).FactorOption.value(i).Status.toString())
             var listFactorOptionDelete : List[FactorOptionIN] = List()
             for(fd <- DBLista(0).FactorOption.value){
               if(!fd.FactorOptionId.toString().equals(json.apply("_id").toString))
@@ -269,7 +268,7 @@ object FactorAPI extends RestHelper {
   }
 
   def insertFactorOption(q: JValue): JValue = {
-    val mess = code.common.Message.CheckNullReturnMess(q, List("FactorId", "Description", "FactorOptionName", "Fatal", "Score", "Status"))
+    val mess = code.common.Message.CheckNullReturnMess(q, List("FactorId", "FactorOptionName", "Score"))
     if(mess.equals("OK")) {
       val json = q.asInstanceOf[JObject].values
       var listFactorOption: List[FactorOptionIN] = List()
@@ -297,11 +296,11 @@ object FactorAPI extends RestHelper {
 
         val factorOption = FactorOptionIN
           .FactorOptionId(UUID.randomUUID().toString)
-          .Description(json.apply("Description").toString)
+          .Description(if(json.exists(j => j._1.toString.equals("Description"))) json.apply("Description").toString else "")
           .FactorOptionName(json.apply("FactorOptionName").toString)
-          .Fatal(json.apply("Fatal").toString)
+          .Fatal(if(json.exists(j => j._1.toString.equals("Fatal"))) json.apply("Fatal").toString.toLowerCase else "no")
           .Score(json.apply("Score").toString.toDouble)
-          .Status(json.apply("Status").toString.toLowerCase())
+          .Status(if(json.exists(j => j._1.toString.equals("Status"))) json.apply("Status").toString.toLowerCase else "")
 
         listFactorOption = listFactorOption ::: DBList(0).FactorOption.value
 
@@ -370,15 +369,15 @@ object FactorAPI extends RestHelper {
             parentid = json.apply("Parentid").toString
           saveItem = Factor.Parentid(parentid)
         } else
-          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Parentid"), null)
+          saveItem = Factor.Parentid("")
 
         if (json.exists(p => p._1 == "ParentName")) {
-          var parentid: String = ""
-          if (json.apply("Parentid").toString != "")
-            parentid = json.apply("Parentid").toString
-          saveItem = Factor.Parentid(parentid)
+          var parentName: String = ""
+          if (json.apply("parentName").toString != "")
+            parentName = json.apply("parentName").toString
+          saveItem = Factor.Parentid(parentName)
         } else
-          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("ParentName"), null)
+          saveItem = Factor.Parentid("")
 
         if (json.exists(p => p._1 == "Name")) {
           var name: String = ""
@@ -396,7 +395,7 @@ object FactorAPI extends RestHelper {
             description = json.apply("Description").toString
           saveItem = Factor.Description(description)
         } else
-          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Description"), null)
+          saveItem = Factor.Description("")
 
         if (json.exists(p => p._1 == "Weight")) {
           var weight: Double = 0
@@ -412,7 +411,7 @@ object FactorAPI extends RestHelper {
             ordinal = json.apply("Ordinal").toString.toInt
           saveItem = Factor.Ordinal(ordinal)
         } else
-          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Ordinal"), null)
+          saveItem = Factor.Ordinal(0)
 
         if (json.exists(p => p._1 == "Status")) {
           var status: String = ""
@@ -420,7 +419,7 @@ object FactorAPI extends RestHelper {
             status = json.apply("Status").toString.toLowerCase()
           saveItem = Factor.Status(status)
         } else
-          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Status"), null)
+          saveItem = Factor.Status("")
 
         if (json.exists(p => p._1 == "Note")) {
           var note: String = ""
@@ -428,7 +427,7 @@ object FactorAPI extends RestHelper {
             note = json.apply("Note").toString
           saveItem = Factor.Note(note)
         } else
-          return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("Note"), null)
+          saveItem = Factor.Note("")
 
         saveItem = Factor
           .id(UUID.randomUUID().toString)
@@ -442,10 +441,10 @@ object FactorAPI extends RestHelper {
   }
 
   def updateFactor(q: JValue): JValue = {
-    val mess = code.common.Message.CheckNullReturnMess(q, List("Description","_id", "Parentid", "ParentName", "Name", "Weight", "Ordinal", "Status", "Note"))
+    val mess = code.common.Message.CheckNullReturnMess(q, List("_id"))
     if(mess.equals("OK")) {
       val json = q.asInstanceOf[JObject].values
-      if(json.apply("Parentid") != null && json.apply("_id").toString.equals(json.apply("Parentid").toString))
+      if(json.exists(j => j._1.toString.equals("Parentid")) && json.apply("_id").toString.equals(json.apply("Parentid").toString))
         return code.common.Message.returnMassage("updateFactor", "1", "Itself can not be a father !", null)
       val qry = QueryBuilder.start("_id").is(json.apply("_id").toString).get
       val DBUpdate = Factor.findAll(qry)
@@ -461,7 +460,7 @@ object FactorAPI extends RestHelper {
 
       //Get path moi theo ParentID
       var listPathFactor: List[FactorPath] = List()
-      if (json.apply("Parentid") != null && json.apply("Parentid").toString != "") {
+      if (json.exists(j => j._1.toString.equals("Parentid")) && json.apply("Parentid").toString != "") {
         val qry = QueryBuilder.start("_id").is(json.apply("Parentid").toString).get
         val DBList = Factor.findAll(qry)
         if (DBList != null) {
@@ -476,7 +475,7 @@ object FactorAPI extends RestHelper {
         }
       }
       val saveItem = DBUpdate(0).update
-      if(json.apply("Parentid") != null && json.apply("Parentid").toString != ""){
+      if(json.exists(j => j._1.toString.equals("Parentid")) != null && json.apply("Parentid").toString != ""){
         saveItem
           .Parentid(json.apply("Parentid").toString)
       }else{
@@ -486,13 +485,13 @@ object FactorAPI extends RestHelper {
 
       //Updaet factor
       saveItem
-        .ParentName(json.apply("ParentName").toString)
-        .FactorName(json.apply("Name").toString)
-        .Weight(json.apply("Weight").toString.toDouble)
-        .Ordinal(json.apply("Ordinal").toString.toInt)
-        .Status(json.apply("Status").toString.toLowerCase())
-        .Note(json.apply("Note").toString)
-        .Description(json.apply("Description").toString)
+        .ParentName(if(json.exists(j=>j._1.toString.equals("ParentName"))) json.apply("ParentName").toString else saveItem.ParentName.toString())
+        .FactorName(if(json.exists(j=>j._1.toString.equals("Name"))) json.apply("Name").toString else saveItem.FactorName.toString())
+        .Weight(if(json.exists(j=>j._1.toString.equals("Weight"))) json.apply("Weight").toString.toDouble else saveItem.Weight.toString().toDouble)
+        .Ordinal(if(json.exists(j=>j._1.toString.equals("Ordinal"))) json.apply("Ordinal").toString.toInt else saveItem.Ordinal.toString().toInt)
+        .Status(if(json.exists(j=>j._1.toString.equals("Status"))) json.apply("Status").toString else saveItem.Status.toString())
+        .Note(if(json.exists(j=>j._1.toString.equals("Note"))) json.apply("Note").toString else saveItem.Note.toString())
+        .Description(if(json.exists(j=>j._1.toString.equals("Description"))) json.apply("Description").toString else saveItem.Description.toString())
         .PathFactor(listPathFactor)
 
 

@@ -79,14 +79,14 @@ object ModelInfoAPI extends RestHelper {
   }
 
   def insertModelInfo(q : JValue): JValue = {
-    val mess = code.common.Message.CheckNullReturnMess(q, List("name", "description", "status"))
+    val mess = code.common.Message.CheckNullReturnMess(q, List("name"))
     if(mess.equals("OK")) {
       val json = q.asInstanceOf[JObject].values
       return code.common.Message.returnMassage("insertModelInfo", "0", "SUCCESS",
                                 ModelInfo.createRecord.id(UUID.randomUUID().toString)
                                 .name(json.apply("name").toString)
-                                .description(json.apply("description").toString)
-                                .status(json.apply("status").toString.toLowerCase())
+                                .description(if(json.exists(j => j._1.toString.equals("description"))) json.apply("description").toString.toLowerCase else "")
+                                .status(if(json.exists(j => j._1.toString.equals("status"))) json.apply("status").toString.toLowerCase else "")
                                 .save.asJValue)
     }else
       return code.common.Message.returnMassage("insertModelInfo", "1", mess, null)
@@ -111,8 +111,8 @@ object ModelInfoAPI extends RestHelper {
         return code.common.Message.returnMassage("updateModelInfo", "0", "SUCCESS",
                                                   update(0).update
                                                   .name(json.apply("name").toString)
-                                                  .description(json.apply("description").toString)
-                                                  .status(json.apply("status").toString.toLowerCase())
+                                                    .description(if(json.exists(j => j._1.toString.equals("description"))) json.apply("description").toString.toLowerCase else update(0).description.toString())
+                                                    .status(if(json.exists(j => j._1.toString.equals("status"))) json.apply("status").toString.toLowerCase else update(0).status.toString())
                                                   .save.asJValue)
 
       } else
