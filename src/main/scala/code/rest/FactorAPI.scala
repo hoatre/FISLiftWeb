@@ -63,7 +63,7 @@ object FactorAPI extends RestHelper {
       .get
     val DBM = ModelInfo.findAll(qryM)
     if(DBM.equals("publish") || DBM.equals("active")){
-      return code.common.Message.returnMassage("deleteFactor", "1", "Factor can't delete (model was published) !", null)
+      return code.common.Message.returnMassage("deleteFactor", "1", "Factor can't delete (model is not draft) !", null)
     }else {
       var msg = code.common.Message.returnMassage("deleteFactor", "2", "Can not delete Factor", null)
       val qry: QueryBuilder = new QueryBuilder
@@ -91,7 +91,7 @@ object FactorAPI extends RestHelper {
       .get
     val DBM = ModelInfo.findAll(qryM)
     if(DBM.equals("publish") || DBM.equals("active")){
-      return code.common.Message.returnMassage("deleteOptionFactor", "1", "FactorOption can't delete (model was published) !", null)
+      return code.common.Message.returnMassage("deleteOptionFactor", "1", "FactorOption can't delete (model is not draft) !", null)
     }else {
 
       val size = DBListOp(0).FactorOption.value.size
