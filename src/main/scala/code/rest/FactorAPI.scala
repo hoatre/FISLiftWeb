@@ -118,7 +118,7 @@ object FactorAPI extends RestHelper {
           .get
         val DBM = ModelInfo.findAll(qryM)
         if(DBM.equals("publish") || DBM.equals("active")){
-          return code.common.Message.returnMassage("updateFactorOption", "1", "FactorOption can't update (model was published !)", null)
+          return code.common.Message.returnMassage("updateFactorOption", "1", "FactorOption can't update (model is not draft !)", null)
         }
 
         var factorOptionUpdate: List[FactorOptionIN] = List()
@@ -309,7 +309,7 @@ object FactorAPI extends RestHelper {
 
         val updateFactor = DBList(0).update.FactorOption(listFactorOption).save
 
-        return code.common.Message.returnMassage("insertFactorOption","0", "SUCCESS", updateFactor.asJValue)
+        return code.common.Message.returnMassage("insertFactorOption","0", "SUCCESS", factorOption.asJValue)
       } else
         return code.common.Message.returnMassage("insertFactorOption", "2", "INSERT FAILED", null)
     }else
