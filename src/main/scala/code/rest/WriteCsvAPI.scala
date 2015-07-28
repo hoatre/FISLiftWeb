@@ -58,7 +58,7 @@ object csvAPI extends RestHelper {
 
     case "csv" :: "read" :: q :: Nil JsonGet req => {
       S.respondAsync {
-        val s = CsvModule.readCSV(q)
+        val s = CsvModule.readCSV(q,null)
         Full(JsonResponse(s))
       }
     }
@@ -67,12 +67,17 @@ object csvAPI extends RestHelper {
 
     case "csv"  ::  "upload" :: q :: Nil  Options _ => OkResponse()
 
-    case "csv"  ::  "upload" :: q :: Nil Post req => code.snippet.CsvModule.testcsv(q,req)
+    case "csv"  ::  "upload" :: q :: Nil Post req => {
+      S.respondAsync {
+        val s = code.snippet.CsvModule.uploadCSV(q,req)
+        Full(JsonResponse(s))
+      }
+    }
 
 
   }
   object CSV {
     def unapply(req: Req): Option[Req] =
-      req.contentType.filter(_ == "application/vnd.ms-excela").map(_ => req)
+      req.contentType.filter(_ == "application/vnd.ms-excel").map(_ => req)
   }
 }
