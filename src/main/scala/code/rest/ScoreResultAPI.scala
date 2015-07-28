@@ -33,11 +33,32 @@ object ScoreResultAPI extends RestHelper{
     case "scoreresult"::"customer" :: Nil JsonGet req => getCustomer()
 
     case "scoreresult"::"customer" :: q:: Nil JsonGet req => getCustomerbyid(q)
+    case "scoreresult"::"result" :: Nil JsonGet req => getResult()
+
+    case "scoreresult"::"result" :: q:: Nil JsonGet req => getResultid(q)
 
     case "scoreresult" :: Nil JsonPost json-> request => scoreresult(json)
 
     case "scoreresult"  :: Nil Options _ => {"OK" -> "200"} :JValue
 
+
+  }
+  def getResult(): JValue ={
+
+    val db = ScoringResult.findAll(("_id" -> ("$ne" -> "fdsd")),Skip(0),Limit(50))
+    var list : List[JValue] = List()
+
+    for(x <- db){
+      list = list ::: List({("_id" -> x.id.toString())} :JValue)
+    }
+
+    Message.returnMassage("getresult","0","Success",list.distinct,list.distinct.size)
+
+  }
+  def getResultid(q:String) : JValue={
+    val db = ScoringResult.findAll(("_id" -> ("$oid" ->q)))
+
+    Message.returnMassage("getresult","0","Success",db.map(_.asJValue),db.size)
 
   }
 
