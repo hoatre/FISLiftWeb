@@ -41,9 +41,11 @@ import scala.concurrent.{Future, ExecutionContext}
  */
 object CsvModule {
 
+
   implicit object MyFormat extends DefaultCSVFormat {
     override val delimiter = '#'
   }
+
 
   def search(q: String): JValue = {
     val db = CSVsave.findAll("session" -> ("$oid" -> q))
@@ -113,7 +115,11 @@ object CsvModule {
     implicit val xc: ExecutionContext = ExecutionContext.global
     val f = readCSVFuture(model_id, a,session)(xc)
     f.onComplete{
-      case _ => new Thread(readCSVFutureAfter(model_id, a,session)).start()
+      case _ => {
+        val th = new Thread(readCSVFutureAfter(model_id, a, session))
+        th.start()
+        Thread.sleep(3000)
+      }
     }
 
     Message.returnMassage("readfile", "0", "No error", ("session" -> session.toString), 1)
@@ -249,39 +255,42 @@ object CsvModule {
 
 
   def readCSVFutureAfter (model_id : String, stream : Stream[List[String]],session :ObjectId)   = new Thread(){
-    var time = System.currentTimeMillis()
-    println(time)
+    override def run {
 
-    val db = Factor.findAll("ModelId" -> model_id)
-    val dbrating = Rating.findAll("modelid" -> model_id)
-    val dbmodel = ModelInfo.findAll("_id" -> model_id)
-    val props = new Properties()
-    props.put("metadata.broker.list", "10.15.171.36:9092,10.15.171.33:9095")
-//    props.put("zk.connect", "10.15.171.36:2181")
-    props.put("serializer.class", "kafka.serializer.StringEncoder")
-    props.put("producer.type", "async")
-//    props.put("batch.size", "10000")
-    props.put("queue.enqueue.timeout.ms", "-1")
-    props.put("batch.num.messages", "200")
-    props.put("compression.codec", "1")
-//    props.put("queue.size", "10000")
-//    props.put("queue.time", "5000")
-    val config = new ProducerConfig(props)
-    val producer = new Producer[String, String](config)
+      var time = System.currentTimeMillis()
+      println(time)
 
-    var count = 0
-    //    val session = ObjectId.get().toString
-   var messages : List[KeyedMessage[String,String]] = List()
-    stream foreach {
-      x =>  getvalueafter(x, db, dbrating,dbmodel, session,producer)
+      val db = Factor.findAll("ModelId" -> model_id)
+      val dbrating = Rating.findAll("modelid" -> model_id)
+      val dbmodel = ModelInfo.findAll("_id" -> model_id)
+      val props = new Properties()
+      props.put("metadata.broker.list", "10.15.171.36:9092,10.15.171.36:9093")
+      //    props.put("zk.connect", "10.15.171.36:2181")
+      props.put("serializer.class", "kafka.serializer.StringEncoder")
+      props.put("producer.type", "async")
+      //    props.put("batch.size", "10000")
+      props.put("queue.enqueue.timeout.ms", "-1")
+      props.put("batch.num.messages", "200")
+      props.put("compression.codec", "1")
+      //    props.put("queue.size", "10000")
+      //    props.put("queue.time", "5000")
+      val config = new ProducerConfig(props)
+      val producer = new Producer[String, String](config)
 
-        count += 1
-        println(count)
+      var count = 0
+      //    val session = ObjectId.get().toString
+      var messages: List[KeyedMessage[String, String]] = List()
+      stream foreach {
+        x => getvalueafter(x, db, dbrating, dbmodel, session, producer)
+
+          count += 1
+          println(count)
+      }
+      println(System.currentTimeMillis() - time)
+      //    producer.send(messages : _*)
+      producer.close()
+      println(System.currentTimeMillis() - time)
     }
-    println(System.currentTimeMillis() -time)
-//    producer.send(messages : _*)
-    producer.close()
-    println(System.currentTimeMillis() -time)
   }
   def getvalueafter(listString: List[String], db: List[Factor], rates: List[Rating], dbmodel :List[ModelInfo], session: ObjectId,producer:Producer[String, String]) : Unit = {
     var lista: List[resultIN] = List()
@@ -372,14 +381,15 @@ object CsvModule {
     //    ScoreResultAPI.saveScoreResult(session, db(0).ModelId.toString(), listString(0).toString, scoreresult, coderesul, codestatus, lista)
 
 
-    val result = ScoringResult.createRecord.id(ObjectId.get).session(session).modelid(dbmodel(0).id.toString()).model_name(dbmodel(0).name.toString()).customer_id(ObjectId.get).customer_name(ObjectId.get().toString).scoring(scoreresult).rating_code(coderesul).rating_status(codestatus).resultin(lista).timestamp(System.currentTimeMillis()).factor(db)
+    val result = ScoringResult.id(ObjectId.get).session(session).modelid(dbmodel(0).id.toString()).model_name(dbmodel(0).name.toString()).customer_id(ObjectId.get).customer_name(ObjectId.get().toString).scoring(scoreresult).rating_code(coderesul).rating_status(codestatus)
+      .resultin(lista).timestamp(System.currentTimeMillis()/1000).factor(db)
       .model(dbmodel(0)).rate(rates(0))
 
 //    val liststr : List[String] = List(result.asJSON.toString())
 
 
 //  val hhj = net.liftweb.json.compact(net.liftweb.json.render(result.asJValue))
-    val data = new KeyedMessage[String, String]("Camus",net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
+    val data = new KeyedMessage[String, String]("CamusTopic",net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
 //    data.copy()
     producer.send(data)
 //    println(hhj)
