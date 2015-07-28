@@ -50,23 +50,28 @@ object CsvModule {
 
   req.contentType.filter(_ == "application/csv").map(_ => req)
 }
-def testcsv(q:String,byte : Box[Array[Byte]]) :JValue ={
+def testcsv(q:String,req: Req) :JValue ={
 
 //  val bfile : Array[Byte] = Array()
 
-println(byte)
+  req.body.foreach{
+    x => {
+      val name = ObjectId.get().toString
+      val file : FileOutputStream= new FileOutputStream(name+".csv")
+      file.write(x.clone())
+      file.close()
 
-val Full(b)= byte
-
-  val out :FileOutputStream  = new FileOutputStream("filename.csv");
-  try {
-    out.write(b);
-  } finally {
-    out.close();
+    }
   }
+
+
+//  for(file <- req.body){
+//    println(file.clone())
+//  }
 
   {"ddd" -> "ddd"} :JValue
 }
+
 
 
   def search(q: String): JValue = {

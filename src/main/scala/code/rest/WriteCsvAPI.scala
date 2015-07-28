@@ -65,16 +65,14 @@ object csvAPI extends RestHelper {
 
     case "csv" :: q :: Nil JsonGet req => CsvModule.search(q)
 
-    case "csv"  ::  "upload" ::q:: Nil  Options _ => OkResponse()
+    case "csv"  ::  "upload" :: q :: Nil  Options _ => OkResponse()
 
-//    case "csv"  ::  "upload" :: q :: Nil Post req => for(file <-req.uploadedFiles) {
-//     println(file.fileName.toString)
-//    }
+    case "csv"  ::  "upload" :: q :: Nil Post req => code.snippet.CsvModule.testcsv(q,req)
 
 
   }
   object CSV {
     def unapply(req: Req): Option[Req] =
-      req.contentType.filter(_ == "text/csv").map(_ => req)
+      req.contentType.filter(_ == "application/vnd.ms-excela").map(_ => req)
   }
 }
