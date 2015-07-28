@@ -17,6 +17,7 @@ import net.liftweb.json.JsonAST.JField
 import net.liftweb.json.JsonAST.JString
 import net.liftweb.json.JsonAST.JValue
 
+
 import com.mongodb.{BasicDBObject, BasicDBObjectBuilder, QueryBuilder}
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
@@ -112,7 +113,7 @@ object CsvModule {
     implicit val xc: ExecutionContext = ExecutionContext.global
     val f = readCSVFuture(model_id, a,session)(xc)
     f.onComplete{
-      case _ => readCSVFutureAfter(model_id, a,session)
+      case _ => new Thread(readCSVFutureAfter(model_id, a,session)).start()
     }
 
     Message.returnMassage("readfile", "0", "No error", ("session" -> session.toString), 1)
@@ -235,7 +236,7 @@ object CsvModule {
     //    val msg = (("Customer"-> listString(0).toString) ~ ("Score" -> scoreresult) ~ ("Rating" -> coderesul) ~ ("Status" -> codestatus))
 
 
-    saveResult(CSVsave.createRecord.session(session).customer(listString(0).toString).score(scoreresult).rating(coderesul).status(codestatus))
+    saveResult(CSVsave.createRecord.session(session).customerid(ObjectId.get).customer(listString(0).toString).score(scoreresult).rating(coderesul).status(codestatus))
     //
 //    ScoreResultAPI.saveScoreResult(session, db(0).ModelId.toString(), listString(0).toString, scoreresult, coderesul, codestatus, lista)
 
@@ -247,7 +248,7 @@ object CsvModule {
   }
 
 
-  def readCSVFutureAfter (model_id : String, stream : Stream[List[String]],session :ObjectId)(implicit xc: ExecutionContext = ExecutionContext.global): Future[Unit]   = Future{
+  def readCSVFutureAfter (model_id : String, stream : Stream[List[String]],session :ObjectId)   = new Thread(){
     var time = System.currentTimeMillis()
     println(time)
 
@@ -255,18 +256,30 @@ object CsvModule {
     val dbrating = Rating.findAll("modelid" -> model_id)
     val dbmodel = ModelInfo.findAll("_id" -> model_id)
     val props = new Properties()
-    props.put("metadata.broker.list", "10.15.171.36:9092")
+    props.put("metadata.broker.list", "10.15.171.36:9092,10.15.171.33:9095")
+//    props.put("zk.connect", "10.15.171.36:2181")
     props.put("serializer.class", "kafka.serializer.StringEncoder")
     props.put("producer.type", "async")
+//    props.put("batch.size", "10000")
+    props.put("queue.enqueue.timeout.ms", "-1")
+    props.put("batch.num.messages", "200")
+    props.put("compression.codec", "1")
+//    props.put("queue.size", "10000")
+//    props.put("queue.time", "5000")
     val config = new ProducerConfig(props)
     val producer = new Producer[String, String](config)
 
     var count = 0
     //    val session = ObjectId.get().toString
+   var messages : List[KeyedMessage[String,String]] = List()
     stream foreach {
-      x => getvalueafter(x, db, dbrating,dbmodel, session,producer)
+      x =>  getvalueafter(x, db, dbrating,dbmodel, session,producer)
 
+        count += 1
+        println(count)
     }
+    println(System.currentTimeMillis() -time)
+//    producer.send(messages : _*)
     producer.close()
     println(System.currentTimeMillis() -time)
   }
@@ -359,13 +372,18 @@ object CsvModule {
     //    ScoreResultAPI.saveScoreResult(session, db(0).ModelId.toString(), listString(0).toString, scoreresult, coderesul, codestatus, lista)
 
 
-    val result = ScoringResult.id(ObjectId.get).session(session).modelid(dbmodel(0).id.toString()).model_name(dbmodel(0).name.toString()).customer_name(ObjectId.get().toString).scoring(scoreresult).rating_code(coderesul).rating_status(codestatus).resultin(lista).timestamp(System.currentTimeMillis()).factor(db)
+    val result = ScoringResult.createRecord.id(ObjectId.get).session(session).modelid(dbmodel(0).id.toString()).model_name(dbmodel(0).name.toString()).customer_id(ObjectId.get).customer_name(ObjectId.get().toString).scoring(scoreresult).rating_code(coderesul).rating_status(codestatus).resultin(lista).timestamp(System.currentTimeMillis()).factor(db)
       .model(dbmodel(0)).rate(rates(0))
 
+//    val liststr : List[String] = List(result.asJSON.toString())
 
-    val data = new KeyedMessage[String, String]("Camus", result.asJSON.toString())
 
+//  val hhj = net.liftweb.json.compact(net.liftweb.json.render(result.asJValue))
+    val data = new KeyedMessage[String, String]("Camus",net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
+//    data.copy()
     producer.send(data)
+//    println(hhj)
+
 
   }
 

@@ -14,6 +14,7 @@ class CSVsave private () extends MongoRecord[CSVsave] with ObjectIdPk[CSVsave] {
   // An embedded document:
   object session  extends ObjectIdField(this)
   object customer extends StringField(this,1024)
+  object customerid extends ObjectIdField(this)
   object score extends DoubleField(this)
   object rating extends StringField(this,1024)
   object status extends StringField(this,1024)

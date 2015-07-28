@@ -53,15 +53,24 @@ object csvAPI extends RestHelper {
 
     //    case "validate" :: "checkweightrate" :: Nil JsonDelete json  => test(json)
 
-    case "csv" :: "test"::q:: Nil JsonGet req => CsvModule.writetoCSV(q)
+    case "csv" :: "test" :: q :: Nil JsonGet req => CsvModule.writetoCSV(q)
 
-    case "csv" :: "read"::q:: Nil JsonGet req => {
+    case "csv" :: "read" :: q :: Nil JsonGet req => {
       S.respondAsync {
-      val s=    CsvModule.readCSV(q)
+        val s = CsvModule.readCSV(q)
         Full(JsonResponse(s))
       }
     }
 
-    case "csv" ::q:: Nil JsonGet req => CsvModule.search(q)
+    case "csv" :: q :: Nil JsonGet req => CsvModule.search(q)
+
+    case "csv"  ::  "upload" :: Nil  Options _ => {
+      "OK" -> "200"
+    }: JValue
+
+    case "csv"  ::  "upload" :: q :: Nil Post req => for {
+      bodyBytes <- req.body
+    } yield <info>Received {bodyBytes.length} bytes</info>
+
   }
 }

@@ -11,6 +11,7 @@ import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.{JArray, JValue, _}
 import net.liftweb.json.JsonDSL.{seq2jvalue, _}
+import net.liftweb.mongodb.{Skip, Limit}
 import org.bson.types.ObjectId
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,11 +30,33 @@ object ScoreResultAPI extends RestHelper{
 
 
   serve {
+    case "scoreresult"::"customer" :: Nil JsonGet req => getCustomer()
+
+    case "scoreresult"::"customer" :: q:: Nil JsonGet req => getCustomerbyid(q)
 
     case "scoreresult" :: Nil JsonPost json-> request => scoreresult(json)
 
     case "scoreresult"  :: Nil Options _ => {"OK" -> "200"} :JValue
 
+
+  }
+
+  def getCustomer(): JValue ={
+
+    val db = ScoringResult.findAll(("_id" -> ("$ne" -> "fdsd")),Skip(0),Limit(50))
+    var list : List[JValue] = List()
+
+    for(x <- db){
+      list = list ::: List({("customer_id" -> x.customer_id.toString()) ~ ("customer_name" -> x.customer_name.toString())} :JValue)
+    }
+
+    Message.returnMassage("getcustomer","0","Success",list,list.size)
+
+  }
+  def getCustomerbyid(q:String) : JValue={
+    val db = ScoringResult.findAll(("customer_id" -> ("$oid" ->q)))
+
+    Message.returnMassage("getcustomer","0","Success",db.map(_.asJValue),db.size)
 
   }
 
@@ -169,11 +192,12 @@ object ScoreResultAPI extends RestHelper{
     if (session == null){
        ses = ObjectId.get()
     }
+    val customer_id  = ObjectId.get
 
 
     val db = ModelInfo.findAll("_id" -> modelid)
     if(db.size == 1) {
-      val result = ScoringResult.createRecord.id(ObjectId.get).session(ses).modelid(modelid).model_name(db(0).name.toString()).customer_name(ObjectId.get().toString).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).timestamp(System.currentTimeMillis()).factor(Factor.findAll("ModelId" -> modelid))
+      val result = ScoringResult.createRecord.id(ObjectId.get).session(ses).modelid(modelid).model_name(db(0).name.toString()).customer_id(customer_id).customer_name(ObjectId.get().toString).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).timestamp(System.currentTimeMillis()).factor(Factor.findAll("ModelId" -> modelid))
         .model(ModelInfo.find("_id" -> modelid)).rate(Rating.find("modelid" -> modelid)).save
 
       val props = new Properties()

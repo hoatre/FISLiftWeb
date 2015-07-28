@@ -18,6 +18,7 @@ class ScoringResult private () extends MongoRecord[ScoringResult] with ObjectIdP
   }
   object model_name extends StringField(this,1024)
   object customer_name extends  StringField(this,1024)
+  object customer_id  extends ObjectIdField(this)
   object session  extends  ObjectIdField(this)
   object timestamp extends LongField(this)
   object scoring extends DoubleField(this)
