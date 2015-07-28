@@ -373,8 +373,8 @@ object FactorAPI extends RestHelper {
 
         if (json.exists(p => p._1 == "ParentName")) {
           var parentName: String = ""
-          if (json.apply("parentName").toString != "")
-            parentName = json.apply("parentName").toString
+          if (json.apply("ParentName").toString != "")
+            parentName = json.apply("ParentName").toString
           saveItem = Factor.Parentid(parentName)
         } else
           saveItem = Factor.Parentid("")
