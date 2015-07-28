@@ -50,7 +50,7 @@ object ScoreResultAPI extends RestHelper{
       list = list ::: List({("customer_id" -> x.customer_id.toString()) ~ ("customer_name" -> x.customer_name.toString())} :JValue)
     }
 
-    Message.returnMassage("getcustomer","0","Success",list,list.size)
+    Message.returnMassage("getcustomer","0","Success",list.distinct,list.distinct.size)
 
   }
   def getCustomerbyid(q:String) : JValue={
@@ -206,7 +206,7 @@ object ScoreResultAPI extends RestHelper{
       props.put("producer.type", "async")
       val config = new ProducerConfig(props)
       val producer = new Producer[String, String](config)
-      val data = new KeyedMessage[String, String]("Camus", result.asJSON.toString())
+      val data = new KeyedMessage[String, String]("CamusTopic", result.asJSON.toString())
       producer.send(data)
       producer.close()
     }
