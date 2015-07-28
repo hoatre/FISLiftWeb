@@ -2,6 +2,7 @@ package code.rest
 
 import code.rest.ValidateAPI._
 import net.liftweb.common.Full
+import net.liftweb.http
 import net.liftweb.http._
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.JValue
@@ -64,13 +65,16 @@ object csvAPI extends RestHelper {
 
     case "csv" :: q :: Nil JsonGet req => CsvModule.search(q)
 
-    case "csv"  ::  "upload" :: Nil  Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "csv"  ::  "upload" ::q:: Nil  Options _ => OkResponse()
 
-    case "csv"  ::  "upload" :: q :: Nil Post req => for {
-      bodyBytes <- req.body
-    } yield <info>Received {bodyBytes.length} bytes</info>
+//    case "csv"  ::  "upload" :: q :: Nil Post req => for(file <-req.uploadedFiles) {
+//     println(file.fileName.toString)
+//    }
 
+
+  }
+  object CSV {
+    def unapply(req: Req): Option[Req] =
+      req.contentType.filter(_ == "text/csv").map(_ => req)
   }
 }
