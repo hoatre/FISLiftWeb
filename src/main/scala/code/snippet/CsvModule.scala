@@ -1,6 +1,6 @@
 package code.snippet
 
-import java.io.File
+import java.io.{FileOutputStream, File}
 import java.util.concurrent.{Callable, FutureTask, Executors, ExecutorService}
 
 import code.rest.ScoreResultAPI
@@ -9,7 +9,8 @@ import java.util.{Properties, UUID}
 
 import code.common.Message
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
-import net.liftweb.http.LiftRules
+import net.liftweb.common.{Full, Box}
+import net.liftweb.http.{Req, LiftRules, S}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json._
 import net.liftweb.json.JsonAST.JArray
@@ -21,7 +22,6 @@ import net.liftweb.json.JsonAST.JValue
 import com.mongodb.{BasicDBObject, BasicDBObjectBuilder, QueryBuilder}
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
-import net.liftweb.http.{S, LiftRules}
 import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
@@ -45,6 +45,28 @@ object CsvModule {
   implicit object MyFormat extends DefaultCSVFormat {
     override val delimiter = '#'
   }
+
+  def unapply(req: Req): Option[Req] = {
+
+  req.contentType.filter(_ == "application/csv").map(_ => req)
+}
+def testcsv(q:String,byte : Box[Array[Byte]]) :JValue ={
+
+//  val bfile : Array[Byte] = Array()
+
+println(byte)
+
+val Full(b)= byte
+
+  val out :FileOutputStream  = new FileOutputStream("filename.csv");
+  try {
+    out.write(b);
+  } finally {
+    out.close();
+  }
+
+  {"ddd" -> "ddd"} :JValue
+}
 
 
   def search(q: String): JValue = {
@@ -382,7 +404,7 @@ object CsvModule {
 
 
     val result = ScoringResult.id(ObjectId.get).session(session).modelid(dbmodel(0).id.toString()).model_name(dbmodel(0).name.toString()).customer_id(ObjectId.get).customer_name(ObjectId.get().toString).scoring(scoreresult).rating_code(coderesul).rating_status(codestatus)
-      .resultin(lista).timestamp(System.currentTimeMillis()/1000).factor(db)
+      .resultin(lista).timestamp((System.currentTimeMillis()/1000).toString).factor(db)
       .model(dbmodel(0)).rate(rates(0))
 
 //    val liststr : List[String] = List(result.asJSON.toString())
