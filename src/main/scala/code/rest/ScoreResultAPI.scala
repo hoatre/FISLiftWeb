@@ -7,6 +7,7 @@ import code.common.Message
 import code.model._
 import com.mongodb.QueryBuilder
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
+import net.liftweb.common.Full
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.{JArray, JValue, _}
@@ -57,8 +58,12 @@ object ScoreResultAPI extends RestHelper{
   }
   def getResultid(q:String) : JValue={
     val db = ScoringResult.findAll(("_id" -> ("$oid" ->q)))
+    if(db.size == 1){
+     val Full(dbone) = ScoringResult.find(("_id" -> ("$oid" ->q)))
+      return Message.returnMassage("getresult","0","Success",dbone.asJValue,db.size)
+    }
 
-    Message.returnMassage("getresult","0","Success",db.map(_.asJValue),db.size)
+    Message.returnMassage("getresult","1","Found many item",db.map(_.asJValue),db.size)
 
   }
 
