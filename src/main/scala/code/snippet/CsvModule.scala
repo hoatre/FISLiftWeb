@@ -10,7 +10,7 @@ import java.util.{Properties, UUID}
 import code.common.Message
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
 import net.liftweb.common.{Full, Box}
-import net.liftweb.http.{Req, LiftRules, S}
+import net.liftweb.http._
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json._
 import net.liftweb.json.JsonAST.JArray
@@ -50,18 +50,13 @@ object CsvModule {
 
   req.contentType.filter(_ == "application/csv").map(_ => req)
 }
-def testcsv(q:String,req: Req) :JValue ={
+def uploadCSV(q:String,req: Req) :JValue ={
 
 //  val bfile : Array[Byte] = Array()
+var str :JValue =   {"ddd" -> "ddd"} :JValue
 
-  req.body.foreach{
-    x => {
-      val name = ObjectId.get().toString
-      val file : FileOutputStream= new FileOutputStream(name+".csv")
-      file.write(x.clone())
-      file.close()
-
-    }
+  for(file <- req.uploadedFiles){
+    str= readCSV(q,file)
   }
 
 
@@ -69,7 +64,7 @@ def testcsv(q:String,req: Req) :JValue ={
 //    println(file.clone())
 //  }
 
-  {"ddd" -> "ddd"} :JValue
+  str
 }
 
 
@@ -102,7 +97,7 @@ def testcsv(q:String,req: Req) :JValue ={
     executor.execute(future)
     //    val mes = future.get()
     //    println(mes)
-    executor.shutdown();
+    executor.shutdown()
 
 
     {
@@ -110,8 +105,24 @@ def testcsv(q:String,req: Req) :JValue ={
     }: JValue
   }
 
-  def readCSV(q:String) :JValue =  {
+  def readCSV(q:String,file : FileParamHolder) :JValue =  {
+    if(!(file.mimeType.toString.equals("application/vnd.ms-excel")&&file.fileName.toLowerCase().contains(".csv"))){
+      return Message.returnMassage("uploadcsv", "3", "File not allow", null, 0)
+    }
+
+    val filename = ObjectId.get().toString + ".csv"
+
+    val out :FileOutputStream = new FileOutputStream(filename)
+
+
+    out.write(file.file)
+    out.close()
+
+
     val reader = CSVReader.open(new File(q + ".csv"), "UTF-8")
+
+
+
     val a = reader.toStream
     //    println(a)
 
@@ -119,7 +130,7 @@ def testcsv(q:String,req: Req) :JValue ={
     //    loop("Iterator2: ", it2.next, it2){
     //
     //    }
-    val model_id = "c69f764e-d651-42ab-8046-b09e9e2c412e"
+    val model_id = q
     val list = a.head
     val model_name: String = list(1)
     val factor_name: String = list(2)
@@ -137,7 +148,7 @@ def testcsv(q:String,req: Req) :JValue ={
     val checkfactor = Factor.count(qry)
 
     if (checkfactor < 1) {
-      return Message.returnMassage("uploadcsv", "1", "Factor not found", null, 0)
+      return Message.returnMassage("uploadcsv", "2", "Factor not found", null, 0)
     }
     implicit val xc: ExecutionContext = ExecutionContext.global
     val f = readCSVFuture(model_id, a,session)(xc)
@@ -146,6 +157,12 @@ def testcsv(q:String,req: Req) :JValue ={
         val th = new Thread(readCSVFutureAfter(model_id, a, session))
         th.start()
         Thread.sleep(3000)
+        reader.close()
+
+        if(new File(filename).exists()){
+          new File(filename).delete()
+        }
+
       }
     }
 
