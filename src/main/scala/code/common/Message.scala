@@ -43,4 +43,8 @@ object Message {
 
     {api -> (("header" ->(("code"-> code)~("message" -> msgerr)))~("body" -> body)~("count" -> count))} :JValue
   }
+  def returnMassage(api : String,code:String, msgerr :String,body:JValue,count:Long,countss:Long,countf:Long) : JValue={
+
+    {api -> (("header" ->(("code"-> code)~("message" -> msgerr)))~("body" -> body)~("count" -> count)~("ok" -> countss)~("fail" -> countf))} :JValue
+  }
 }
