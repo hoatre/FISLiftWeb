@@ -18,6 +18,7 @@ class CSVsave private () extends MongoRecord[CSVsave] with ObjectIdPk[CSVsave] {
   object score extends DoubleField(this)
   object rating extends StringField(this,1024)
   object status extends StringField(this,1024)
+  object statustype extends StringField(this,10)
 
 
 }

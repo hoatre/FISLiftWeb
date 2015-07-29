@@ -70,9 +70,10 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
 
 
   def search(q: String): JValue = {
-    val db = CSVsave.findAll("session" -> ("$oid" -> q))
+    val dbok = CSVsave.findAll(("session" -> ("$oid" -> q)) ~ ("statustype" -> "0"))
+    val dbfail = CSVsave.findAll(("session" -> ("$oid" -> q)) ~ ("statustype" -> "1"))
     val count = CSVsave.count("session" -> ("$oid" -> q))
-    Message.returnMassage("uploadfile", "0", "No error", db.map(_.asJValue), count)
+    Message.returnMassage("uploadfile", "0", "No error", ("ok" -> dbok.map(_.asJValue)) ~ ("fail" -> dbfail.map(_.asJValue)), count,dbok.size,dbfail.size)
   }
 
   def writetoCSV(q: String): JValue = {
@@ -119,7 +120,7 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
     out.close()
 
 
-    val reader = CSVReader.open(new File(q + ".csv"), "UTF-8")
+    val reader = CSVReader.open(filename, "UTF-8")
 
 
 
@@ -131,25 +132,25 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
     //
     //    }
     val model_id = q
-    val list = a.head
-    val model_name: String = list(1)
-    val factor_name: String = list(2)
-    val factor_option_name: String = list(3)
+//    val list = a.head
+//    val model_name: String = list(1)
+//    val factor_name: String = list(2)
+//    val factor_option_name: String = list(3)
     val session: ObjectId = ObjectId.get()
-
-    val check = ModelInfo.findAll("_id" -> model_id)
-    if (!(check.size > 0 && check(0).name.toString.equals(model_name))) {
-      return Message.returnMassage("uploadcsv", "1", "Error", null, 0)
-    }
-    //    val b = {("FactorOption" -> ("$elemMatch" -> ("FactorOptionName" -> factor_option_name))) ~ ("ModelId" -> model_id) ~ ("FactorName" -> factor_name)} : JValue
-
-    val qry = QueryBuilder.start("ModelId").is(model_id).and("FactorName").is(factor_name).and("FactorOption").elemMatch(new BasicDBObject("FactorOptionName", factor_option_name))
-      .get
-    val checkfactor = Factor.count(qry)
-
-    if (checkfactor < 1) {
-      return Message.returnMassage("uploadcsv", "2", "Factor not found", null, 0)
-    }
+//
+//    val check = ModelInfo.findAll("_id" -> model_id)
+//    if (!(check.size > 0 && check(0).name.toString.equals(model_name))) {
+//      return Message.returnMassage("uploadcsv", "1", "Error", null, 0)
+//    }
+//    //    val b = {("FactorOption" -> ("$elemMatch" -> ("FactorOptionName" -> factor_option_name))) ~ ("ModelId" -> model_id) ~ ("FactorName" -> factor_name)} : JValue
+//
+//    val qry = QueryBuilder.start("ModelId").is(model_id).and("FactorName").is(factor_name).and("FactorOption").elemMatch(new BasicDBObject("FactorOptionName", factor_option_name))
+//      .get
+//    val checkfactor = Factor.count(qry)
+//
+//    if (checkfactor < 1) {
+//      return Message.returnMassage("uploadcsv", "2", "Factor not found", null, 0)
+//    }
     implicit val xc: ExecutionContext = ExecutionContext.global
     val f = readCSVFuture(model_id, a,session)(xc)
     f.onComplete{
@@ -177,12 +178,12 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
     val dbrating = Rating.findAll("modelid" -> model_id)
     val dbmodel = ModelInfo.findAll("_id" -> model_id)
 
-    var count = 0
+//    var count = 0
     //    val session = ObjectId.get().toString
     stream foreach {
       x => getvalue(x, db, dbrating,dbmodel, session)
-        count += 1
-        println(count)
+//        count += 1
+//        println(count)
     }
 
 
@@ -213,6 +214,7 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
     var score: Double = 0
     var coderesul: String = null
     var codestatus: String = null
+    var statustype : String = "1"
 
     //    if(listString == null){
     //      return
@@ -223,43 +225,47 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
         listDBCuoi = listDBCuoi ::: List(factor)
     }
 
+if(listString(1).toString.equals(dbmodel(0).name.toString())) {
 
-    for (i <- 2 to listString.size - 1) {
-      if (j == 1) {
-        factor_name = listString(i).toString
-      } else if (j == 2) {
-        factor_option_name = listString(i).toString
-      } else if (j == 3) {
-        factor_option_score = listString(i).toString.toDouble
-        for (x <- 0 to listDBCuoi.size - 1) {
-          if (listDBCuoi(x).FactorName.toString().equals(factor_name)) {
+  for (i <- 2 to listString.size - 1) {
+    if (j == 1) {
+      factor_name = listString(i).toString
+    } else if (j == 2) {
+      factor_option_name = listString(i).toString
+    } else if (j == 3) {
+      factor_option_score = listString(i).toString.toDouble
+      for (x <- 0 to listDBCuoi.size - 1) {
+        if (listDBCuoi(x).FactorName.toString().equals(factor_name)) {
 
-            for (z <- listDBCuoi(x).FactorOption.value) {
-              //                val j = z.asInstanceOf[JObject].values
-              if (z.FactorOptionName.toString().equals(factor_option_name)) {
-                score = z.Score.toString.toDouble
+          for (z <- listDBCuoi(x).FactorOption.value) {
+            //                val j = z.asInstanceOf[JObject].values
+            if (z.FactorOptionName.toString().equals(factor_option_name)) {
+              score = z.Score.toString.toDouble
 
-                score = score * (listDBCuoi(x).Weight.toString().toDouble / 100)
-                for (path <- listDBCuoi(x).PathFactor.value) {
-                  score = score * (path.Weight.toString().toDouble / 100)
-                }
-                scoreresult = scoreresult + score
-                lista = lista ::: List(resultIN.createRecord.factor_id(listDBCuoi(x).id.toString()).factor_name(listDBCuoi(x).FactorName.toString()).
-                  factor_score(score).factor_option_id(z.FactorOptionId.toString()).factor_option_name(z.FactorOptionName.toString()).
-                  factor_option_score(z.Score.toString().toDouble))
+              score = score * (listDBCuoi(x).Weight.toString().toDouble / 100)
+              for (path <- listDBCuoi(x).PathFactor.value) {
+                score = score * (path.Weight.toString().toDouble / 100)
               }
+              scoreresult = scoreresult + score
+              statustype = "0"
+              lista = lista ::: List(resultIN.createRecord.factor_id(listDBCuoi(x).id.toString()).factor_name(listDBCuoi(x).FactorName.toString()).
+                factor_score(score).factor_option_id(z.FactorOptionId.toString()).factor_option_name(z.FactorOptionName.toString()).
+                factor_option_score(z.Score.toString().toDouble))
             }
-
           }
-
 
         }
 
-        j = 0
-      }
-      j += 1
 
+      }
+
+      j = 0
     }
+    j += 1
+
+  }
+}
+
     if (rates.size > 0) {
       scoreresult = (f"$scoreresult%1.2f").toDouble
 
@@ -286,7 +292,7 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
     //    val msg = (("Customer"-> listString(0).toString) ~ ("Score" -> scoreresult) ~ ("Rating" -> coderesul) ~ ("Status" -> codestatus))
 
 
-    saveResult(CSVsave.createRecord.session(session).customerid(ObjectId.get).customer(listString(0).toString).score(scoreresult).rating(coderesul).status(codestatus))
+    saveResult(CSVsave.createRecord.session(session).customerid(ObjectId.get).customer(listString(0).toString).score(scoreresult).rating(coderesul).status(codestatus).statustype(statustype))
     //
 //    ScoreResultAPI.saveScoreResult(session, db(0).ModelId.toString(), listString(0).toString, scoreresult, coderesul, codestatus, lista)
 
@@ -321,14 +327,14 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
       val config = new ProducerConfig(props)
       val producer = new Producer[String, String](config)
 
-      var count = 0
+//      var count = 0
       //    val session = ObjectId.get().toString
       var messages: List[KeyedMessage[String, String]] = List()
       stream foreach {
         x => getvalueafter(x, db, dbrating, dbmodel, session, producer)
 
-          count += 1
-          println(count)
+//          count += 1
+//          println(count)
       }
       println(System.currentTimeMillis() - time)
       //    producer.send(messages : _*)
@@ -347,6 +353,7 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
     var score: Double = 0
     var coderesul: String = null
     var codestatus: String = null
+    var statustype:String = "1"
 
     //    if(listString == null){
     //      return
@@ -357,42 +364,44 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
         listDBCuoi = listDBCuoi ::: List(factor)
     }
 
+    if(listString(1).toString.equals(dbmodel(0).name.toString())) {
+      for (i <- 2 to listString.size - 1) {
+        if (j == 1) {
+          factor_name = listString(i).toString
+        } else if (j == 2) {
+          factor_option_name = listString(i).toString
+        } else if (j == 3) {
+          factor_option_score = listString(i).toString.toDouble
+          for (x <- 0 to listDBCuoi.size - 1) {
+            if (listDBCuoi(x).FactorName.toString().equals(factor_name)) {
 
-    for (i <- 2 to listString.size - 1) {
-      if (j == 1) {
-        factor_name = listString(i).toString
-      } else if (j == 2) {
-        factor_option_name = listString(i).toString
-      } else if (j == 3) {
-        factor_option_score = listString(i).toString.toDouble
-        for (x <- 0 to listDBCuoi.size - 1) {
-          if (listDBCuoi(x).FactorName.toString().equals(factor_name)) {
+              for (z <- listDBCuoi(x).FactorOption.value) {
+                //                val j = z.asInstanceOf[JObject].values
+                if (z.FactorOptionName.toString().equals(factor_option_name)) {
+                  score = z.Score.toString.toDouble
 
-            for (z <- listDBCuoi(x).FactorOption.value) {
-              //                val j = z.asInstanceOf[JObject].values
-              if (z.FactorOptionName.toString().equals(factor_option_name)) {
-                score = z.Score.toString.toDouble
-
-                score = score * (listDBCuoi(x).Weight.toString().toDouble / 100)
-                for (path <- listDBCuoi(x).PathFactor.value) {
-                  score = score * (path.Weight.toString().toDouble / 100)
+                  score = score * (listDBCuoi(x).Weight.toString().toDouble / 100)
+                  for (path <- listDBCuoi(x).PathFactor.value) {
+                    score = score * (path.Weight.toString().toDouble / 100)
+                  }
+                  scoreresult = scoreresult + score
+                  statustype = "0"
+                  lista = lista ::: List(resultIN.createRecord.factor_id(listDBCuoi(x).id.toString()).factor_name(listDBCuoi(x).FactorName.toString()).
+                    factor_score(score).factor_option_id(z.FactorOptionId.toString()).factor_option_name(z.FactorOptionName.toString()).
+                    factor_option_score(z.Score.toString().toDouble))
                 }
-                scoreresult = scoreresult + score
-                lista = lista ::: List(resultIN.createRecord.factor_id(listDBCuoi(x).id.toString()).factor_name(listDBCuoi(x).FactorName.toString()).
-                  factor_score(score).factor_option_id(z.FactorOptionId.toString()).factor_option_name(z.FactorOptionName.toString()).
-                  factor_option_score(z.Score.toString().toDouble))
               }
+
             }
+
 
           }
 
-
+          j = 0
         }
+        j += 1
 
-        j = 0
       }
-      j += 1
-
     }
     if (rates.size > 0) {
       scoreresult = (f"$scoreresult%1.2f").toDouble
@@ -424,21 +433,21 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
     //
     //    ScoreResultAPI.saveScoreResult(session, db(0).ModelId.toString(), listString(0).toString, scoreresult, coderesul, codestatus, lista)
 
+if(statustype.equals("0")) {
+  val result = ScoringResult.id(ObjectId.get).session(session).modelid(dbmodel(0).id.toString()).model_name(dbmodel(0).name.toString()).customer_id(ObjectId.get).customer_name(ObjectId.get().toString).scoring(scoreresult).rating_code(coderesul).rating_status(codestatus)
+    .resultin(lista).timestamp((System.currentTimeMillis() / 1000)).factor(db)
+    .model(dbmodel(0)).rate(rates(0))
 
-    val result = ScoringResult.id(ObjectId.get).session(session).modelid(dbmodel(0).id.toString()).model_name(dbmodel(0).name.toString()).customer_id(ObjectId.get).customer_name(ObjectId.get().toString).scoring(scoreresult).rating_code(coderesul).rating_status(codestatus)
-      .resultin(lista).timestamp((System.currentTimeMillis()/1000).toString).factor(db)
-      .model(dbmodel(0)).rate(rates(0))
-
-//    val liststr : List[String] = List(result.asJSON.toString())
-
-
-//  val hhj = net.liftweb.json.compact(net.liftweb.json.render(result.asJValue))
-    val data = new KeyedMessage[String, String]("CamusTopic",net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
-//    data.copy()
-    producer.send(data)
-//    println(hhj)
+  //    val liststr : List[String] = List(result.asJSON.toString())
 
 
+  //  val hhj = net.liftweb.json.compact(net.liftweb.json.render(result.asJValue))
+  val data = new KeyedMessage[String, String]("CamusTopic", net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
+  //    data.copy()
+      producer.send(data)
+  //    println(hhj)
+
+}
   }
 
   def saveResult(csv: CSVsave)(implicit xc: ExecutionContext = ExecutionContext.global): Future[Unit] = Future {

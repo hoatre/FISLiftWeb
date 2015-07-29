@@ -5,7 +5,7 @@ import java.util.concurrent.{Callable, ExecutorService, Executors, FutureTask}
 
 import code.common.Message
 import code.model._
-import com.mongodb.QueryBuilder
+import com.mongodb.{BasicDBObject, DBObject, QueryBuilder}
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
 import net.liftweb.common.Full
 import net.liftweb.http.LiftRules
@@ -46,7 +46,8 @@ object ScoreResultAPI extends RestHelper{
   }
   def getResult(): JValue ={
 
-    val db = ScoringResult.findAll(("_id" -> ("$ne" -> "fdsd")),Skip(0),Limit(50))
+    val qry = QueryBuilder.start().get()
+    val db = ScoringResult.findAll(qry,new BasicDBObject("timestamp",-1),Skip(0),Limit(50))
     var list : List[JValue] = List()
 
     for(x <- db){
@@ -223,7 +224,7 @@ object ScoreResultAPI extends RestHelper{
 
     val db = ModelInfo.findAll("_id" -> modelid)
     if(db.size == 1) {
-      val result = ScoringResult.createRecord.id(ObjectId.get).session(ses).modelid(modelid).model_name(db(0).name.toString()).customer_id(customer_id).customer_name(ObjectId.get().toString).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).timestamp((System.currentTimeMillis()/1000).toString).factor(Factor.findAll("ModelId" -> modelid))
+      val result = ScoringResult.createRecord.id(ObjectId.get).session(ses).modelid(modelid).model_name(db(0).name.toString()).customer_id(customer_id).customer_name(ObjectId.get().toString).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).timestamp((System.currentTimeMillis()/1000)).factor(Factor.findAll("ModelId" -> modelid))
         .model(ModelInfo.find("_id" -> modelid)).rate(Rating.find("modelid" -> modelid)).save
 
       val props = new Properties()
