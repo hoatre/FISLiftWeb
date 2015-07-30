@@ -6,6 +6,7 @@ package code.rest
 
 import java.util.UUID
 
+import code.common.Message
 import code.model._
 import com.mongodb.QueryBuilder
 import net.liftweb.http.LiftRules
@@ -15,7 +16,6 @@ import net.liftweb.mongodb.BsonDSL._
 import net.liftweb.util.Helpers._
 
 object ModelInfoAPI extends RestHelper {
-
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(ModelInfoAPI)
@@ -153,8 +153,27 @@ object ModelInfoAPI extends RestHelper {
     return code.common.Message.returnMassage("rangeAndUpdate", "0", "SUCCESS",
       DBList(0).update.min(range(0).toDouble).max(range(1).toDouble).save.asJValue)
   }
+  def getmodelfactor(q:String) :JValue = {
+
+    val dbmodel = ModelInfo.findAll("_id" -> q)
+    if(dbmodel.size == 1){
+
+      val dbfactor = Factor.findAll(("ModelId" -> q) ~ ("Parentid" ->""))
+
+     return Message.returnMassage("modelinfo","0","Success",("model" -> dbmodel(0).asJValue) ~ ("factor" -> dbfactor.map(_.asJValue)))
+
+
+    }else if(dbmodel.size ==0){
+      return  Message.returnMassage("modelinfo","0","No record found",("model" -> "") ~ ("factor" -> "[]"))
+    }else{
+      return  Message.returnMassage("modelinfo","1","Many model found",null)
+    }
+
+
+  }
 
   serve {
+    case "modelinfo" :: "factor":: q  :: Nil JsonGet req => getmodelfactor(q) : JValue
     case "modelinfo" :: "getall"  :: Nil JsonGet req => getModelInfoJSON() : JValue
 
     case "modelinfo" :: "getbymodelinfoid" :: Nil Options _ => {"OK" -> "200"} :JValue
