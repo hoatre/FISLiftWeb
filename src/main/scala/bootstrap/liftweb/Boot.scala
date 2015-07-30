@@ -20,7 +20,7 @@ class Boot {
   def boot {
 
     //MongoDB
-    MongoUrl.defineDb(DefaultMongoIdentifier, "mongodb://10.15.171.35:27017/TPBUSER")
+    MongoUrl.defineDb(DefaultMongoIdentifier, "mongodb://10.15.171.35:27017/ScoringCardDB")
 
     // where to search snippet
     LiftRules.addToPackages("code")

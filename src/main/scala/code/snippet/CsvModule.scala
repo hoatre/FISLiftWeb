@@ -443,7 +443,7 @@ if(statustype.equals("0")) {
 
 
   //  val hhj = net.liftweb.json.compact(net.liftweb.json.render(result.asJValue))
-  val data = new KeyedMessage[String, String]("CamusTopic", net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
+  val data = new KeyedMessage[String, String]("Camus", net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
   //    data.copy()
       producer.send(data)
   //    println(hhj)
