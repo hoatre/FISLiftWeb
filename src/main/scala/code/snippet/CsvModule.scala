@@ -35,6 +35,7 @@ import org.bson.types.ObjectId
 
 import scala.collection.immutable.HashMap
 import scala.concurrent.{Future, ExecutionContext}
+import scala.util.Random
 
 /**
  * Created by bacnv on 7/23/15.
@@ -84,11 +85,11 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
         val time = System.currentTimeMillis()
         println(time)
 
-        val count = ScoringResult.count(("modelid" -> q))
+//        val count = ScoringResult.count(("modelid" -> q))
 
         implicit val xc: ExecutionContext = ExecutionContext.global
 
-        val f = savefilecsv(q, count.toInt)(xc)
+        val f = savefilecsv(q, 1)(xc)
         f.onComplete {
           case _ => println(System.currentTimeMillis() - time)
         }
@@ -314,7 +315,7 @@ if(listString(1).toString.equals(dbmodel(0).name.toString())) {
       val dbrating = Rating.findAll("modelid" -> model_id)
       val dbmodel = ModelInfo.findAll("_id" -> model_id)
       val props = new Properties()
-      props.put("metadata.broker.list", "10.15.171.36:9092,10.15.171.36:9093")
+      props.put("metadata.broker.list", "10.15.171.36:9092")
       //    props.put("zk.connect", "10.15.171.36:2181")
       props.put("serializer.class", "kafka.serializer.StringEncoder")
       props.put("producer.type", "async")
@@ -460,43 +461,89 @@ if(statustype.equals("0")) {
     var page = 5
     val f = new File(q + ".csv")
     val writer = CSVWriter.open(f)
-    for (z <- 0 to count - 1) {
+//    for (z <- 0 to count - 1) {
+//
+//      val skip = page * (index - 1)
+//      if (z == count.toInt - 1 || skip == z) {
+//        val db = ScoringResult.findAll(("modelid" -> q), Skip(skip), Limit(page))
+//
+//        var list: List[String] = List()
+//        var listModel: List[List[String]] = List()
+//        var x = 0
+//
+//        for (i <- 0 to db.size - 1) {
+//          println(i)
+//          val JArray(listop) = db(i).resultin.asJValue
+//
+//          //      println(listop)
+//          list = list ::: List(db(i).customer_name.toString()) ::: List(db(i).model_name.toString())
+//          for (j <- 0 to listop.size - 1) {
+//            val a = listop(j).asInstanceOf[JObject].values
+//            list = list ::: List(a.apply("factor_name").toString) ::: List(a.apply("factor_option_name").toString) ::: List(a.apply("factor_option_score").toString)
+//
+//
+//            //          listModel = listModel ::: List(list)
+//
+//
+//            //          }
+//            //            x = 0
+//          }
+//          writer.writeRow(list)
+//
+//          list = List()
+//          x += 1
+//          println(i)
+//        }
+//        index += 1
+//      }
+//
+//      println(z)
+//    }
 
-      val skip = page * (index - 1)
-      if (z == count.toInt - 1 || skip == z) {
-        val db = ScoringResult.findAll(("modelid" -> q), Skip(skip), Limit(page))
+    val dbFind = Factor.findAll("ModelId" -> q)
+    val dbmodel = ModelInfo.findAll("_id" -> q)
+    var lista: List[String] = List()
 
-        var list: List[String] = List()
-        var listModel: List[List[String]] = List()
-        var x = 0
+    var i = 0
+    for (i <- 0 to dbFind.size - 1) {
 
-        for (i <- 0 to db.size - 1) {
-          println(i)
-          val JArray(listop) = db(i).resultin.asJValue
+      //     for {
+      //       JString(parent) <- (dbFind(i).asJValue \ "Parentid").toOpt
+      //       item = parent.toString
+      //     } yield {
+      if (!lista.contains(dbFind(i).Parentid.toString())) {
+        val listb: List[String] = List(dbFind(i).Parentid.toString())
 
-          //      println(listop)
-          list = list ::: List(db(i).customer_name.toString()) ::: List(db(i).model_name.toString())
-          for (j <- 0 to listop.size - 1) {
-            val a = listop(j).asInstanceOf[JObject].values
-            list = list ::: List(a.apply("factor_name").toString) ::: List(a.apply("factor_option_name").toString) ::: List(a.apply("factor_option_score").toString)
+        lista = lista ::: listb
+        //       }
 
-
-            //          listModel = listModel ::: List(list)
-
-
-            //          }
-            //            x = 0
-          }
-          writer.writeRow(list)
-
-          list = List()
-          x += 1
-          println(i)
-        }
-        index += 1
       }
 
-      println(z)
+    }
+    val dbin = QueryBuilder.start("ModelId").is(q).and("_id").notIn(lista.toArray).get
+
+    val db = Factor.findAll(dbin)
+    for (x <-1 to 10000){
+      var listwriter : List[String] = List()
+      listwriter = listwriter ::: List(ObjectId.get().toString) ::: List(dbmodel(0).name.toString())
+      for(i<-0 to db.size -1){
+
+        listwriter = listwriter ::: List(db(i).FactorName.toString())
+        val random :Int = new Random().nextInt(db(i).FactorOption.value.size)
+        println(db(i).FactorOption.value.size + "/"+random)
+        for(y <- 0 to db(i).FactorOption.value.size -1){
+          if(y == random){
+            listwriter = listwriter ::: List(db(i).FactorOption.value(y).FactorOptionName.toString())::: List(db(i).FactorOption.value(y).Score.toString())
+          }
+
+        }
+
+
+
+
+      }
+      writer.writeRow(listwriter)
+
     }
 
     writer.close()
