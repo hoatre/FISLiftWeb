@@ -36,6 +36,8 @@ import org.bson.types.ObjectId
 import scala.collection.immutable.HashMap
 import scala.concurrent.{Future, ExecutionContext}
 import scala.util.Random
+import net.liftweb.http.provider.HTTPRequest
+import net.liftweb.http.S
 
 /**
  * Created by bacnv on 7/23/15.
@@ -71,10 +73,17 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
 
 
   def search(q: String): JValue = {
-    val dbok = CSVsave.findAll(("session" -> ("$oid" -> q)) ~ ("statustype" -> "0"))
-    val dbfail = CSVsave.findAll(("session" -> ("$oid" -> q)) ~ ("statustype" -> "1"))
+    val dbok = CSVsave.count(("session" -> ("$oid" -> q)) ~ ("statustype" -> "0"))
+    val dbfail = CSVsave.count(("session" -> ("$oid" -> q)) ~ ("statustype" -> "1"))
     val count = CSVsave.count("session" -> ("$oid" -> q))
-    Message.returnMassage("uploadfile", "0", "No error", ("ok" -> dbok.map(_.asJValue)) ~ ("fail" -> dbfail.map(_.asJValue)), count,dbok.size,dbfail.size)
+
+   // val http =  CurrentReq.value.request.remoteAddress
+ //   println(CurrentReq.value.request.remoteAddress +" "+ CurrentReq.value.request.remoteHost + " "+S.hostAndPath + " " +S.hostName )
+   val f = new File(q + ".csv")
+    val writer = CSVWriter.open(f)
+
+
+    Message.returnMassage("uploadfile", "0", "No error", ("url" -> (S.hostAndPath+"/csv/download/"+q)), count,dbok,dbfail)
   }
 
   def writetoCSV(q: String): JValue = {
