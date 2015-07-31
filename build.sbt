@@ -35,6 +35,10 @@ libraryDependencies ++= {
     "org.mongodb" %% "casbah" % "2.8.1",
     "com.github.tototoshi" %% "scala-csv" % "1.2.1" intransitive(),
     "org.apache.kafka" % "kafka_2.11" % "0.8.2.1" % "provided",
+    "org.apache.spark" %% "spark-core" % "1.4.1",
+    "org.apache.spark" %% "spark-sql" % "1.4.1",
+    "org.apache.spark" % "spark-hive_2.10" % "1.4.1",
+    "org.apache.hadoop" % "hadoop-client" % "2.6.0",
     "com.nulab-inc" %% "scala-oauth2-core" % "0.15.0",
     "net.liftmodules" %% ("omniauth_"+liftEdition) % "0.17" % "compile"
   )
