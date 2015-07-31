@@ -2,8 +2,9 @@ package bootstrap.liftweb
 
 import java.net.URI
 
+import code.api.SparkAPI
 import code.rest._
-import com.mongodb.{DBCollection, Mongo, ServerAddress}
+import com.mongodb.{Mongo, ServerAddress}
 import net.liftmodules.JQueryModule
 import net.liftweb.common._
 import net.liftweb.http._
@@ -20,7 +21,7 @@ class Boot {
   def boot {
 
     //MongoDB
-    MongoUrl.defineDb(DefaultMongoIdentifier, "mongodb://10.15.171.35:27017/TPBUSER")
+    MongoUrl.defineDb(DefaultMongoIdentifier, "mongodb://10.15.171.35:27017/ScoringCardDB")
 
     // where to search snippet
     LiftRules.addToPackages("code")
@@ -87,7 +88,7 @@ class Boot {
 
     ModelInfoAPI.init()
 
-//    FactorOptionAPI.init()
+    SparkAPI.init()
 
     RatingAPI.init()
 
