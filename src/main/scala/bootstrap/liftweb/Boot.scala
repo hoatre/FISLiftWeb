@@ -20,7 +20,11 @@ import code.common.Utils
  * to modify lift's environment
  */
 class Boot {
+  val MONGODBPROPSNAME = "boot.mongodb.props"
+  Props.whereToLook = () => Utils.propsWheretoLook(MONGODBPROPSNAME)
+
   def boot {
+
 
     //MongoDB
     MongoUrl.defineDb(DefaultMongoIdentifier, Props.props.apply("mongodburl"))
