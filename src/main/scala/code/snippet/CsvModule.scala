@@ -7,7 +7,7 @@ import code.rest.ScoreResultAPI
 import com.github.tototoshi.csv._
 import java.util.{Properties, UUID}
 
-import code.common.Message
+import code.common.{Utils, Message}
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
 import net.liftweb.common.{Full, Box}
 import net.liftweb.http._
@@ -31,6 +31,7 @@ import net.liftweb.json.Printer._
 import net.liftweb.mongodb.{Limit, Skip, JObjectParser}
 import net.liftweb.http.js.JsExp
 import net.liftweb.json.JsonDSL.seq2jvalue
+import net.liftweb.util.Props
 import org.bson.types.ObjectId
 
 import scala.collection.immutable.HashMap
@@ -42,7 +43,11 @@ import net.liftweb.http.S
 /**
  * Created by bacnv on 7/23/15.
  */
+
+
 object CsvModule {
+  val PROPSNAME = "code.snippet.csvmodel.props"
+  Props.whereToLook = () => Utils.propsWheretoLook(PROPSNAME)
 
 
   implicit object MyFormat extends DefaultCSVFormat {
@@ -317,6 +322,8 @@ if(listString(1).toString.equals(dbmodel(0).name.toString())) {
   def readCSVFutureAfter (model_id : String, stream : Stream[List[String]],session :ObjectId)   = new Thread(){
     override def run {
 
+
+
       var time = System.currentTimeMillis()
       println(time)
 
@@ -324,14 +331,19 @@ if(listString(1).toString.equals(dbmodel(0).name.toString())) {
       val dbrating = Rating.findAll("modelid" -> model_id)
       val dbmodel = ModelInfo.findAll("_id" -> model_id)
       val props = new Properties()
-      props.put("metadata.broker.list", "10.15.171.36:9092")
-      //    props.put("zk.connect", "10.15.171.36:2181")
-      props.put("serializer.class", "kafka.serializer.StringEncoder")
-      props.put("producer.type", "async")
-      //    props.put("batch.size", "10000")
-      props.put("queue.enqueue.timeout.ms", "-1")
-      props.put("batch.num.messages", "200")
-      props.put("compression.codec", "1")
+      for(x <- Props.props){
+
+        props.put(x._1,x._2)
+      }
+
+//      props.put("metadata.broker.list", Props.props.apply("metadata.broker.list"))
+//      //    props.put("zk.connect", "10.15.171.36:2181")
+//      props.put("serializer.class", "kafka.serializer.StringEncoder")
+//      props.put("producer.type", "async")
+//      //    props.put("batch.size", "10000")
+//      props.put("queue.enqueue.timeout.ms", "-1")
+//      props.put("batch.num.messages", "200")
+//      props.put("compression.codec", "1")
       //    props.put("queue.size", "10000")
       //    props.put("queue.time", "5000")
       val config = new ProducerConfig(props)
@@ -454,7 +466,7 @@ if(statustype.equals("0")) {
   //  val hhj = net.liftweb.json.compact(net.liftweb.json.render(result.asJValue))
   val data = new KeyedMessage[String, String]("Camus", net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
   //    data.copy()
-      producer.send(data)
+//      producer.send(data)
   //    println(hhj)
 
 }
