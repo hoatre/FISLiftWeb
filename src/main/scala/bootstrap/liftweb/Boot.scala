@@ -1,7 +1,9 @@
 package bootstrap.liftweb
 
+import java.io.FileInputStream
 import java.net.URI
 
+import code.common.Utils
 import code.rest._
 import com.mongodb.{DBCollection, Mongo, ServerAddress}
 import net.liftmodules.JQueryModule
@@ -12,15 +14,21 @@ import net.liftweb.http.provider.HTTPParam
 import net.liftweb.mongodb.{DefaultMongoIdentifier, MongoDB, MongoIdentifier}
 import net.liftweb.sitemap.Loc._
 import net.liftweb.sitemap._
+import net.liftweb.util.Props
+
 /**
  * A class that's instantiated early and run.  It allows the application
  * to modify lift's environment
  */
 class Boot {
+  val MONGODBPROPSNAME = "boot.mongodb.props"
+  Props.whereToLook = () => Utils.propsWheretoLook(MONGODBPROPSNAME)
+
+
   def boot {
 
     //MongoDB
-    MongoUrl.defineDb(DefaultMongoIdentifier, "mongodb://10.15.171.35:27017/TPBUSER")
+    MongoUrl.defineDb(DefaultMongoIdentifier,  Props.props.apply("mongodburl") )
 
     // where to search snippet
     LiftRules.addToPackages("code")
