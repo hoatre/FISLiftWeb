@@ -8,11 +8,13 @@ import java.util.UUID
 
 import code.common.Message
 import code.model._
-import com.mongodb.QueryBuilder
-import net.liftweb.http.LiftRules
+import com.mongodb.{BasicDBObject, QueryBuilder}
+import net.liftweb.common.Full
+import net.liftweb.http.{S, OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST._
 import net.liftweb.mongodb.BsonDSL._
+import net.liftweb.mongodb.{Limit, Skip}
 import net.liftweb.util.Helpers._
 
 object ModelInfoAPI extends RestHelper {
@@ -172,7 +174,75 @@ object ModelInfoAPI extends RestHelper {
 
   }
 
+  def search(q: List[String]): JValue ={
+
+    println(q)
+    var pageIndex :Int= 1
+    var pageSize :Int= 5
+
+//    val jsonMap: Map[String, String] = q.values.asInstanceOf[Map[String, String]]
+//
+//    for ((key, value) <- jsonMap) {
+//      if(key.toString.equals("pageIndex")){
+//        pageIndex = value.toString.toInt
+//      }else if(key.toString.equals("pageIndex")){
+//        pageSize = value.toString.toInt
+//      }
+//    }
+
+//  val req =  S.request.toList
+//    for(x<- req){
+//      for(y<-x.paramNames){
+//        if(y.toString.equals("pageIndex")){
+//          pageIndex=S.param(y).toString.toInt
+//        }else if(y.toString.equals("pageIndex")){
+//          pageSize=S.param(y).toString.toInt
+//        }
+//      }
+//    }
+
+    for(req <- S.request.toList){
+     for(paramName <- req.paramNames) {
+       val Full(a) = S.param(paramName)
+       if (paramName.toLowerCase.equals("pageindex")) {
+         pageIndex = a.toString.toInt
+       }else if(paramName.toLowerCase.equals("pagesize")){
+         pageSize = a.toString.toInt
+       }
+     }
+    }
+
+//   val  a = for{
+//      req <- S.request.toList
+//      paramName <- req.paramNames
+//      if(paramName.toString.equals("pageIndex"))
+//        value <- S.param(paramName)
+//    } yield value
+//
+//    val  b = for{
+//      req <- S.request.toList
+//      paramName <- req.paramNames
+//      if(paramName.toString.equals("pageSize"))
+//      value <- S.param(paramName)
+//    } yield value
+//    if(a.size == 1){
+//      pageIndex = a(0).toInt
+//    }
+//    if(b.size ==1){
+//      pageSize = b(0).toInt
+//    }
+
+    val qry = QueryBuilder.start().get()
+    val db = ModelInfo.findAll(qry,new BasicDBObject("_id",-1),Skip(pageSize*(pageIndex-1)), Limit(pageSize))
+    val count = ModelInfo.count(qry)
+
+   Message.returnMassage("modelinfo","0","Success",db.map(_.asJValue),count)
+  }
+
   serve {
+
+    case "modelinfo" :: "search":: q JsonGet req => search(q)
+
     case "modelinfo" :: "factor":: q  :: Nil JsonGet req => getmodelfactor(q) : JValue
     case "modelinfo" :: "getall"  :: Nil JsonGet req => getModelInfoJSON() : JValue
 
