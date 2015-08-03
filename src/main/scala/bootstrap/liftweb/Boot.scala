@@ -94,8 +94,6 @@ class Boot {
 
     ModelInfoAPI.init()
 
-    SparkAPI.init()
-
     RatingAPI.init()
 
     ScoreResultAPI.init()
@@ -105,6 +103,8 @@ class Boot {
     ValidateAPI.init()
 
     csvAPI.init()
+
+    SparkAPI.init()
 
   }
 
