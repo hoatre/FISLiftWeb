@@ -5,7 +5,7 @@ import java.util.UUID
 import code.common.Message
 import code.model.{ModelInfo, Rating, codeIN}
 import com.mongodb.{BasicDBObject, QueryBuilder}
-import net.liftweb.http.LiftRules
+import net.liftweb.http.{OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.{JArray, JField, JString, JValue, _}
 import net.liftweb.json.JsonDSL.{seq2jvalue, _}
@@ -37,15 +37,11 @@ object RatingAPI extends RestHelper {
     case "rating" :: "getcode" :: q :: p :: Nil JsonGet req => getbycodelid(q, p)
     case "rating" :: "getall" :: Nil JsonGet req => getall
 
-    case "rating" :: "add" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
-    case "rating" :: "update" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
-    case "rating" :: "delete" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "rating" :: "add" :: Nil Options _ => OkResponse()
+
+    case "rating" :: "update" :: Nil Options _ => OkResponse()
+
+    case "rating" :: "delete" :: Nil Options _ => OkResponse()
 
 
   }

@@ -46,10 +46,10 @@ object csvAPI extends RestHelper {
 
 
   serve {
+    case "csv" :: "download" :: p::q :: Nil JsonGet req => CsvModule.fileResponse(p,q)
 
-    case "csv" :: "upload" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "csv" :: "upload" :: Nil Options _ => OkResponse()
+
     case "csv" :: "upload" :: Nil JsonPost json -> request => checkweightrate(json)
 
     //    case "validate" :: "checkweightrate" :: Nil JsonDelete json  => test(json)

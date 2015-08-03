@@ -174,9 +174,9 @@ object ModelInfoAPI extends RestHelper {
 
   }
 
-  def search(q: List[String]): JValue ={
+  def search(q:List[String]): JValue ={
 
-    println(q)
+
     var pageIndex :Int= 1
     var pageSize :Int= 5
 

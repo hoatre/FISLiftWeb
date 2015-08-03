@@ -8,7 +8,7 @@ import code.model._
 import com.mongodb.{BasicDBObject, DBObject, QueryBuilder}
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
 import net.liftweb.common.Full
-import net.liftweb.http.LiftRules
+import net.liftweb.http.{OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.{JArray, JValue, _}
 import net.liftweb.json.JsonDSL.{seq2jvalue, _}
@@ -40,7 +40,7 @@ object ScoreResultAPI extends RestHelper{
 
     case "scoreresult" :: Nil JsonPost json-> request => scoreresult(json)
 
-    case "scoreresult"  :: Nil Options _ => {"OK" -> "200"} :JValue
+    case "scoreresult"  :: Nil Options _ => OkResponse()
 
 
   }

@@ -1,6 +1,6 @@
 package code.snippet
 
-import java.io.{FileOutputStream, File}
+import java.io.{FileInputStream, FileOutputStream, File}
 import java.util.concurrent.{Callable, FutureTask, Executors, ExecutorService}
 
 import code.rest.ScoreResultAPI
@@ -31,7 +31,7 @@ import net.liftweb.json.Printer._
 import net.liftweb.mongodb.{Limit, Skip, JObjectParser}
 import net.liftweb.http.js.JsExp
 import net.liftweb.json.JsonDSL.seq2jvalue
-import net.liftweb.util.Props
+import net.liftweb.util.{Helpers, Props}
 import org.bson.types.ObjectId
 
 import scala.collection.immutable.HashMap
@@ -74,6 +74,51 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
 
   str
 }
+  def fileResponse(p: String,q:String): Box[LiftResponse] = {
+
+  val filename =  new File("/tmp/" +p+ q)
+    if(filename.exists()){
+      filename.delete()
+    }
+
+    val writer = CSVWriter.open(filename)
+
+val statustype = if(p.equals("ok")) "0" else if(p.equals("fail")) "1" else "2"
+
+
+
+    val db = CSVsave.findAll(("session" -> q.split('.')(0)) ~("statustype" -> statustype))
+
+            var list: List[String] = List()
+    if(statustype.equals("0")) {
+
+      for (i <- 0 to db.size - 1) {
+
+
+        list = List(db(i).customer.toString()) ::: List("score:" + db(i).score.toString()) ::: List("rating:" + db(i).rating.toString()) ::: List("status:" + db(i).score.toString())
+
+        writer.writeRow(list)
+
+      }
+    }else if(statustype.equals("1")) {
+
+      for (i <- 0 to db.size - 1) {
+
+
+        list = List(db(i).customer.toString())
+
+        writer.writeRow(list)
+
+      }
+    }
+
+    writer.close()
+
+    for {
+      file <- Box !! filename
+      input <- Helpers.tryo(new FileInputStream(file))
+    } yield StreamingResponse(input, () => input.close,file.length,headers = Nil,cookies = Nil,200)
+  }
 
 
 
@@ -88,7 +133,7 @@ var str :JValue =   {"ddd" -> "ddd"} :JValue
     val writer = CSVWriter.open(f)
 
 
-    Message.returnMassage("uploadfile", "0", "No error", ("url" -> (S.hostAndPath+"/csv/download/"+q)), count,dbok,dbfail)
+    Message.returnMassage("uploadfile", "0", "No error", ("urlok" -> (S.hostAndPath+"/csv/download/ok/"+q)) ~ ("urlfail" -> (S.hostAndPath+"/csv/download/fail/"+q)), count,dbok,dbfail)
   }
 
   def writetoCSV(q: String): JValue = {
