@@ -331,13 +331,14 @@ object FactorAPI extends RestHelper {
     }
     else
       return code.common.Message.returnMassage("insertFactor", "2", code.common.Message.ErrorFieldNull("ModelId"), null)
-
+    var parentName: String = ""
       if (json != null) {
         var listPathFactor: List[FactorPath] = List()
         if (json.exists(p => p._1 == "Parentid")) {
           if (json.apply("Parentid").toString != "") {
             val qry = QueryBuilder.start("_id").is(json.apply("Parentid").toString).get
             val DBList = Factor.findAll(qry)
+                parentName = DBList(0).FactorName.toString()
             if (DBList != Nil) {
               listPathFactor = listPathFactor ::: DBList(0).PathFactor.value
               val factorPath = FactorPath.createRecord
@@ -365,19 +366,12 @@ object FactorAPI extends RestHelper {
           return code.common.Message.returnMassage("insertFactor", "3", code.common.Message.ErrorFieldExixts("ModelId"), null)
         if (json.exists(p => p._1 == "Parentid")) {
           var parentid: String = ""
-          if (json.apply("Parentid").toString != "")
+          if (json.apply("Parentid").toString != "") {
             parentid = json.apply("Parentid").toString
-          saveItem = Factor.Parentid(parentid)
+          }
+          saveItem = Factor.Parentid(parentid).ParentName(parentName)
         } else
-          saveItem = Factor.Parentid("")
-
-        if (json.exists(p => p._1 == "ParentName")) {
-          var parentName: String = ""
-          if (json.apply("ParentName").toString != "")
-            parentName = json.apply("ParentName").toString
-          saveItem = Factor.Parentid(parentName)
-        } else
-          saveItem = Factor.Parentid("")
+          saveItem = Factor.Parentid("").ParentName("")
 
         if (json.exists(p => p._1 == "Name")) {
           var name: String = ""
