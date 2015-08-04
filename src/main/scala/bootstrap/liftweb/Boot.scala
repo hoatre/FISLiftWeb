@@ -3,8 +3,9 @@ package bootstrap.liftweb
 import java.net.URI
 
 import code.api.SparkAPI
+import code.common.Utils
 import code.rest._
-import com.mongodb.{DBCollection, Mongo, ServerAddress}
+import com.mongodb.{Mongo, ServerAddress}
 import net.liftmodules.JQueryModule
 import net.liftweb.common._
 import net.liftweb.http._
@@ -14,7 +15,6 @@ import net.liftweb.mongodb.{DefaultMongoIdentifier, MongoDB, MongoIdentifier}
 import net.liftweb.sitemap.Loc._
 import net.liftweb.sitemap._
 import net.liftweb.util.Props
-import code.common.Utils
 /**
  * A class that's instantiated early and run.  It allows the application
  * to modify lift's environment
@@ -74,6 +74,8 @@ class Boot {
     JQueryModule.init()
 
     // Init RestService
+    SparkAPI.init()
+
     IssuesService.init()
 
     GroupsAPI.init()
@@ -104,7 +106,7 @@ class Boot {
 
     csvAPI.init()
 
-    SparkAPI.init()
+
 
   }
 

@@ -15,14 +15,16 @@ import org.apache.spark._
 
 object SparkAPI extends RestHelper {
 
+
+  def init(): Unit = {
+    LiftRules.statelessDispatch.append(SparkAPI)
+  }
+
   val conf = new SparkConf().setMaster("local[*]").setAppName("CamusApp")
   val sc = new SparkContext(conf)
   val hiveContext = new org.apache.spark.sql.hive.HiveContext(sc)
   val df = hiveContext.read.json("hdfs://10.15.171.36:54310/home/phonghh/project/demo/camusDisk/topics/Scoring/hourly/*/*/*/*")
   df.registerTempTable("HDFS")
-  def init(): Unit = {
-    LiftRules.statelessDispatch.append(SparkAPI)
-  }
 
   def ScoringRange(q: JValue) : JValue={
     val mess = code.common.Message.CheckNullReturnMess(q, List("modelId"))
