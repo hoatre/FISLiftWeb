@@ -377,13 +377,13 @@ if(listString(1).toString.equals(dbmodel(0).name.toString())) {
       val dbmodel = ModelInfo.findAll("_id" -> model_id)
       val props = new Properties()
 
-      for(x <- Props.props){
-
-                println(x._1 + "  "+x._2)
-              }
-
-      println(Props.props.apply("serializer.class"))
-      props.put("metadata.broker.list","10.15.171.41:9092")
+//      for(x <- Props.props){
+//
+//                println(x._1 + "  "+x._2)
+//              }
+//
+//      println(Props.props.apply("serializer.class"))
+      props.put("metadata.broker.list",Props.props.apply("metadata.broker.list"))
       props.put("serializer.class",Props.props.apply("serializer.class"))
       props.put("producer.type",Props.props.apply("producer.type"))
       props.put("queue.enqueue.timeout.ms",Props.props.apply("queue.enqueue.timeout.ms"))

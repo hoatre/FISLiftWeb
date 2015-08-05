@@ -4,7 +4,7 @@ mongodbuser=
 mongodbpass=
 
 ######kafka config###############
-metadata.broker.list=10.15.171.41:9092
+metadata.broker.list=10.15.171.36:9092
 serializer.class=kafka.serializer.StringEncoder
 producer.type=async
 queue.enqueue.timeout.ms=-1
