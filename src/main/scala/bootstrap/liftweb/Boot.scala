@@ -20,7 +20,7 @@ import net.liftweb.util.Props
  * to modify lift's environment
  */
 class Boot {
-  val MONGODBPROPSNAME = "boot.mongodb.props"
+  val MONGODBPROPSNAME = "default.props"
   Props.whereToLook = () => Utils.propsWheretoLook(MONGODBPROPSNAME)
 
   def boot {

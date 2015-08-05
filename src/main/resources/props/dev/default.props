@@ -1,3 +1,9 @@
+#######mongodb##########
+mongodburl=mongodb://10.15.171.35:27017/ScoringCardDB
+mongodbuser=
+mongodbpass=
+
+######kafka config###############
 metadata.broker.list=10.15.171.41:9092
 serializer.class=kafka.serializer.StringEncoder
 producer.type=async

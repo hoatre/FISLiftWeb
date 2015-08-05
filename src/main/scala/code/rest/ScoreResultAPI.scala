@@ -3,7 +3,7 @@ package code.rest
 import java.util.Properties
 import java.util.concurrent.{Callable, ExecutorService, Executors, FutureTask}
 
-import code.common.Message
+import code.common.{Utils, Message}
 import code.model._
 import com.mongodb.{BasicDBObject, DBObject, QueryBuilder}
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
@@ -13,6 +13,7 @@ import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.{JArray, JValue, _}
 import net.liftweb.json.JsonDSL.{seq2jvalue, _}
 import net.liftweb.mongodb.{Skip, Limit}
+import net.liftweb.util.Props
 import org.bson.types.ObjectId
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -21,6 +22,9 @@ import scala.concurrent.{ExecutionContext, Future}
  * Created by bacnv on 7/15/15.
  */
 object ScoreResultAPI extends RestHelper{
+
+  val PROPSNAME = "code.scoringresultapi.props"
+  Props.whereToLook = () => Utils.propsWheretoLook(PROPSNAME)
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(ScoreResultAPI)
@@ -228,12 +232,15 @@ object ScoreResultAPI extends RestHelper{
         .model(ModelInfo.find("_id" -> modelid)).rate(Rating.find("modelid" -> modelid)).save
 
       val props = new Properties()
-      props.put("metadata.broker.list", "10.15.171.36:9092,10.15.171.36:9093")
-      props.put("serializer.class", "kafka.serializer.StringEncoder")
-      props.put("producer.type", "async")
+      props.put("metadata.broker.list",Props.props.apply("metadata.broker.list"))
+      props.put("serializer.class",Props.props.apply("serializer.class"))
+      props.put("producer.type",Props.props.apply("producer.type"))
+      props.put("queue.enqueue.timeout.ms",Props.props.apply("queue.enqueue.timeout.ms"))
+      props.put("batch.num.messages",Props.props.apply("batch.num.messages"))
+      props.put("compression.codec",Props.props.apply("compression.codec"))
       val config = new ProducerConfig(props)
       val producer = new Producer[String, String](config)
-      val data = new KeyedMessage[String, String]("CamusTopic", result.asJSON.toString())
+      val data = new KeyedMessage[String, String](Props.props.apply("scoring.topic"), result.asJSON.toString())
       producer.send(data)
       producer.close()
     }
