@@ -46,8 +46,8 @@ import net.liftweb.http.S
 
 
 object CsvModule {
-  val PROPSNAME = "code.snippet.csvmodel.props"
-  Props.whereToLook = () => Utils.propsWheretoLook(PROPSNAME)
+//  val PROPSNAME = "code.snippet.csvmodel.props"
+//  Props.whereToLook = () => Utils.propsWheretoLook(PROPSNAME)
 
 
   implicit object MyFormat extends DefaultCSVFormat {
@@ -227,7 +227,7 @@ val statustype = if(p.equals("ok")) "0" else if(p.equals("fail")) "1" else "2"
       }
     }
 
-    Message.returnMassage("readfile", "0", "No error", ("session" -> session.toString), 1)
+    Message.returnMassage("readfile", "0", "No error", ("session" -> S.hostAndPath+"/csv/"+session.toString), 1)
 
   }
 
