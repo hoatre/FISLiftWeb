@@ -23,8 +23,8 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 object ScoreResultAPI extends RestHelper{
 
-  val PROPSNAME = "code.scoringresultapi.props"
-  Props.whereToLook = () => Utils.propsWheretoLook(PROPSNAME)
+//  val PROPSNAME = "code.scoringresultapi.props"
+//  Props.whereToLook = () => Utils.propsWheretoLook(PROPSNAME)
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(ScoreResultAPI)
