@@ -167,7 +167,7 @@ val statustype = if(p.equals("ok")) "0" else if(p.equals("fail")) "1" else "2"
   }
 
   def readCSV(q:String,file : FileParamHolder) :JValue =  {
-    if(!(file.mimeType.toString.equals("application/vnd.ms-excel")&&file.fileName.toLowerCase().contains(".csv"))){
+    if(!((file.mimeType.toString.equals("application/vnd.ms-excel")||file.mimeType.toString.equals("text/csv"))&&file.fileName.toLowerCase().contains(".csv"))){
       return Message.returnMassage("uploadcsv", "3", "File not allow", null, 0)
     }
 
@@ -376,10 +376,24 @@ if(listString(1).toString.equals(dbmodel(0).name.toString())) {
       val dbrating = Rating.findAll("modelid" -> model_id)
       val dbmodel = ModelInfo.findAll("_id" -> model_id)
       val props = new Properties()
+
       for(x <- Props.props){
 
-        props.put(x._1,x._2)
-      }
+                println(x._1 + "  "+x._2)
+              }
+
+      println(Props.props.apply("serializer.class"))
+      props.put("metadata.broker.list","10.15.171.41:9092")
+      props.put("serializer.class",Props.props.apply("serializer.class"))
+      props.put("producer.type",Props.props.apply("producer.type"))
+      props.put("queue.enqueue.timeout.ms",Props.props.apply("queue.enqueue.timeout.ms"))
+      props.put("batch.num.messages",Props.props.apply("batch.num.messages"))
+      props.put("compression.codec",Props.props.apply("compression.codec"))
+
+//      for(x <- Props.props){
+//
+//        props.put(x._1,x._2)
+//      }
 
 //      props.put("metadata.broker.list", Props.props.apply("metadata.broker.list"))
 //      //    props.put("zk.connect", "10.15.171.36:2181")
@@ -509,7 +523,7 @@ if(statustype.equals("0")) {
 
 
   //  val hhj = net.liftweb.json.compact(net.liftweb.json.render(result.asJValue))
-  val data = new KeyedMessage[String, String]("Camus", net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
+  val data = new KeyedMessage[String, String](Props.props.apply("scoring.topic"), net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
   //    data.copy()
 //      producer.send(data)
   //    println(hhj)
@@ -589,7 +603,7 @@ if(statustype.equals("0")) {
     val dbin = QueryBuilder.start("ModelId").is(q).and("_id").notIn(lista.toArray).get
 
     val db = Factor.findAll(dbin)
-    for (x <-1 to 10000){
+    for (x <-1 to 5000){
       var listwriter : List[String] = List()
       listwriter = listwriter ::: List(ObjectId.get().toString) ::: List(dbmodel(0).name.toString())
       for(i<-0 to db.size -1){
