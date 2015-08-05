@@ -1,0 +1,13 @@
+#######mongodb##########
+mongodburl=mongodb://10.15.171.35:27017/ScoringCardDB
+mongodbuser=
+mongodbpass=
+
+######kafka config###############
+metadata.broker.list=10.15.171.41:9092
+serializer.class=kafka.serializer.StringEncoder
+producer.type=async
+queue.enqueue.timeout.ms=-1
+batch.num.messages=200
+compression.codec=1
+scoring.topic=Scoring
