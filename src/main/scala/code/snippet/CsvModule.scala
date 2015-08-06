@@ -405,8 +405,8 @@ if(listString(1).toString.equals(dbmodel(0).name.toString())) {
 //      props.put("compression.codec", "1")
       //    props.put("queue.size", "10000")
       //    props.put("queue.time", "5000")
-      val config = new ProducerConfig(props)
-      val producer = new Producer[String, String](config)
+      val config = new kafka.producer.ProducerConfig(props)
+      val producer = new kafka.producer.Producer[String, String](config)
 
 //      var count = 0
       //    val session = ObjectId.get().toString
