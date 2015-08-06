@@ -106,6 +106,7 @@ class Boot {
 
     csvAPI.init()
 
+    ActiveTableAPI.init()
 
 
   }
