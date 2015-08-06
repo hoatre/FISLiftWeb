@@ -32,7 +32,6 @@ import net.liftweb.mongodb.{Limit, Skip, JObjectParser}
 import net.liftweb.http.js.JsExp
 import net.liftweb.json.JsonDSL.seq2jvalue
 import net.liftweb.util.{Helpers, Props}
-import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer}
 import org.bson.types.ObjectId
 
 import scala.collection.immutable.HashMap
@@ -376,7 +375,7 @@ if(listString(1).toString.equals(dbmodel(0).name.toString())) {
       val db = Factor.findAll("ModelId" -> model_id)
       val dbrating = Rating.findAll("modelid" -> model_id)
       val dbmodel = ModelInfo.findAll("_id" -> model_id)
-      val props = new Properties()
+      var props = new Properties()
 
 //      for(x <- Props.props){
 //
@@ -406,9 +405,8 @@ if(listString(1).toString.equals(dbmodel(0).name.toString())) {
 //      props.put("compression.codec", "1")
       //    props.put("queue.size", "10000")
       //    props.put("queue.time", "5000")
-//      val config = new kafka.producer.ProducerConfig(props)
-//      val producer = new kafka.producer.Producer[String, String](config)
-      val producer = new KafkaProducer[String,String](props)
+      val config = new kafka.producer.ProducerConfig(props)
+      val producer = new kafka.producer.Producer[String, String](config)
 
 //      var count = 0
       //    val session = ObjectId.get().toString
@@ -526,7 +524,7 @@ if(statustype.equals("0")) {
 
 
   //  val hhj = net.liftweb.json.compact(net.liftweb.json.render(result.asJValue))
-  val data = new ProducerRecord[String, String](Props.props.apply("scoring.topic"), net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
+  val data = new KeyedMessage[String, String](Props.props.apply("scoring.topic"), net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
   //    data.copy()
       producer.send(data)
   //    println(hhj)

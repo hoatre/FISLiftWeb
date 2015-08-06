@@ -14,7 +14,6 @@ import net.liftweb.json.JsonAST.{JArray, JValue, _}
 import net.liftweb.json.JsonDSL.{seq2jvalue, _}
 import net.liftweb.mongodb.{Skip, Limit}
 import net.liftweb.util.Props
-import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer}
 import org.bson.types.ObjectId
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -232,17 +231,16 @@ object ScoreResultAPI extends RestHelper{
       val result = ScoringResult.createRecord.id(ObjectId.get).session(ses).modelid(modelid).model_name(db(0).name.toString()).customer_id(customer_id).customer_name(ObjectId.get().toString).scoring(scoring).rating_code(ratingCode).rating_status(ratingStatus).resultin(list).timestamp((System.currentTimeMillis()/1000)).factor(Factor.findAll("ModelId" -> modelid))
         .model(ModelInfo.find("_id" -> modelid)).rate(Rating.find("modelid" -> modelid)).save
 
-      val props = new Properties()
+      var props = new Properties()
       props.put("metadata.broker.list",Props.props.apply("metadata.broker.list"))
       props.put("serializer.class",Props.props.apply("serializer.class"))
       props.put("producer.type",Props.props.apply("producer.type"))
       props.put("queue.enqueue.timeout.ms",Props.props.apply("queue.enqueue.timeout.ms"))
       props.put("batch.num.messages",Props.props.apply("batch.num.messages"))
       props.put("compression.codec",Props.props.apply("compression.codec"))
-//      val config = new ProducerConfig(props)
-//      val producer = new Producer[String, String](config)
-      val producer =  new KafkaProducer[String,String](props)
-      val data = new ProducerRecord[String, String](Props.props.apply("scoring.topic"), result.asJSON.toString())
+      val config = new ProducerConfig(props)
+      val producer = new Producer[String, String](config)
+      val data = new KeyedMessage[String, String](Props.props.apply("scoring.topic"), result.asJSON.toString())
       producer.send(data)
       producer.close()
     }
