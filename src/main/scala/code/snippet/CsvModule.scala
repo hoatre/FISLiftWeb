@@ -95,7 +95,7 @@ val statustype = if(p.equals("ok")) "0" else if(p.equals("fail")) "1" else "2"
       for (i <- 0 to db.size - 1) {
 
 
-        list = List(db(i).customer.toString()) ::: List("score:" + db(i).score.toString()) ::: List("rating:" + db(i).rating.toString()) ::: List("status:" + db(i).score.toString())
+        list = List(db(i).customer.toString()) ::: List("score:" + db(i).score.toString()) ::: List("rating:" + db(i).rating.toString()) ::: List("status:" + db(i).status.toString())
 
         writer.writeRow(list)
 
@@ -614,6 +614,7 @@ if(statustype.equals("0")) {
         println(db(i).FactorOption.value.size + "/"+random)
         for(y <- 0 to db(i).FactorOption.value.size -1){
           if(y == random){
+            println("-------"+y + "/"+random)
             listwriter = listwriter ::: List(db(i).FactorOption.value(y).FactorOptionName.toString())::: List(db(i).FactorOption.value(y).Score.toString())
           }
 
