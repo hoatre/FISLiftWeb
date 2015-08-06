@@ -16,6 +16,7 @@ import net.liftweb.json.JsonAST._
 import net.liftweb.mongodb.BsonDSL._
 import net.liftweb.mongodb.{Limit, Skip}
 import net.liftweb.util.Helpers._
+import net.liftweb.util.Props
 import org.bson.types.ObjectId
 
 import scala.collection.immutable.::
@@ -279,8 +280,19 @@ return Message.returnMassage("copymodel","0","Success",modelinfonew.asJValue)
   }
   def saveFactor (_id : String,idnew:String)   = new Thread(){
     override def run: Unit = {
+
       var mapid: Map[String, String] = Map()
       val dbfactor = Factor.findAll("ModelId" -> _id)
+      val dbrate = Rating.findAll("modelid" -> _id)
+      if(dbrate.size > 0){
+        for(rate <- dbrate){
+          Rating.createRecord.id(UUID.randomUUID().toString).modelid(idnew)
+          .modelname(rate.modelname.toString()).codein(rate.codein.value).save
+
+        }
+
+
+      }
       if (dbfactor.size > 0) {
         var lstFactor :List[Factor] = List()
 
@@ -328,6 +340,55 @@ return Message.returnMassage("copymodel","0","Success",modelinfonew.asJValue)
 
 
       }
+    }
+  }
+
+  def dellallmodel(q:JValue) : Unit = {
+    val jsonmap: Map[String, String] = q.values.asInstanceOf[Map[String, String]]
+
+    var _id = ""
+
+    for ((key, value) <- jsonmap) {
+      if (key.toLowerCase.equals("_id")) {
+        _id = value.toString
+      }
+    }
+    if (_id == "" || _id.isEmpty) {
+      return Message.returnMassage("dellallmodel", "1", "_id params not found", null)
+    }
+
+    val dbmodel = ModelInfo.findAll("_id" -> _id)
+
+    if(dbmodel.size > 0){
+      for(model <- dbmodel){
+        if(model.status.toString().equals(Props.props.apply("modelinfo.status.publish"))){
+          return Message.returnMassage("dellallmodel", "3", "Modelinfo publish", null)
+        }else if(model.status.toString().equals(Props.props.apply("modelinfo.status.publish"))){
+          return Message.returnMassage("dellallmodel", "4", "Modelinfo active", null)
+        }else{
+          val th = new Thread(thredelallmodel(_id))
+          th.start()
+          Thread.sleep(3000)
+
+
+          return Message.returnMassage("dellallmodel", "0", "Modelinfo deleted all success", null)
+        }
+
+      }
+
+    }else{
+      return Message.returnMassage("dellallmodel", "2", "Modelinfo not found", null)
+    }
+
+  }
+
+  def thredelallmodel (_id : String)   = new Thread() {
+    override def run: Unit = {
+        Factor.delete("ModelId" -> _id)
+
+        Rating.delete("modelid" -> _id)
+
+        ModelInfo.delete("_id" -> _id)
     }
   }
 
@@ -395,7 +456,13 @@ return Message.returnMassage("copymodel","0","Success",modelinfonew.asJValue)
          Full(JsonResponse(s))
        }
      }
-
+    case "modelinfo" :: "delall"  :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "delall" :: Nil JsonPost json -> request =>  {
+      S.respondAsync {
+        val s =  dellallmodel(json)
+        Full(JsonResponse(s))
+      }
+    }
 
   }
 
