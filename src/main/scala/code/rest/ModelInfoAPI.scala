@@ -343,7 +343,7 @@ return Message.returnMassage("copymodel","0","Success",modelinfonew.asJValue)
     }
   }
 
-  def dellallmodel(q:JValue) : Unit = {
+  def dellallmodel(q:JValue) : JValue = {
     val jsonmap: Map[String, String] = q.values.asInstanceOf[Map[String, String]]
 
     var _id = ""
