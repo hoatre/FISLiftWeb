@@ -344,6 +344,8 @@ return Message.returnMassage("copymodel","0","Success",modelinfonew.asJValue)
   }
 
   def dellallmodel(q:JValue) : JValue = {
+
+    val msg = Message.returnMassage("dellallmodel", "0", "Modelinfo deleted all success", null)
     val jsonmap: Map[String, String] = q.values.asInstanceOf[Map[String, String]]
 
     var _id = ""
@@ -379,7 +381,7 @@ return Message.returnMassage("copymodel","0","Success",modelinfonew.asJValue)
     }else{
       return Message.returnMassage("dellallmodel", "2", "Modelinfo not found", null)
     }
-
+    msg
   }
 
   def thredelallmodel (_id : String)   = new Thread() {
