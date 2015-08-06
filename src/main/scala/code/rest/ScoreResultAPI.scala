@@ -14,7 +14,7 @@ import net.liftweb.json.JsonAST.{JArray, JValue, _}
 import net.liftweb.json.JsonDSL.{seq2jvalue, _}
 import net.liftweb.mongodb.{Skip, Limit}
 import net.liftweb.util.Props
-import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer}
 import org.bson.types.ObjectId
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -242,7 +242,7 @@ object ScoreResultAPI extends RestHelper{
 //      val config = new ProducerConfig(props)
 //      val producer = new Producer[String, String](config)
       val producer =  new KafkaProducer[String,String](props)
-      val data = new KeyedMessage[String, String](Props.props.apply("scoring.topic"), result.asJSON.toString())
+      val data = new ProducerRecord[String, String](Props.props.apply("scoring.topic"), result.asJSON.toString())
       producer.send(data)
       producer.close()
     }

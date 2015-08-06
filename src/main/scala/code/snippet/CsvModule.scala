@@ -32,7 +32,7 @@ import net.liftweb.mongodb.{Limit, Skip, JObjectParser}
 import net.liftweb.http.js.JsExp
 import net.liftweb.json.JsonDSL.seq2jvalue
 import net.liftweb.util.{Helpers, Props}
-import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer}
 import org.bson.types.ObjectId
 
 import scala.collection.immutable.HashMap
@@ -526,7 +526,7 @@ if(statustype.equals("0")) {
 
 
   //  val hhj = net.liftweb.json.compact(net.liftweb.json.render(result.asJValue))
-  val data = new KeyedMessage[String, String](Props.props.apply("scoring.topic"), net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
+  val data = new ProducerRecord[String, String](Props.props.apply("scoring.topic"), net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
   //    data.copy()
       producer.send(data)
   //    println(hhj)
