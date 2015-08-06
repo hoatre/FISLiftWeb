@@ -267,12 +267,21 @@ object ModelInfoAPI extends RestHelper {
       return Message.returnMassage("copymodel", "2", if (dbmodel.size > 1) "Found many model" else "Model not found", null)
     }
     val idnew = UUID.randomUUID().toString
-    val modelinfonew = ModelInfo.createRecord.id(idnew).name(dbmodel(0).name.toString()).description(dbmodel(0).description.toString()).max(dbmodel(0).max.toString().toDouble)
+    var i : Int = 0
+    var namenew = ""
+    var count : Long = 1
+    while (count > 0){
+      i = i +1
+      namenew =  dbmodel(0).name.toString()+i
+      count = ModelInfo.count("name" ->namenew)
+    }
+
+    val modelinfonew = ModelInfo.createRecord.id(idnew).name(namenew).description(dbmodel(0).description.toString()).max(dbmodel(0).max.toString().toDouble)
       .min(dbmodel(0).min.toString().toDouble).status("draft").save
 
     val th = new Thread(saveFactor(_id,idnew))
     th.start()
-    Thread.sleep(3000)
+//    Thread.sleep(3000)
 
 
 return Message.returnMassage("copymodel","0","Success",modelinfonew.asJValue)

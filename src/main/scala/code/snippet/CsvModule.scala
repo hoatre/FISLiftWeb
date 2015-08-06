@@ -227,7 +227,7 @@ val statustype = if(p.equals("ok")) "0" else if(p.equals("fail")) "1" else "2"
       }
     }
 
-    Message.returnMassage("readfile", "0", "No error", ("session" -> S.hostAndPath+"/csv/"+session.toString), 1)
+    Message.returnMassage("readfile", "0", "No error", ("session" -> (S.hostAndPath+"/csv/"+session.toString)), 1)
 
   }
 
@@ -418,7 +418,8 @@ if(listString(1).toString.equals(dbmodel(0).name.toString())) {
 //          println(count)
       }
       println(System.currentTimeMillis() - time)
-      //    producer.send(messages : _*)
+
+//      producer.send(messages : _*)
       producer.close()
       println(System.currentTimeMillis() - time)
     }
@@ -525,7 +526,7 @@ if(statustype.equals("0")) {
   //  val hhj = net.liftweb.json.compact(net.liftweb.json.render(result.asJValue))
   val data = new KeyedMessage[String, String](Props.props.apply("scoring.topic"), net.liftweb.json.compact(net.liftweb.json.render(result.asJValue)))
   //    data.copy()
-//      producer.send(data)
+      producer.send(data)
   //    println(hhj)
 
 }
