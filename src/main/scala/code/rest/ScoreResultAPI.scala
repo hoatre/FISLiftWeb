@@ -14,6 +14,7 @@ import net.liftweb.json.JsonAST.{JArray, JValue, _}
 import net.liftweb.json.JsonDSL.{seq2jvalue, _}
 import net.liftweb.mongodb.{Skip, Limit}
 import net.liftweb.util.Props
+import org.apache.kafka.clients.producer.KafkaProducer
 import org.bson.types.ObjectId
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -238,8 +239,9 @@ object ScoreResultAPI extends RestHelper{
       props.put("queue.enqueue.timeout.ms",Props.props.apply("queue.enqueue.timeout.ms"))
       props.put("batch.num.messages",Props.props.apply("batch.num.messages"))
       props.put("compression.codec",Props.props.apply("compression.codec"))
-      val config = new ProducerConfig(props)
-      val producer = new Producer[String, String](config)
+//      val config = new ProducerConfig(props)
+//      val producer = new Producer[String, String](config)
+      val producer = new KafkaProducer(props)
       val data = new KeyedMessage[String, String](Props.props.apply("scoring.topic"), result.asJSON.toString())
       producer.send(data)
       producer.close()

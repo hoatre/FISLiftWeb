@@ -32,6 +32,7 @@ import net.liftweb.mongodb.{Limit, Skip, JObjectParser}
 import net.liftweb.http.js.JsExp
 import net.liftweb.json.JsonDSL.seq2jvalue
 import net.liftweb.util.{Helpers, Props}
+import org.apache.kafka.clients.producer.KafkaProducer
 import org.bson.types.ObjectId
 
 import scala.collection.immutable.HashMap
@@ -405,8 +406,9 @@ if(listString(1).toString.equals(dbmodel(0).name.toString())) {
 //      props.put("compression.codec", "1")
       //    props.put("queue.size", "10000")
       //    props.put("queue.time", "5000")
-      val config = new kafka.producer.ProducerConfig(props)
-      val producer = new kafka.producer.Producer[String, String](config)
+//      val config = new kafka.producer.ProducerConfig(props)
+//      val producer = new kafka.producer.Producer[String, String](config)
+      val producer = new KafkaProducer(props)
 
 //      var count = 0
       //    val session = ObjectId.get().toString
