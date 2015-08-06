@@ -241,7 +241,7 @@ object ScoreResultAPI extends RestHelper{
       props.put("compression.codec",Props.props.apply("compression.codec"))
 //      val config = new ProducerConfig(props)
 //      val producer = new Producer[String, String](config)
-      val producer = new KafkaProducer(props)
+      val producer =  new KafkaProducer[String,String](props)
       val data = new KeyedMessage[String, String](Props.props.apply("scoring.topic"), result.asJSON.toString())
       producer.send(data)
       producer.close()

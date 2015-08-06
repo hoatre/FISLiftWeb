@@ -408,7 +408,7 @@ if(listString(1).toString.equals(dbmodel(0).name.toString())) {
       //    props.put("queue.time", "5000")
 //      val config = new kafka.producer.ProducerConfig(props)
 //      val producer = new kafka.producer.Producer[String, String](config)
-      val producer = new KafkaProducer(props)
+      val producer = new KafkaProducer[String,String](props)
 
 //      var count = 0
       //    val session = ObjectId.get().toString
