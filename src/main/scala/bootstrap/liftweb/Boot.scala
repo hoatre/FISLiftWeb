@@ -23,11 +23,16 @@ class Boot {
   val MONGODBPROPSNAME = "default.props"
   Props.whereToLook = () => Utils.propsWheretoLook(MONGODBPROPSNAME)
 
+
   def boot {
 
 
     //MongoDB
     MongoUrl.defineDb(DefaultMongoIdentifier, Props.props.apply("mongodburl"))
+
+    MongoUrl.defineDb(UsersDb, Props.props.apply("mongodbuserurl"))
+
+
 
     // where to search snippet
     LiftRules.addToPackages("code")
@@ -112,6 +117,9 @@ class Boot {
   }
 
 
+}
+object UsersDb extends MongoIdentifier {
+  val jndiName = "Users"
 }
 object MongoUrl {
 

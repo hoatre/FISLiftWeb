@@ -3,6 +3,10 @@ mongodburl=mongodb://10.15.171.35:27017/ScoringCardDB
 mongodbuser=
 mongodbpass=
 
+mongodbuserurl=mongodb://10.15.171.35:27017/UsersDB
+mongodbuseruser=
+mongodbuserpass=
+
 ######kafka config###############
 metadata.broker.list=10.15.171.41:9092
 serializer.class=kafka.serializer.StringEncoder
@@ -16,3 +20,11 @@ scoring.topic=Scoring
 modelinfo.status.active=active
 modelinfo.status.publish=publish
 modelinfo.status.draft=draft
+
+
+#############UserAPI##########
+userapi.host.port=http://localhost:9000
+userapi.checkapi=/checkapi
+userapi.client_id=client1
+userapi.client_secret=secret1
+userapi.token_type.bearer=Bearer

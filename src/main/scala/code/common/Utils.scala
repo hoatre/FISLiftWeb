@@ -3,6 +3,8 @@ package code.common
 import java.io.FileInputStream
 
 import net.liftweb.common.Full
+import net.liftweb.http.S
+import net.liftweb.json.JsonAST.JValue
 import net.liftweb.util.Props
 
 import scala.io.Source
@@ -24,6 +26,10 @@ object Utils {
   def propsWheretoLook(filename:String,any :Any) : List[(String, () => Full[FileInputStream])]={
     println(Props.mode)
     ((getClass.getResource("/props/"+filename).getPath, () => Full(new FileInputStream(getClass.getResource("/props/"+filename).getPath))) :: Nil)
+  }
+
+  def checkuserAPI():Unit={
+    val url = "http://api.hostip.info/get_json.php?ip=12.215.42.19"
   }
 
 }
