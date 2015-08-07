@@ -405,6 +405,7 @@ return Message.returnMassage("copymodel","0","Success",modelinfonew.asJValue)
 
       serve {
 
+        case "modelinfo" :: "search"  :: Nil Options _ => OkResponse()
     case "modelinfo" :: "search" :: q JsonGet req => search(q)
 
     case "modelinfo" :: "factor" :: q :: Nil JsonGet req => getmodelfactor(q): JValue
