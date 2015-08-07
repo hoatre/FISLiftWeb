@@ -44,7 +44,7 @@ class Boot {
       List(
         HTTPParam("X-Lift-Version", LiftRules.liftVersion),
         HTTPParam("Access-Control-Allow-Origin", "*"),
-//        HTTPParam("Access-Control-Allow-Credentials", "true"),
+        HTTPParam("Access-Control-Allow-Credentials", "false"),
         HTTPParam("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT"),
         HTTPParam("Access-Control-Allow-Headers", "X-API-KEY, x-xsrf-token,origin, authorization, Authorization, accept, client-security-token, " +
                         "Access-Control-Request-Method, WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")
