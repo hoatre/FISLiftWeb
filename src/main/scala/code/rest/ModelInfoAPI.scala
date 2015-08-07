@@ -405,15 +405,16 @@ return Message.returnMassage("copymodel","0","Success",modelinfonew.asJValue)
 
       serve {
 
-        case "modelinfo" :: "search"  :: Nil Options _ => OkResponse()
+//        case "modelinfo" :: "search"  :: Nil Options _ => OkResponse()
     case "modelinfo" :: "search" :: q JsonGet req => search(q)
 
+        case "modelinfo" :: "factor"::q  :: Nil Options _ => OkResponse()
     case "modelinfo" :: "factor" :: q :: Nil JsonGet req => getmodelfactor(q): JValue
+
+        case "modelinfo" :: "getall" :: Nil Options _ => OkResponse()
     case "modelinfo" :: "getall" :: Nil JsonGet req => getModelInfoJSON(): JValue
 
-    case "modelinfo" :: "getbymodelinfoid" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "modelinfo" :: "getbymodelinfoid" :: Nil Options _ => OkResponse()
     case "modelinfo" :: "getbymodelinfoid" :: Nil JsonPost json -> request =>
       for {JString(id) <- (json \\ "_id").toOpt} yield getModelInfoByIdJSON(id): JValue
 
