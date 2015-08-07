@@ -31,16 +31,18 @@ object RatingAPI extends RestHelper {
     case "rating" :: "update" :: Nil JsonPost json -> request => updates(json)
     case "rating" :: "delete" :: Nil JsonPost json -> request => delete(json)
     case "rating" :: "getmodelid" :: q :: Nil JsonGet req => getbymodelid(q)
-
     case "rating" :: "search"  :: Nil JsonPost json -> request => searchAvand(json)
-
     case "rating" :: "getcode" :: q :: p :: Nil JsonGet req => getbycodelid(q, p)
     case "rating" :: "getall" :: Nil JsonGet req => getall
 
+
+
+    case "rating" :: "getmodelid" :: q :: Nil Options _ => OkResponse()
+    case "rating" :: "search" :: Nil Options _ => OkResponse()
+    case "rating" :: "getall" :: Nil Options _ => OkResponse()
+    case "rating" :: "getcode" :: Nil Options _ => OkResponse()
     case "rating" :: "add" :: Nil Options _ => OkResponse()
-
     case "rating" :: "update" :: Nil Options _ => OkResponse()
-
     case "rating" :: "delete" :: Nil Options _ => OkResponse()
 
 

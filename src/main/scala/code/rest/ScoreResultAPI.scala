@@ -35,9 +35,11 @@ object ScoreResultAPI extends RestHelper{
 
 
   serve {
+    case "scoreresult"::"customer" :: Nil Options _ => OkResponse()
     case "scoreresult"::"customer" :: Nil JsonGet req => getCustomer()
 
-    case "scoreresult"::"customer" :: q:: Nil JsonGet req => getCustomerbyid(q)
+    case "scoreresult"::"customer" :: q :: Nil Options _ => OkResponse()
+    case "scoreresult"::"customer" :: q :: Nil JsonGet req => getCustomerbyid(q)
     case "scoreresult"::"result" :: Nil JsonGet req => getResult()
 
     case "scoreresult"::"result" :: q:: Nil JsonGet req => getResultid(q)
@@ -46,6 +48,7 @@ object ScoreResultAPI extends RestHelper{
 
     case "scoreresult"  :: Nil Options _ => OkResponse()
 
+    case "scoreresult"::"result" :: q:: Nil Options _ => OkResponse()
 
   }
   def getResult(): JValue ={

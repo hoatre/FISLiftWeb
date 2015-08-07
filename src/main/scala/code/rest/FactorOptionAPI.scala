@@ -125,7 +125,7 @@ package code.rest
 
 import code.model._
 import com.mongodb.{QueryBuilder, BasicDBObject}
-import net.liftweb.http.LiftRules
+import net.liftweb.http.{OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST._
 import net.liftweb.mongodb.BsonDSL._
@@ -142,9 +142,7 @@ object FactorOptionAPI extends RestHelper {
   serve {
     //  case "factoroption" :: "getall" :: Nil JsonGet req => getFactorJSON(): JValue
 
-    case "factoroption" :: "getbymodelid" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "factoroption" :: "getbymodelid" :: Nil Options _ => OkResponse()
     case "factoroption" :: "getbymodelid" :: Nil JsonPost json -> request => searchFactorForOption(json): JValue
     //    case "factoroption" :: "getbymodelid" :: Nil JsonPut json -> request => searchFactorForOption(json): JValue
 

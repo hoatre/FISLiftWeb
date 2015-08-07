@@ -405,7 +405,7 @@ return Message.returnMassage("copymodel","0","Success",modelinfonew.asJValue)
 
       serve {
 
-//        case "modelinfo" :: "search"  :: Nil Options _ => OkResponse()
+        case "modelinfo" :: "search"  :: Nil Options _ => OkResponse()
     case "modelinfo" :: "search" :: q JsonGet req => search(q)
 
         case "modelinfo" :: "factor"::q  :: Nil Options _ => OkResponse()
@@ -418,47 +418,33 @@ return Message.returnMassage("copymodel","0","Success",modelinfonew.asJValue)
     case "modelinfo" :: "getbymodelinfoid" :: Nil JsonPost json -> request =>
       for {JString(id) <- (json \\ "_id").toOpt} yield getModelInfoByIdJSON(id): JValue
 
-    case "modelinfo" :: "getbymodelinfostatus" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "modelinfo" :: "getbymodelinfostatus" :: Nil Options _ => OkResponse()
     case "modelinfo" :: "getbymodelinfostatus" :: Nil JsonPost json -> request =>
       for {JString(status) <- (json \\ "status").toOpt} yield getModelInfoByStatusJSON(status): JValue
 
     //    case "modelinfo" :: "getbymodelinfoid" ::q:: Nil JsonGet req => getModelInfoByIdJSON(q) : JValue
 
-    case "modelinfo" :: "update" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "modelinfo" :: "update" :: Nil Options _ => OkResponse()
     case "modelinfo" :: "update" :: Nil JsonPost json -> request => updateModelInfo(json)
 
-    case "modelinfo" :: "delete" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "modelinfo" :: "delete" :: Nil Options _ => OkResponse()
     case "modelinfo" :: "delete" :: Nil JsonPost json -> request =>
       for {JString(id) <- (json \\ "_id").toOpt} yield deleteModelInfo(id)
 
     //    case "modelinfo" :: "delete" :: id :: Nil JsonDelete req => deleteModelInfo(id)
 
-    case "modelinfo" :: "insert" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "modelinfo" :: "insert" :: Nil Options _ => OkResponse()
     case "modelinfo" :: "insert" :: Nil JsonPost json -> request => insertModelInfo(json)
 
-    case "modelinfo" :: "view" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "modelinfo" :: "view" :: Nil Options _ => OkResponse()
     case "modelinfo" :: "view" :: Nil JsonPost json -> request =>
       for {JString(id) <- (json \\ "_id").toOpt} yield viewModelInfo(id)
 
-    case "modelinfo" :: "range" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "modelinfo" :: "range" :: Nil Options _ => OkResponse()
     case "modelinfo" :: "range" :: Nil JsonPost json -> request =>
       for {JString(id) <- (json \\ "_id").toOpt} yield range(id)
 
-    case "modelinfo" :: "rangeandupdate" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "modelinfo" :: "rangeandupdate" :: Nil Options _ => OkResponse()
     case "modelinfo" :: "rangeandupdate" :: Nil JsonPost json -> request =>
       for {JString(id) <- (json \\ "_id").toOpt} yield rangeAndUpdate(id)
 

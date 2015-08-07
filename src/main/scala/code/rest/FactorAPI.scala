@@ -8,7 +8,7 @@ import java.util.UUID
 
 import code.model._
 import com.mongodb.{QueryBuilder, BasicDBObject}
-import net.liftweb.http.LiftRules
+import net.liftweb.http.{OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST._
 import net.liftweb.mongodb.BsonDSL._
@@ -528,56 +528,42 @@ object FactorAPI extends RestHelper {
 
 
   serve {
+    case "factor" :: "getall" :: Nil Options _ => OkResponse()
     case "factor" :: "getall" :: Nil JsonGet req => getFactorJSON(): JValue
 
-    case "factor" :: "getbyfactorid" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "factor" :: "getbyfactorid" :: Nil Options _ => OkResponse()
+
     case "factor" :: "getbyfactorid" :: Nil JsonPost json -> request =>
       for {JString(id) <- (json \\ "_id").toOpt} yield getFactorByIdJSON(id): JValue
 
-    case "factor" :: "update" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "factor" :: "update" :: Nil Options _ => OkResponse()
     case "factor" :: "update" :: Nil JsonPost json -> request => updateFactor(json)
 
-    case "factor" :: "delete" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "factor" :: "delete" :: Nil Options _ => OkResponse()
     case "factor" :: "delete" :: Nil JsonPost json -> request =>
       for {JString(id) <- (json \\ "_id").toOpt} yield deleteFactor(id)
 
-    case "factor" :: "insert" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "factor" :: "insert" :: Nil Options _ => OkResponse()
     case "factor" :: "insert" :: Nil JsonPost json -> request => insertFactor(json)
 
 //--------------------------------------------------------------------------------------------------------------------
 
-    case "factoroption" :: "getbyfactoroptionid" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "factoroption" :: "getbyfactoroptionid" :: Nil Options _ => OkResponse()
     case "factoroption" :: "getbyfactoroptionid" :: Nil JsonPost json -> request =>
       for {JString(factorId) <- (json \\ "FactorId").toOpt
            JString(factorOptionId) <- (json \\ "_id").toOpt
       } yield getFactorOptionByIdJSON(factorId, factorOptionId): JValue
 
-    case "factoroption" :: "deleteoption" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "factoroption" :: "deleteoption" :: Nil Options _ => OkResponse()
     case "factoroption" :: "deleteoption" :: Nil JsonPost json -> request =>
       for {JString(idFactor) <- (json \\ "FactorId").toOpt
            JString(idFactorOption) <- (json \\ "_id").toOpt
       } yield deleteOptionFactor(idFactor, idFactorOption)
 
-    case "factoroption" :: "insertoption" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "factoroption" :: "insertoption" :: Nil Options _ => OkResponse()
     case "factoroption" :: "insertoption" :: Nil JsonPost json -> request => insertFactorOption(json)
 
-    case "factoroption" :: "updateoption" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "factoroption" :: "updateoption" :: Nil Options _ => OkResponse()
     case "factoroption" :: "updateoption" :: Nil JsonPost json -> request => updateFactorOption(json)
 
   }

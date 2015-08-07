@@ -6,7 +6,7 @@ package code.rest
 import java.util.UUID
 
 import code.common.Message
-import net.liftweb.http.LiftRules
+import net.liftweb.http.{OkResponse, LiftRules, S}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json._
 import net.liftweb.json.JsonAST.JArray
@@ -17,7 +17,6 @@ import net.liftweb.json.JsonAST.JValue
 import com.mongodb.{BasicDBObject, BasicDBObjectBuilder, QueryBuilder}
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
-import net.liftweb.http.{S, LiftRules}
 import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
@@ -45,9 +44,7 @@ object ValidateAPI extends RestHelper {
 
   serve {
 
-    case "validate" :: "checkweightrate" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
+    case "validate" :: "checkweightrate" :: Nil Options _ => OkResponse()
     case "validate" :: "checkweightrate" :: Nil JsonPost json -> request => checkweightrate(json)
 
 //    case "validate" :: "checkweightrate" :: Nil JsonDelete json  => test(json)

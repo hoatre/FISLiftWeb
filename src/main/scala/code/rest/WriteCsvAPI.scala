@@ -46,6 +46,7 @@ object csvAPI extends RestHelper {
 
 
   serve {
+    case "csv" :: "download" :: p :: q :: Nil Options _ => OkResponse()
     case "csv" :: "download" :: p::q :: Nil JsonGet req => CsvModule.fileResponse(p,q)
 
     case "csv" :: "upload" :: Nil Options _ => OkResponse()
@@ -56,13 +57,17 @@ object csvAPI extends RestHelper {
 
     case "csv" :: "test" :: q :: Nil JsonGet req => CsvModule.writetoCSV(q)
 
+    case "csv" :: "test" :: q :: Nil Options _ => OkResponse()
+
+    case "csv" :: "read" :: q :: Nil Options req => OkResponse()
+
     case "csv" :: "read" :: q :: Nil JsonGet req => {
       S.respondAsync {
         val s = CsvModule.readCSV(q,null)
         Full(JsonResponse(s))
       }
     }
-
+    case "csv" :: q :: Nil Options _ => OkResponse()
     case "csv" :: q :: Nil JsonGet req => CsvModule.search(q)
 
     case "csv"  ::  "upload" :: q :: Nil  Options _ => OkResponse()

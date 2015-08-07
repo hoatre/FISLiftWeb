@@ -4,7 +4,7 @@ import code.common.Oauth2users
 import com.mongodb.{BasicDBObjectBuilder, QueryBuilder}
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
-import net.liftweb.http.{S, LiftRules}
+import net.liftweb.http.{OkResponse, S, LiftRules}
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
 import code.snippet._
@@ -55,9 +55,10 @@ object UsersAPI extends RestHelper {
 
     case "shout" :: q:: Nil Post req => {"abc" -> "abc"} :JValue
 
-
+    case "user" :: "accesstoken" :: Nil Options _ => OkResponse()
     case "user" :: "accesstoken" :: Nil JsonGet req => Oauth2users.getAccessToken()
 
+    case "user" :: "checkapi" :: Nil Options _ => OkResponse()
     case "user" :: "checkapi" :: Nil JsonGet req => Oauth2users.validate()
 
   }
