@@ -26,12 +26,15 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Await, Future}
 import scala.util.Success
 
+
+
 /**
  * Created by bacnv on 7/8/15.
  */
 object Users {
 
   def getall(rest: String, q: String): JValue = {
+
 
     var dbOject: List[UsersModel] = List.empty
 

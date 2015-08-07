@@ -15,6 +15,9 @@ import net.liftweb.mongodb.{DefaultMongoIdentifier, MongoDB, MongoIdentifier}
 import net.liftweb.sitemap.Loc._
 import net.liftweb.sitemap._
 import net.liftweb.util.Props
+import omniauth.Omniauth
+import omniauth.lib._
+
 /**
  * A class that's instantiated early and run.  It allows the application
  * to modify lift's environment
@@ -43,7 +46,7 @@ class Boot {
         HTTPParam("Access-Control-Allow-Origin", "*"),
         HTTPParam("Access-Control-Allow-Credentials", "true"),
         HTTPParam("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT"),
-        HTTPParam("Access-Control-Allow-Headers", "X-API-KEY, x-xsrf-token,origin, authorization, accept, client-security-token, " +
+        HTTPParam("Access-Control-Allow-Headers", "X-API-KEY, x-xsrf-token,origin, authorization, Authorization, accept, client-security-token, " +
                         "Access-Control-Request-Method, WWW-Authenticate,Keep-Alive,User-Agent,X-Requested-With,Cache-Control,Content-Type")
       ))
 
@@ -77,6 +80,13 @@ class Boot {
     LiftRules.jsArtifacts = JQueryArtifacts
     JQueryModule.InitParam.JQuery=JQueryModule.JQuery191
     JQueryModule.init()
+
+    Omniauth.sitemap
+    //init
+    //Supply a list of providers
+    Omniauth.initWithProviders(List(new GoogleProvider(Props.props.apply("google.client_id"),Props.props.apply("google.client_secret"))))
+    //or init with providers in properties
+    Omniauth.init
 
     // Init RestService
     SparkAPI.init()

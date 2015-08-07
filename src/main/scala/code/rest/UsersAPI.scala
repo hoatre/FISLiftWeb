@@ -1,5 +1,6 @@
 package code.rest
 
+import code.common.Oauth2users
 import com.mongodb.{BasicDBObjectBuilder, QueryBuilder}
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
@@ -35,8 +36,8 @@ object UsersAPI extends RestHelper {
   serve {
     case "user" :: "getall"  :: Nil JsonGet req => UsersSpet.getall("getall","") : JValue
 
-    case "user" :: q   JsonGet req =>
-      UsersSpet.getuserbyusername(q) : JValue
+//    case "user" :: q   JsonGet req =>
+//      UsersSpet.getuserbyusername(q) : JValue
 
     case "user" :: "update_user" :: q:: Nil Post req -> request =>
       for{
@@ -54,6 +55,10 @@ object UsersAPI extends RestHelper {
 
     case "shout" :: q:: Nil Post req => {"abc" -> "abc"} :JValue
 
+
+    case "user" :: "accesstoken" :: Nil JsonGet req => Oauth2users.getAccessToken()
+
+    case "user" :: "checkapi" :: Nil JsonGet req => Oauth2users.validate()
 
   }
 }
