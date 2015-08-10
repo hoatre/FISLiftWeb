@@ -129,11 +129,11 @@ val statustype = if(p.equals("ok")) "0" else if(p.equals("fail")) "1" else "2"
 
    // val http =  CurrentReq.value.request.remoteAddress
  //   println(CurrentReq.value.request.remoteAddress +" "+ CurrentReq.value.request.remoteHost + " "+S.hostAndPath + " " +S.hostName )
-   val f = new File(q + ".csv")
-    val writer = CSVWriter.open(f)
+//   val f = new File(q + ".csv")
+//    val writer = CSVWriter.open(f)
 
 
-    Message.returnMassage("uploadfile", "0", "No error", ("urlok" -> (S.hostAndPath+"/csv/download/ok/"+q)) ~ ("urlfail" -> (S.hostAndPath+"/csv/download/fail/"+q)), count,dbok,dbfail)
+    Message.returnMassage("uploadfile", "0", "No error", ("urlok" -> (S.hostAndPath+"/csv/download/ok/"+q+".csv")) ~ ("urlfail" -> (S.hostAndPath+"/csv/download/fail/"+q+".csv")), count,dbok,dbfail)
   }
 
   def writetoCSV(q: String): JValue = {
@@ -604,7 +604,7 @@ if(statustype.equals("0")) {
     val dbin = QueryBuilder.start("ModelId").is(q).and("_id").notIn(lista.toArray).get
 
     val db = Factor.findAll(dbin)
-    for (x <-1 to 5000){
+    for (x <-1 to 100){
       var listwriter : List[String] = List()
       listwriter = listwriter ::: List(ObjectId.get().toString) ::: List(dbmodel(0).name.toString())
       for(i<-0 to db.size -1){

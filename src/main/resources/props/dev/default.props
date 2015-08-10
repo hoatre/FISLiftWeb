@@ -7,6 +7,9 @@ mongodbuserurl=mongodb://10.15.171.35:27017/UsersDB
 mongodbuseruser=
 mongodbuserpass=
 
+google.client_id=906084559925-me6j6jo19t39tfbqajcuvj5h914dr0a1.apps.googleusercontent.com
+google.client_secret=vVexpJlHAIe_9nkj4LXtVBPS
+
 ######kafka config###############
 metadata.broker.list=10.15.171.41:9092
 serializer.class=kafka.serializer.StringEncoder
@@ -28,3 +31,11 @@ userapi.checkapi=/checkapi
 userapi.client_id=client1
 userapi.client_secret=secret1
 userapi.token_type.bearer=Bearer
+
+
+#Redis#########
+redis.host=10.15.171.41
+redis.port=6379
+
+
+

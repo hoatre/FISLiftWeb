@@ -1,11 +1,19 @@
 package code.common
 
 import java.io.FileInputStream
+import java.lang.{Throwable, Exception}
+import java.util
 
 import net.liftweb.common.Full
 import net.liftweb.http.S
+import net.liftweb.http.provider.HTTPResponse
 import net.liftweb.json.JsonAST.JValue
 import net.liftweb.util.Props
+import org.apache.http.NameValuePair
+import org.apache.http.client.entity.UrlEncodedFormEntity
+import org.apache.http.client.methods.{CloseableHttpResponse, HttpPost}
+import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.message.BasicNameValuePair
 
 import scala.io.Source
 
@@ -14,22 +22,62 @@ import scala.io.Source
  */
 object Utils {
 
-  def propsWheretoLook(filename:String) : List[(String, () => Full[FileInputStream])]={
-        println(Props.mode)
-   println(Props.hostName)
-        Props.mode match {
-          case Props.RunModes.Test =>  ((getClass.getResource("/props/test/"+filename).getPath, () => Full(new FileInputStream(getClass.getResource("/props/test/"+filename).getPath))) :: Nil)
-          case Props.RunModes.Production =>  ((getClass.getResource("/props/production/"+filename).getPath, () => Full(new FileInputStream(getClass.getResource("/props/production/"+filename).getPath))) :: Nil)
-          case Props.RunModes.Development =>  ((getClass.getResource("/props/dev/"+filename).getPath, () => Full(new FileInputStream(getClass.getResource("/props/dev/"+filename).getPath))) :: Nil)
-        }
-  }
-  def propsWheretoLook(filename:String,any :Any) : List[(String, () => Full[FileInputStream])]={
+  def propsWheretoLook(filename: String): List[(String, () => Full[FileInputStream])] = {
     println(Props.mode)
-    ((getClass.getResource("/props/"+filename).getPath, () => Full(new FileInputStream(getClass.getResource("/props/"+filename).getPath))) :: Nil)
+    println(Props.hostName)
+    Props.mode match {
+      case Props.RunModes.Test => ((getClass.getResource("/props/test/" + filename).getPath, () => Full(new FileInputStream(getClass.getResource("/props/test/" + filename).getPath))) :: Nil)
+      case Props.RunModes.Production => ((getClass.getResource("/props/production/" + filename).getPath, () => Full(new FileInputStream(getClass.getResource("/props/production/" + filename).getPath))) :: Nil)
+      case Props.RunModes.Development => ((getClass.getResource("/props/dev/" + filename).getPath, () => Full(new FileInputStream(getClass.getResource("/props/dev/" + filename).getPath))) :: Nil)
+    }
   }
 
-  def checkuserAPI():Unit={
+  def propsWheretoLook(filename: String, any: Any): List[(String, () => Full[FileInputStream])] = {
+    println(Props.mode)
+    ((getClass.getResource("/props/" + filename).getPath, () => Full(new FileInputStream(getClass.getResource("/props/" + filename).getPath))) :: Nil)
+  }
+
+  def checkuserAPI(): Unit = {
     val url = "http://api.hostip.info/get_json.php?ip=12.215.42.19"
   }
 
+  def http(url: String, method_name: String, header: Map[String, String], param: Map[String, String], namevaluepair: Map[String, String]): CloseableHttpResponse = {
+
+    val client = new DefaultHttpClient
+    val post = new HttpPost(url)
+    //    val post = if (url_type.toLowerCase.equals("post")) new HttpPost(url) else if (url_type.toLowerCase.equals("get")) new HttpPost(url)
+    try {
+
+      if (header != null && header.size > 0) {
+        for ((key, value) <- header) {
+          post.addHeader(key.toString, value.toString)
+        }
+      }
+
+
+      if (param != null && param.size > 0) {
+        val params = client.getParams
+        for ((key, value) <- param) {
+          params.setParameter(key.toString, value.toString)
+        }
+        client.setParams(params)
+      }
+
+
+      if (namevaluepair != null && namevaluepair.size > 0) {
+        val nameValuePairs = new util.ArrayList[NameValuePair](1)
+        for ((key, value) <- namevaluepair) {
+          nameValuePairs.add(new BasicNameValuePair(key.toString, value.toString))
+        }
+        post.setEntity(new UrlEncodedFormEntity(nameValuePairs))
+      }
+      // send the post request
+
+      client.execute(post)
+    }
+    finally {
+      client.close()
+    }
+
+  }
 }

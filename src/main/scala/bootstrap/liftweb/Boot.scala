@@ -81,13 +81,6 @@ class Boot {
     JQueryModule.InitParam.JQuery=JQueryModule.JQuery191
     JQueryModule.init()
 
-//    Omniauth.sitemap
-//    //init
-//    //Supply a list of providers
-//    Omniauth.initWithProviders(List(new GoogleProvider(Props.props.apply("google.client_id"),Props.props.apply("google.client_secret"))))
-//    //or init with providers in properties
-//    Omniauth.init
-
     // Init RestService
     SparkAPI.init()
 
@@ -123,6 +116,7 @@ class Boot {
 
     ActiveTableAPI.init()
 
+    GoogleAPI.init()
 
   }
 
