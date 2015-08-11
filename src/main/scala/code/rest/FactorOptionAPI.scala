@@ -124,9 +124,9 @@
 package code.rest
 
 import code.model._
-import com.mongodb.{QueryBuilder, BasicDBObject}
-import net.liftweb.http.{OkResponse, LiftRules}
+import com.mongodb.QueryBuilder
 import net.liftweb.http.rest.RestHelper
+import net.liftweb.http.{LiftRules, OkResponse}
 import net.liftweb.json.JsonAST._
 import net.liftweb.mongodb.BsonDSL._
 import net.liftweb.util.Helpers._
@@ -146,7 +146,64 @@ object FactorOptionAPI extends RestHelper {
     case "factoroption" :: "getbymodelid" :: Nil JsonPost json -> request => searchFactorForOption(json): JValue
     //    case "factoroption" :: "getbymodelid" :: Nil JsonPut json -> request => searchFactorForOption(json): JValue
 
+    case "factoroption" :: "getoptionbymodelid" :: Nil Options _ => OkResponse()
+    case "factoroption" :: "getoptionbymodelid" :: Nil JsonPost json -> request => searchOptionForModel(json): JValue
 
+
+  }
+
+  def searchOptionForModel(q: JValue): JValue = {
+
+    val json = q.asInstanceOf[JObject]
+
+    val modelid = json.values.apply("modelid").toString
+
+    val dbFind = Factor.findAll(QueryBuilder.start("ModelId").is(modelid).get)
+    var lista: List[String] = List()
+
+    var i = 0
+    for (i <- 0 to dbFind.size - 1) {
+
+      //     for {
+      //       JString(parent) <- (dbFind(i).asJValue \ "Parentid").toOpt
+      //       item = parent.toString
+      //     } yield {
+      if (!lista.contains(dbFind(i).Parentid.toString())) {
+        val listb: List[String] = List(dbFind(i).Parentid.toString())
+
+        lista = lista ::: listb
+        //       }
+
+      }
+
+    }
+    val dbin = QueryBuilder.start("ModelId").is(modelid).and("_id").notIn(lista.toArray).get
+
+    val db = Factor.findAll(dbin)
+
+
+    var msg = {
+      "ERROR" -> "Not found"
+    }: JValue
+
+    if (db.size > 0) {
+      var listOption:List[FactorOptionIN] = List()
+
+      for(factor<-db){
+        for(option<-factor.FactorOption.value) {
+          listOption = listOption ::: List(option)
+        }
+      }
+      msg = {
+        "SUCCESS" -> listOption.map((_.asJValue))
+      }: JValue
+    } else {
+      msg = {
+        "ERROR" -> "No Record"
+      }: JValue
+    }
+    msg
+    //val a :List[Factor] = Factor.findAll("ModelId" -> "")
   }
 
   def searchFactorForOption(q: JValue): JValue = {

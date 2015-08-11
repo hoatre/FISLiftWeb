@@ -88,7 +88,7 @@ object SparkAPI extends RestHelper {
     if(mess.equals("OK")) {
       val json = q.asInstanceOf[JObject].values
       val r = new RedisClient(Props.props.apply("redis.host"), Props.props.apply("redis.port").toInt)
-      if(r.llen("Spark-TopBotOption-Top-" + json.apply("factorOptionId").toString).get.toInt == 0 && r.llen("Spark-TopBotOption-Bot-" + json.apply("factorOptionId").toString).get.toInt == 0) {
+      if(r.llen("Spark-TopBotOption-Top-" + json.apply("factorOptionId").toString).get.toInt == 0 || r.llen("Spark-TopBotOption-Bot-" + json.apply("factorOptionId").toString).get.toInt == 0) {
         return code.common.Message.returnMassage("ScoringRange", "1", "null", null)
       }else {
         var top = r.lrange("Spark-TopBotOption-Top-" + json.apply("factorOptionId").toString, 0, r.llen("Spark-TopBotOption-Top-" + json.apply("factorOptionId").toString).get.toInt - 1).get
