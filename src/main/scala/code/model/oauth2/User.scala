@@ -1,11 +1,11 @@
-package code.model
-
+package code.model.oauth2
 
 import bootstrap.liftweb.UsersDb
+import net.liftweb.mongodb.BsonDSL._
 import net.liftweb.mongodb.record.field.StringPk
-import net.liftweb.mongodb.record.{MongoRecord, MongoMetaRecord}
+import net.liftweb.mongodb.record.{MongoMetaRecord, MongoRecord}
 import net.liftweb.record.field.{LongField, PasswordField, StringField}
-import org.datanucleus.enhancer.spi.StringFieldPK
+
 
 /**
  * Created by bacnv on 11/08/2015.
@@ -36,54 +36,57 @@ object User extends User with MongoMetaRecord[User] {
   override def collectionName = "user"
   override def mongoIdentifier = UsersDb
 
-//  def get(id: String): Option[User] = {
-//   User.find("_id" -> id)
-//  }
+  def get(id: String): Option[User] = {
+   User.find("_id" -> id)
+  }
 //
-//  def findByUsername(username: String): Option[User] =
-//    users.where(_.username === username).firstOption
-//
-//  /**
-//   * @param username Username to find
-//   * @param encryptedPassword Encrypted version of password
-//   * @return Option containing User.
-//   */
-//  def findByUsernameAndPassword(username: String, encryptedPassword: String): Option[User] = {
-//
-//    User.find(("username" -> username) ~ ("password" -> encryptedPassword))
-//  }
-//
-//  /**
-//   * @param user User object with already encrypted password
-//   * @return
-//   */
-//  def insert(user: User) = {
-//   user.save
-//  }
-//
-//  /**
-//   * @param id User id to be updated
-//   * @param user New User details
-//   * @return
-//   */
-//  def update(id: String, user: User) = {
-//
-//  }
-//
+  def findByUsername(username: String): Option[User] ={
+  User.find("username" -> username)
+
+  }
+
+
+  /**
+   * @param username Username to find
+   * @param encryptedPassword Encrypted version of password
+   * @return Option containing User.
+   */
+  def findByUsernameAndPassword(username: String, encryptedPassword: String): Option[User] = {
+
+    User.find(("username" -> username) ~ ("password" -> encryptedPassword))
+  }
+
+  /**
+   * @param user User object with already encrypted password
+   * @return
+   */
+  def insert(user: User) = {
+   user.save
+  }
+
+  /**
+   * @param id User id to be updated
+   * @param user New User details
+   * @return
+   */
+  def update(id: String, user: User) = {
+
+  }
+
 //  /**
 //   * @param user User object to be deleted
 //   * @return
 //   */
 //  def delete(user: User) = {
 ////    User.delete(("_id" -> user.id.toString()))
-//    User.deleteAll(user)
+//    User.deleteAll("_id" -> user.id.toString)
 //  }
-//
-//  /**
-//   * Delete all the users. NOTE: Use with caution.
-//   * @return
-//   */
-//  def deleteAll() = {
-//
-//  }
+
+  /**
+   * Delete all the users. NOTE: Use with caution.
+   * @return
+   */
+  def deleteAll() = {
+
+  }
 }

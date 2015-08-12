@@ -1,8 +1,8 @@
-package code.model
+package code.model.oauth2
 
 import bootstrap.liftweb.UsersDb
 import net.liftweb.mongodb.record.field.StringPk
-import net.liftweb.mongodb.record.{MongoRecord, MongoMetaRecord}
+import net.liftweb.mongodb.record.{MongoMetaRecord, MongoRecord}
 import net.liftweb.record.field.StringField
 
 /**

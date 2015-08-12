@@ -1,8 +1,10 @@
 package code.rest
 
 import java.util
+import java.util.UUID
 
 import code.common.{Message, Utils}
+import code.model.oauth2.GoogleModel
 import net.liftweb.http.{OkResponse, LiftRules, S}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.JValue
@@ -16,6 +18,7 @@ import org.apache.http.util.EntityUtils
 
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
+import org.bson.types.ObjectId
 
 /**
  * Created by bacnv on 05/08/2015.
@@ -63,7 +66,7 @@ var msg :JValue = {"" -> ""}:JValue
 
     // send the post request
     val response = client.execute(post)
-    client.close()
+
 //    println("--- HEADERS ---")
 //    response.getAllHeaders.foreach(arg => println(arg))
 val entity = EntityUtils.toString(response.getEntity)
@@ -90,7 +93,26 @@ val entity = EntityUtils.toString(response.getEntity)
 
       val enttt = EntityUtils.toString(resp.getEntity)
 
+
+
+
+
       msg =  net.liftweb.json.parse(enttt)
+//      val testid = {"_id" -> ""}:JValue
+
+//      msg =  msg.map(testid =>msg)
+
+      val gg = msg.values.asInstanceOf[Map[String,Any]]
+
+
+      val google : GoogleModel = GoogleModel.createRecord.id(ObjectId.get.toString).audience(gg.apply("audience").toString)
+      .email(gg.apply("email").toString()).email_verified(gg.apply("email_verified").toString().toBoolean).expires_in(gg.apply("expires_in").toString().toLong)
+      .issued_at(gg.apply("issued_at").toString().toLong).issued_to(gg.apply("issued_to").toString()).issuer(gg.apply("issuer").toString())
+      .user_id(gg.apply("user_id").toString())
+
+      GoogleModel.updateByUserAndClient(google)
+
+
     }else{
       msg = net.liftweb.json.parse(entity)
     }
