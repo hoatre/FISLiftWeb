@@ -5,6 +5,7 @@ import java.net.URI
 import code.api.SparkAPI
 import code.common.Utils
 import code.rest._
+import code.rest.oauth2.UserAPI
 import com.mongodb.{Mongo, ServerAddress}
 import net.liftmodules.JQueryModule
 import net.liftweb.common._
@@ -117,6 +118,8 @@ class Boot {
     ActiveTableAPI.init()
 
     GoogleAPI.init()
+
+    UserAPI.init()
 
   }
 
