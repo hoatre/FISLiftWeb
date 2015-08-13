@@ -24,7 +24,7 @@ object UserAPI extends  RestHelper{
     case "user" :: "getall" :: Nil JsonGet req => OkResponse()
 
     case "user" :: "getbyid" :: q ::Nil JsonGet req => OkResponse()
-    case "user" :: "insert" :: Nil JsonPost json -> request => OkResponse()
+    case "user" :: "insert" :: Nil JsonPost json -> request => User.insert(json)
     case "user" :: "update" :: Nil JsonPost json -> request => OkResponse()
     case "user" :: "delete" :: Nil JsonPost json -> request => OkResponse()
 
