@@ -198,6 +198,15 @@ object User extends User with MongoMetaRecord[User] {
 
 
     }
+    if(email.isEmpty || email == "" ){
+      return Message.returnMassage("insertuser","1","Email must be exist")
+    }
+    if(password.isEmpty || password == ""){
+      return Message.returnMassage("insertuser","1","Password must be exist")
+    }
+    if(username.isEmpty || username == ""){
+      return Message.returnMassage("insertuser","1","Username must be exist")
+    }
 
    val user= User.createRecord.id(id).crated_by(created_by).created_date(created_date).description(description)
     .displayname(displayname).facebookid(facebookid).googleid(googleid).modified_by(created_by).modified_date(modified_date)
