@@ -175,7 +175,7 @@ object User extends User with MongoMetaRecord[User] {
       }else  if(key.toString.equals("email")){
         email = value
       } else if(key.toString.equals("password")){
-        password =  BCrypt.hashpw(value, BCrypt.gensalt())
+        password =  value
       } else if(key.toString.equals("imageurl")){
         imageurl = value
       } else if(key.toString.equals("picture")){
@@ -199,13 +199,15 @@ object User extends User with MongoMetaRecord[User] {
 
     }
     if(email.isEmpty || email == "" ){
-      return Message.returnMassage("insertuser","1","Email must be exist")
+      return Message.returnMassage("insertuser","1","Email must be exist",("" -> ""))
     }
     if(password.isEmpty || password == ""){
-      return Message.returnMassage("insertuser","1","Password must be exist")
+      return Message.returnMassage("insertuser","1","Password must be exist",("" -> ""))
+    }else{
+      password =  BCrypt.hashpw(password, BCrypt.gensalt())
     }
     if(username.isEmpty || username == ""){
-      return Message.returnMassage("insertuser","1","Username must be exist")
+      return Message.returnMassage("insertuser","1","Username must be exist",("" -> ""))
     }
 
    val user= User.createRecord.id(id).crated_by(created_by).created_date(created_date).description(description)
