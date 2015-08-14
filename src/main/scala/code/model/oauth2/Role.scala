@@ -163,13 +163,7 @@ object Role extends Role with MongoMetaRecord[Role] {
     for ((key, value) <- jsonmap) {
       if (key.toString.equals("id")) {
         id = value.toString
-        if (id.isEmpty || id == "") {
-          return Message.returnMassage("updateRole", "3", "Id must be exist", ("" -> ""))
-        }
-        val count = Role.findAll("_id" -> id)
-        if (count.size == 0) {
-          return Message.returnMassage("updateRole", "4", "Function not found", ("" -> ""))
-        }
+
       }
       else if (key.toString.equals("name")) {
         if (value.isEmpty || value == "") {
@@ -195,7 +189,13 @@ object Role extends Role with MongoMetaRecord[Role] {
     }
     qry1 += "modified_date" -> modified_date.toString
 
-
+    if (id.isEmpty || id == "") {
+      return Message.returnMassage("updateRole", "3", "Id must be exist", ("" -> ""))
+    }
+    val count = Role.findAll("_id" -> id)
+    if (count.size == 0) {
+      return Message.returnMassage("updateRole", "4", "Function not found", ("" -> ""))
+    }
 
     Role.update(("_id" -> id), ("$set" -> qry1))
     val application = Functions.findAll("_id" -> id)

@@ -85,7 +85,7 @@ class Boot {
 
     IssuesService.init()
 
-    GroupsAPI.init()
+//    GroupsAPI.init()
 
     UsersAPI.init()
 
@@ -97,7 +97,7 @@ class Boot {
 
     ModulesAPI.init()
 
-    GroupUsersAPI.init()
+//    GroupUsersAPI.init()
 
     FactorAPI.init()
 

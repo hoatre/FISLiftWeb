@@ -94,9 +94,9 @@ object Applications {
     var status = ""
     var note = ""
     var created_by = ""
-    var created_date = System.currentTimeMillis() / 1000
+    var created_date = System.currentTimeMillis()/1000
     var modified_by = ""
-    var modified_date = System.currentTimeMillis() / 1000
+    var modified_date = created_date
 
     for ((key, value) <- jsonmap) {
       if (key.toString.equals("name")) {
@@ -130,7 +130,7 @@ object Applications {
   def update(q: JValue): JValue = {
     val jsonmap: Map[String, String] = q.values.asInstanceOf[Map[String, String]]
     var qry1: Map[String, String] = Map()
-    var modified_date = System.currentTimeMillis() / 1000
+    var modified_date = System.currentTimeMillis()/1000
     var id = ""
 
     //    val bu = QueryBuilder.start("_id").is("55cc53aae4b0fb6acad9a144").get
@@ -140,13 +140,7 @@ object Applications {
     for ((key, value) <- jsonmap) {
       if (key.toString.equals("id")) {
         id = value.toString
-        if (id.isEmpty || id == "") {
-          return Message.returnMassage("updateApplication", "3", "Id must be exist", ("" -> ""))
-        }
-        val count = AppModel.findAll("_id" -> id)
-        if (count.size == 0) {
-          return Message.returnMassage("updateApplication", "4", "Application not found", ("" -> ""))
-        }
+
       }
       else if (key.toString.equals("name")) {
         if (value.isEmpty || value == "") {
@@ -172,7 +166,13 @@ object Applications {
     }
     qry1 += "modified_date" -> modified_date.toString
 
-
+    if (id.isEmpty || id == "") {
+      return Message.returnMassage("updateApplication", "3", "Id must be exist", ("" -> ""))
+    }
+    val count = AppModel.findAll("_id" -> id)
+    if (count.size == 0) {
+      return Message.returnMassage("updateApplication", "4", "Application not found", ("" -> ""))
+    }
 
     AppModel.update(("_id" -> id), ("$set" -> qry1))
     val application = AppModel.findAll("_id" -> id)

@@ -173,13 +173,7 @@ object Group extends Group with MongoMetaRecord[Group] {
     for ((key, value) <- jsonmap) {
       if (key.toString.equals("id")) {
         id = value.toString
-        if (id.isEmpty || id == "") {
-          return Message.returnMassage("updateGroup", "3", "Id must be exist", ("" -> ""))
-        }
-        val count = Group.findAll("_id" -> id)
-        if (count.size == 0) {
-          return Message.returnMassage("updateGroup", "4", "Group not found", ("" -> ""))
-        }
+
       }
       else if (key.toString.equals("name")) {
         if (value.isEmpty || value == "") {
@@ -207,7 +201,13 @@ object Group extends Group with MongoMetaRecord[Group] {
     }
     qry1 += "modified_date" -> modified_date.toString
 
-
+    if (id.isEmpty || id == "") {
+      return Message.returnMassage("updateGroup", "3", "Id must be exist", ("" -> ""))
+    }
+    val count = Group.findAll("_id" -> id)
+    if (count.size == 0) {
+      return Message.returnMassage("updateGroup", "4", "Group not found", ("" -> ""))
+    }
 
     Group.update(("_id" -> id), ("$set" -> qry1))
     val application = Group.findAll("_id" -> id)

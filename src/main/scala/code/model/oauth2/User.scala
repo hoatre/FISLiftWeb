@@ -242,13 +242,7 @@ object User extends User with MongoMetaRecord[User] {
     for ((key, value) <- jsonmap) {
       if (key.toString.equals("id")) {
         id = value.toString
-        if (id.isEmpty || id == "") {
-          return Message.returnMassage("updateUser", "3", "Id must be exist", ("" -> ""))
-        }
-        val count = User.findAll("_id" -> id)
-        if (count.size == 0) {
-          return Message.returnMassage("updateUser", "4", "User not found", ("" -> ""))
-        }
+
       }else if(key.toString.equals("username")){
         if(value.isEmpty || value == "" ){
           return Message.returnMassage("insertuser","1","Username must be exist",("" -> ""))
@@ -289,7 +283,13 @@ object User extends User with MongoMetaRecord[User] {
     }
     qry1 += "modified_date" -> modified_date.toString
 
-
+    if (id.isEmpty || id == "") {
+      return Message.returnMassage("updateUser", "3", "Id must be exist", ("" -> ""))
+    }
+    val count = User.findAll("_id" -> id)
+    if (count.size == 0) {
+      return Message.returnMassage("updateUser", "4", "User not found", ("" -> ""))
+    }
 
     User.update(("_id" -> id), ("$set" -> qry1))
     val application = User.findAll("_id" -> id)

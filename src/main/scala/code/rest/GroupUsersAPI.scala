@@ -74,32 +74,32 @@ object GroupUsersAPI extends RestHelper {
   }
 
 
-  serve {
-    case "usergroup" :: "getall"  :: Nil JsonGet req => getGroupUserJSON() : JValue
-
-    case "usergroup" :: "getbyroleid" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "usergroup" :: "getbyroleid" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield getGroupUserByIdJSON(id) : JValue
-
-    case "usergroup" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "usergroup" :: "update" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt
-          JString(userid) <- (json \\ "userid").toOpt
-          JString(groupid) <- (json \\ "groupid").toOpt
-      } yield updateGroupUser(id, userid, groupid)
-
-    case "usergroup" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "usergroup" :: "delete" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield deleteGroupUser(id)
-
-//    case "usergroup" :: "delete" :: id :: Nil JsonDelete req => deleteGroupUser(id)
-
-    case "usergroup" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "usergroup" :: "insert" :: Nil JsonPost json -> request =>
-      for{JString(userid) <- (json \\ "userid").toOpt
-          JString(groupid) <- (json \\ "groupid").toOpt
-      } yield insertGroupUser(userid, groupid)
-  }
+//  serve {
+//    case "usergroup" :: "getall"  :: Nil JsonGet req => getGroupUserJSON() : JValue
+//
+//    case "usergroup" :: "getbyroleid" :: Nil Options _ => {"OK" -> "200"} :JValue
+//    case "usergroup" :: "getbyroleid" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt} yield getGroupUserByIdJSON(id) : JValue
+//
+//    case "usergroup" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
+//    case "usergroup" :: "update" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt
+//          JString(userid) <- (json \\ "userid").toOpt
+//          JString(groupid) <- (json \\ "groupid").toOpt
+//      } yield updateGroupUser(id, userid, groupid)
+//
+//    case "usergroup" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
+//    case "usergroup" :: "delete" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt} yield deleteGroupUser(id)
+//
+////    case "usergroup" :: "delete" :: id :: Nil JsonDelete req => deleteGroupUser(id)
+//
+//    case "usergroup" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
+//    case "usergroup" :: "insert" :: Nil JsonPost json -> request =>
+//      for{JString(userid) <- (json \\ "userid").toOpt
+//          JString(groupid) <- (json \\ "groupid").toOpt
+//      } yield insertGroupUser(userid, groupid)
+//  }
 
 }
 
