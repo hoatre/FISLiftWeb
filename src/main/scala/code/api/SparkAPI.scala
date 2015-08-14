@@ -30,31 +30,41 @@ object SparkAPI extends RestHelper {
 
       var data:List[Map[String,Any]] = List()
       if(listCount.size>0) {
-        val listColor:List[String]=List("green","red","blue","yellow", "violet", "orange", "Amazon", "Apricot","pink")
+        val listColor:List[String]=List("green","red","blue","yellow", "violet", "orange", "Amazon", "pink")
         var listFactorName:List[String] = List()
         for(i <- 1 to listCount.size - 1){
           listFactorName=listFactorName:::List(parse(listCount(i).toList(0)).asInstanceOf[JObject].values.apply("factor_name").toString)
         }
         listFactorName=listFactorName.distinct
         var k = 0
+        var factorOld:String = ""
         for (i <- 1 to listCount.size - 1) {
+
 
           var dataPoints: List[Map[String, Any]] = List()
           val factorOptionName = parse(listCount(i).toList(0)).asInstanceOf[JObject].values.apply("factor_option_name").toString
           val factorNameIN = parse(listCount(i).toList(0)).asInstanceOf[JObject].values.apply("factor_name").toString
+          if(factorOld.equals(factorNameIN) == false){
+            k=0
+          }
           val count = parse(listCount(i).toList(0)).asInstanceOf[JObject].values.apply("application_count").toString
-
+          factorOld = factorNameIN
           for (factorName <- listFactorName) {
 
             if (factorName.equals(factorNameIN.toString)) {
-              dataPoints = dataPoints ::: List(Map("y" -> count.toInt, "label" -> factorName))
+              dataPoints = dataPoints ::: List(Map("y" -> count.toInt, "label" -> factorName, "color"->listColor(k)))
             }
             else
               dataPoints = dataPoints ::: List(Map("y" -> 0, "label" -> factorName))
 
 
           }
+
           data = data ::: List(Map("type" -> "stackedBar100", "showInLegend" -> false, "name" -> factorOptionName, "dataPoints" -> dataPoints))
+          if(k == listColor.size - 1 )
+            k = 0
+          else
+            k=k+1
         }
 
         val bac: Map[String, Any] = Map(
