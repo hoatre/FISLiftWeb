@@ -89,7 +89,7 @@ class Boot {
 
     UsersAPI.init()
 
-    RolesAPI.init()
+//    RolesAPI.init()
 
     GroupModuleAPI.init()
 
