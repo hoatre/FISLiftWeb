@@ -127,12 +127,13 @@ object RoleGroup extends RoleGroup with MongoMetaRecord[RoleGroup] {
     if(group_id.isEmpty || group_id == ""){
       return Message.returnMassage("RoleGroup","2","Group ID must be exist",("" -> ""))
     }
-    val count = RoleGroup.count(("role_id" -> role_id) ~ ("group_id" -> group_id))
+    try {
+      val count = RoleGroup.count(("role_id" -> role_id) ~ ("group_id" -> group_id))
 
-    if(count > 0){
-      return Message.returnMassage("RoleGroup","3","RoleGroup existed",("" -> ""))
+      if (count > 0) {
+        return Message.returnMassage("RoleGroup", "3", "RoleGroup existed", ("" -> ""))
+      }
     }
-
     val user= RoleGroup.createRecord.id(id).role_id(role_id).created_date(created_date).group_id(group_id)
       .created_by(created_by).save(true)
 

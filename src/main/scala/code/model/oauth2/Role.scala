@@ -104,7 +104,7 @@ object Role extends Role with MongoMetaRecord[Role] {
       order = (orderby -> -1)
     }
     val db = Role.findAll(jmap, order, Skip(pageSize * (pageIndex - 1)), Limit(pageSize))
-    val count = Functions.count(qry)
+    val count = Role.count(qry)
 
     Message.returnMassage("role", "0", "Success", db.map(_.asJValue), count)
   }
@@ -194,11 +194,11 @@ object Role extends Role with MongoMetaRecord[Role] {
     }
     val count = Role.findAll("_id" -> id)
     if (count.size == 0) {
-      return Message.returnMassage("updateRole", "4", "Function not found", ("" -> ""))
+      return Message.returnMassage("updateRole", "4", "Role not found", ("" -> ""))
     }
 
     Role.update(("_id" -> id), ("$set" -> qry1))
-    val application = Functions.findAll("_id" -> id)
+    val application = Role.findAll("_id" -> id)
 
     Message.returnMassage("updateRole", "0", "Success", application(0).asJValue)
 
