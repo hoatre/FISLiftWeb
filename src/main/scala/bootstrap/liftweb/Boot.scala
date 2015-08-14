@@ -5,7 +5,7 @@ import java.net.URI
 import code.api.SparkAPI
 import code.common.Utils
 import code.rest._
-import code.rest.oauth2.{ApplicationAPI, UserAPI}
+import code.rest.oauth2._
 import com.mongodb.{Mongo, ServerAddress}
 import net.liftmodules.JQueryModule
 import net.liftweb.common._
@@ -16,8 +16,6 @@ import net.liftweb.mongodb.{DefaultMongoIdentifier, MongoDB, MongoIdentifier}
 import net.liftweb.sitemap.Loc._
 import net.liftweb.sitemap._
 import net.liftweb.util.Props
-import omniauth.Omniauth
-import omniauth.lib._
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -122,6 +120,15 @@ class Boot {
     UserAPI.init()
 
     ApplicationAPI.init()
+
+    FunctionAPI.init()
+
+    GroupAPI.init()
+    GroupFunctionAPI.init()
+    RoleAPI.init()
+    RoleGroupAPI.init()
+    UserGroupAPI.init()
+
 
   }
 

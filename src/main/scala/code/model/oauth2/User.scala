@@ -2,22 +2,38 @@ package code.model.oauth2
 
 import java.util.UUID
 
-import bootstrap.liftweb.UsersDb
 import code.common.Message
 import com.mongodb.QueryBuilder
 import net.liftweb.common.Full
 import net.liftweb.http.S
 import net.liftweb.json.JsonAST.{JObject, JValue}
-import net.liftweb.mongodb.BsonDSL._
-import net.liftweb.mongodb.{Limit, Skip}
-import net.liftweb.mongodb.record.field.StringPk
 import net.liftweb.mongodb.record.{MongoMetaRecord, MongoRecord}
-import net.liftweb.record.field.{LongField, PasswordField, StringField}
-import net.liftweb.util.BCrypt
+import net.liftweb.mongodb.record.field.StringPk
+import net.liftweb.mongodb.{Limit, Skip}
+import net.liftweb.mongodb.BsonDSL
+
+import com.mongodb.{BasicDBObject, BasicDBObjectBuilder, QueryBuilder}
+import net.liftweb.http.rest.RestHelper
+import bootstrap.liftweb._
+import net.liftweb.json.JsonAST.JValue
+import net.liftweb.json.JsonAST._
+import net.liftweb.json.JsonDSL._
+import code.snippet._
+import code.model._
+import net.liftweb.json.Printer._
+import net.liftweb.mongodb.{Limit, Skip, JObjectParser}
+import net.liftweb.http.js.JsExp
+import net.liftweb.json.JsonDSL.seq2jvalue
+import net.liftweb.record.field.{PasswordField, LongField, StringField}
+import net.liftweb.util.{BCrypt, Helpers, Props}
 import org.bson.types.ObjectId
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.collection.immutable.HashMap
+import scala.concurrent.{Future, ExecutionContext}
+import scala.util.Random
+import net.liftweb.http.provider.HTTPRequest
+import net.liftweb.http.S
+import bootstrap.liftweb.UsersDb
 
 
 /**
@@ -112,7 +128,7 @@ object User extends User with MongoMetaRecord[User] {
     var email =""
     var orderby ="created_date"
     val qry = QueryBuilder.start().get()
-    var qry1 : JObject = ("" -> "")
+    var jmap : Map[String,String] = Map()
     var order = ("created_date" -> -1)
     for (req <- S.request.toList) {
       for (paramName <- req.paramNames) {
@@ -133,26 +149,26 @@ object User extends User with MongoMetaRecord[User] {
       }
     }
     if(!id.isEmpty && id != ""){
-       if (qry1.equals(("" -> ""))) qry1 = qry1 ~ ("_id" -> id) else qry1 = ("_id" -> id)
+      jmap += "_id" -> id
     }
     if(!username.isEmpty && username != ""){
-      if (qry1.equals(("" -> ""))) qry1 = qry1 ~ ("username" -> username) else qry1 = ("username" -> username)
+      jmap += "username" -> username
     }
     if(!email.isEmpty && email != ""){
-      if (qry1.equals(("" -> ""))) qry1 = qry1 ~ ("email" -> email) else qry1 = ("email" -> email)
+      jmap += "email" -> email
     }
 
     if(!orderby.isEmpty && orderby != ""){
       order = (orderby -> -1)
     }
-    val db =User.findAll(qry1,order,Skip(pageSize * (pageIndex - 1)), Limit(pageSize))
+    val db =User.findAll(jmap,order,Skip(pageSize * (pageIndex - 1)), Limit(pageSize))
    val count = User.count(qry)
 
     Message.returnMassage("user", "0", "Success", db.map(_.asJValue), count)
   }
   def insert(q:JValue) :  JValue= {
     val jsonmap : Map[String,String] = q.values.asInstanceOf[Map[String,String]]
-    val id = ObjectId.get().toString
+    val id = UUID.randomUUID().toString
     var  username = ""
     var email  = ""
     var password  =""
@@ -216,6 +232,75 @@ object User extends User with MongoMetaRecord[User] {
 
   Message.returnMassage("insertuser","0","Success",user.asJValue)
 
+  }
+  def update(q: JValue): JValue = {
+    val jsonmap: Map[String, String] = q.values.asInstanceOf[Map[String, String]]
+    var qry1: Map[String, String] = Map()
+    var modified_date = System.currentTimeMillis() / 1000
+    var id = ""
+
+    for ((key, value) <- jsonmap) {
+      if (key.toString.equals("id")) {
+        id = value.toString
+        if (id.isEmpty || id == "") {
+          return Message.returnMassage("updateUser", "3", "Id must be exist", ("" -> ""))
+        }
+        val count = User.findAll("_id" -> id)
+        if (count.size == 0) {
+          return Message.returnMassage("updateUser", "4", "User not found", ("" -> ""))
+        }
+      }else if(key.toString.equals("username")){
+        if(value.isEmpty || value == "" ){
+          return Message.returnMassage("insertuser","1","Username must be exist",("" -> ""))
+        }
+        qry1 += key -> value
+      }else  if(key.toString.equals("email")){
+        if(value.isEmpty || value == "" ){
+          return Message.returnMassage("insertuser","1","Email must be exist",("" -> ""))
+        }
+        qry1 += key -> value
+      } else if(key.toString.equals("password")){
+
+        if (value.isEmpty || value == "") {
+          return Message.returnMassage("updateUser", "3", "Password must be exist", ("" -> ""))
+        }
+        qry1 += key -> BCrypt.hashpw(value, BCrypt.gensalt())
+      } else if(key.toString.equals("imageurl")){
+        qry1 += key -> value
+      } else if(key.toString.equals("picture")){
+        qry1 += key -> value
+      } else if(key.toString.equals("facebookid")){
+        qry1 += key -> value
+      } else if(key.toString.equals("googleid")){
+        qry1 += key -> value
+      } else if(key.toString.equals("displayname")){
+        qry1 += key -> value
+      } else if(key.toString.equals("status")){
+        qry1 += key -> value
+      } else if(key.toString.equals("description")){
+        qry1 += key -> value
+      } else if(key.toString.equals("note")){
+        qry1 += key -> value
+      } else if (key.toString.equals("modified_by")) {
+        qry1 += key -> value
+      }
+
+
+    }
+    qry1 += "modified_date" -> modified_date.toString
+
+
+
+    User.update(("_id" -> id), ("$set" -> qry1))
+    val application = User.findAll("_id" -> id)
+
+    Message.returnMassage("updateUser", "0", "Success", application(0).asJValue)
+
+  }
+
+  def delete(q: String): JValue = {
+    User.delete(("_id" -> q))
+    Message.returnMassage("deleteUser", "0", "Success", ("" -> ""))
   }
 
 }

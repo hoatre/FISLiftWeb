@@ -48,7 +48,7 @@ class Applications private () extends MongoRecord[Applications] with StringPk[Ap
 
   // An embedded document:
   object name  extends StringField(this,1024)
-  object  desciption extends StringField(this,1024)
+  object  description extends StringField(this,1024)
   object status extends StringField(this,1024)
   object note extends StringField(this,1024)
   object created_by extends StringField(this,1024)

@@ -1,11 +1,12 @@
 package code.rest.oauth2
 
 import code.common.Message
+import code.rest.oauth2.GroupAPI._
 import net.liftweb.common.CombinableBox.Result
 import net.liftweb.http.{Req, OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.JValue
-import code.model.oauth2.{User, MyDataHandler}
+import code.model.oauth2.{Group, User, MyDataHandler}
 
 import scalaoauth2.provider.{ProtectedResource, AuthInfo, DataHandler}
 
@@ -19,14 +20,14 @@ object UserAPI extends  RestHelper{
   }
 
   serve{
-    case "user" :: Nil Options _ => OkResponse()
-    case "user" :: "search" :: q JsonGet req => User.searh(q)
-    case "user" :: "getall" :: Nil JsonGet req => OkResponse()
-
-    case "user" :: "getbyid" :: q ::Nil JsonGet req => OkResponse()
+    case "user" ::"search":: Nil  Options _ => OkResponse()
+    case "user" ::"insert":: Nil Options _ => OkResponse()
+    case "user" ::"update":: Nil Options _ => OkResponse()
+    case "user" ::"delete":: Nil Options _ => OkResponse()
+    case "user" :: "search" :: q Post req => User.searh(q)
     case "user" :: "insert" :: Nil JsonPost json -> request => User.insert(json)
-    case "user" :: "update" :: Nil JsonPost json -> request => OkResponse()
-    case "user" :: "delete" :: Nil JsonPost json -> request => OkResponse()
+    case "user" :: "update" :: Nil JsonPost json -> request => User.update(json)
+    case "user" :: "delete" :: q :: Nil JsonDelete req => User.delete(q)
 
   }
 

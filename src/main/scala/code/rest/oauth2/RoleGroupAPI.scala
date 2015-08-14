@@ -1,5 +1,6 @@
 package code.rest.oauth2
 
+import code.model.oauth2.RoleGroup
 import net.liftweb.http.{OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 
@@ -13,13 +14,15 @@ object RoleGroupAPI extends  RestHelper{
   }
 
   serve{
-    case "rolegroup" :: Nil Options _ => OkResponse()
-    case "rolegroup" :: "getall" :: Nil JsonGet req => OkResponse()
-
-    case "rolegroup" :: "getbyid" :: q ::Nil JsonGet req => OkResponse()
-    case "rolegroup" :: "insert" :: Nil JsonPost json -> request => OkResponse()
+    case "rolegroup" ::"search":: Nil  Options _ => OkResponse()
+    case "rolegroup" ::"insert":: Nil Options _ => OkResponse()
+    case "rolegroup" ::"update":: Nil Options _ => OkResponse()
+    case "rolegroup" ::"delete":: Nil Options _ => OkResponse()
+    case "rolegroup" :: "search" :: q Post req => RoleGroup.searh(q)
+    case "rolegroup" :: "insert" :: Nil JsonPost json -> request => RoleGroup.insert(json)
     case "rolegroup" :: "update" :: Nil JsonPost json -> request => OkResponse()
-    case "rolegroup" :: "delete" :: Nil JsonPost json -> request => OkResponse()
+    case "rolegroup" :: "delete" :: q :: Nil JsonDelete req => RoleGroup.delete(q)
+
 
   }
 

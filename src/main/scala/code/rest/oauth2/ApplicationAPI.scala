@@ -46,13 +46,6 @@ object ApplicationAPI extends  RestHelper{
     case "application" :: "insert" :: Nil JsonPost json -> request => AppSnip.insert(json)
     case "application" :: "update" :: Nil JsonPost json -> request => AppSnip.update(json)
     case "application" :: "delete" :: q :: Nil JsonDelete req => AppSnip.delete(q)
-    case "application" :: "getbyid" :: q :: Nil JsonGet req => test(q)
 
   }
-  def test(q:String) : JValue ={
-    val db =Applications.findAll("_id" -> q.toString)
-println(db.size)
-    db.map(_.asJValue)
-  }
-
 }

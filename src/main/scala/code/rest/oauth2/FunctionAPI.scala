@@ -1,5 +1,6 @@
 package code.rest.oauth2
 
+import code.model.oauth2.Functions
 import net.liftweb.http.{OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 
@@ -13,13 +14,14 @@ object FunctionAPI extends  RestHelper{
   }
 
   serve{
-    case "function" :: Nil Options _ => OkResponse()
-    case "function" :: "getall" :: Nil JsonGet req => OkResponse()
-
-    case "function" :: "getbyid" :: q ::Nil JsonGet req => OkResponse()
-    case "function" :: "insert" :: Nil JsonPost json -> request => OkResponse()
-    case "function" :: "update" :: Nil JsonPost json -> request => OkResponse()
-    case "function" :: "delete" :: Nil JsonPost json -> request => OkResponse()
+    case "function" ::"search":: Nil  Options _ => OkResponse()
+    case "function" ::"insert":: Nil Options _ => OkResponse()
+    case "function" ::"update":: Nil Options _ => OkResponse()
+    case "function" ::"delete":: Nil Options _ => OkResponse()
+    case "function" :: "search" :: q Post req => Functions.searh(q)
+    case "function" :: "insert" :: Nil JsonPost json -> request => Functions.insert(json)
+    case "function" :: "update" :: Nil JsonPost json -> request => Functions.update(json)
+    case "function" :: "delete" :: q :: Nil JsonDelete req => Functions.delete(q)
 
   }
 

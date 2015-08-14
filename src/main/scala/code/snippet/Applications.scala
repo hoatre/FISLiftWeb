@@ -90,7 +90,7 @@ object Applications {
     val jsonmap: Map[String, String] = q.values.asInstanceOf[Map[String, String]]
     val id = UUID.randomUUID().toString
     var name = ""
-    var desciption = ""
+    var description = ""
     var status = ""
     var note = ""
     var created_by = ""
@@ -101,8 +101,8 @@ object Applications {
     for ((key, value) <- jsonmap) {
       if (key.toString.equals("name")) {
         name = value
-      } else if (key.toString.equals("desciption")) {
-        desciption = value
+      } else if (key.toString.equals("description")) {
+        description = value
       } else if (key.toString.equals("status")) {
         status = value
       } else if (key.toString.equals("note")) {
@@ -120,7 +120,7 @@ object Applications {
       return Message.returnMassage("insertApplication", "2", "Status must be exist", ("" -> ""))
     }
 
-    val application = AppModel.createRecord.id(id).created_by(created_by).created_date(created_date).desciption(desciption)
+    val application = AppModel.createRecord.id(id).created_by(created_by).created_date(created_date).description(description)
       .modified_by(created_by).modified_date(modified_date).name(name).note(note).status(status).save(true)
 
     Message.returnMassage("insertApplication", "0", "Success", application.asJValue)
@@ -153,7 +153,7 @@ object Applications {
           return Message.returnMassage("updateApplication", "1", "Name must be exist", ("" -> ""))
         }
         qry1 += key -> value
-      } else if (key.toString.equals("desciption")) {
+      } else if (key.toString.equals("description")) {
 
         qry1 += key -> value
       } else if (key.toString.equals("status")) {

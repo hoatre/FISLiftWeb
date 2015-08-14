@@ -1,7 +1,7 @@
 package code.rest.oauth2
 
 
-
+import code.model.oauth2.Role
 import net.liftweb.http.{OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 
@@ -15,12 +15,14 @@ object RoleAPI extends  RestHelper{
   }
 
   serve{
-    case "role" :: Nil Options _ => OkResponse()
-    case "role" :: "getall" :: Nil JsonGet req => OkResponse()
-    case "role" :: "getbyid" :: q ::Nil JsonGet req => OkResponse()
-    case "role" :: "insert" :: Nil JsonPost json -> request => OkResponse()
-    case "role" :: "update" :: Nil JsonPost json -> request => OkResponse()
-    case "role" :: "delete" :: Nil JsonPost json -> request => OkResponse()
+    case "role" ::"search":: Nil  Options _ => OkResponse()
+    case "role" ::"insert":: Nil Options _ => OkResponse()
+    case "role" ::"update":: Nil Options _ => OkResponse()
+    case "role" ::"delete":: Nil Options _ => OkResponse()
+    case "role" :: "search" :: q Post req => Role.searh(q)
+    case "role" :: "insert" :: Nil JsonPost json -> request => Role.insert(json)
+    case "role" :: "update" :: Nil JsonPost json -> request => Role.update(json)
+    case "role" :: "delete" :: q :: Nil JsonDelete req => Role.delete(q)
 
   }
 
