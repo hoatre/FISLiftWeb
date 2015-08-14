@@ -130,10 +130,12 @@ object GroupFunction extends GroupFunction with MongoMetaRecord[GroupFunction] {
     if(group_id.isEmpty || group_id == ""){
       return Message.returnMassage("GroupFunction","2","Group ID must be exist",("" -> ""))
     }
+    try{
     val count = GroupFunction.count(("func_id" -> func_id) ~ ("group_id" -> group_id))
 
     if(count > 0){
       return Message.returnMassage("GroupFunction","3","GroupFunction existed",("" -> ""))
+    }
     }
 
     val user= GroupFunction.createRecord.id(id).func_id(func_id).created_date(created_date).group_id(group_id)

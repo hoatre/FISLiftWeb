@@ -127,10 +127,12 @@ object UserGroup extends UserGroup with MongoMetaRecord[UserGroup] {
     if(group_id.isEmpty || group_id == ""){
       return Message.returnMassage("UserGroup","2","Group ID must be exist",("" -> ""))
     }
-    val count = UserGroup.count(("user_id" -> user_id) ~ ("group_id" -> group_id))
+    try {
+      val count = UserGroup.count(("user_id" -> user_id) ~ ("group_id" -> group_id))
 
-    if(count > 0){
-      return Message.returnMassage("UserGroup","3","UserGroup existed",("" -> ""))
+      if (count > 0) {
+        return Message.returnMassage("UserGroup", "3", "UserGroup existed", ("" -> ""))
+      }
     }
 
     val user= UserGroup.createRecord.id(id).user_id(user_id).created_date(created_date).group_id(group_id)

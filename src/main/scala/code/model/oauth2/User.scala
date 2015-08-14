@@ -167,7 +167,7 @@ object User extends User with MongoMetaRecord[User] {
     Message.returnMassage("user", "0", "Success", db.map(_.asJValue), count)
   }
   def insert(q:JValue) :  JValue= {
-    val jsonmap : Map[String,String] = q.values.asInstanceOf[Map[String,String]]
+    val jsonmap : Map[String,Any] = q.values.asInstanceOf[Map[String,Any]]
     val id = UUID.randomUUID().toString
     var  username = ""
     var email  = ""
@@ -187,48 +187,58 @@ object User extends User with MongoMetaRecord[User] {
 
     for((key,value) <- jsonmap){
       if(key.toString.equals("username")){
-        username = value
+        username = value.toString
       }else  if(key.toString.equals("email")){
-        email = value
+        email = value.toString
       } else if(key.toString.equals("password")){
-        password =  value
+        password =  value.toString
       } else if(key.toString.equals("imageurl")){
-        imageurl = value
+        imageurl = value.toString
       } else if(key.toString.equals("picture")){
-        picture = value
+        picture = value.toString
       } else if(key.toString.equals("facebookid")){
-        facebookid = value
+        facebookid = value.toString
       } else if(key.toString.equals("googleid")){
-        googleid = value
+        googleid = value.toString
       } else if(key.toString.equals("displayname")){
-        displayname = value
+        displayname = value.toString
       } else if(key.toString.equals("status")){
-        status = value
+        status = value.toString
       } else if(key.toString.equals("description")){
-        description = value
+        description = value.toString
       } else if(key.toString.equals("note")){
-        note = value
+        note = value.toString
       } else if(key.toString.equals("created_by")){
-        created_by = value
+        created_by = value.toString
       }
 
 
     }
     if(email.isEmpty || email == "" ){
       return Message.returnMassage("insertuser","1","Email must be exist",("" -> ""))
+    }else{
+      val count = User.count("email" -> email)
+      if(count>0){
+        return Message.returnMassage("insertuser","11","Email existed",("" -> ""))
+      }
     }
     if(password.isEmpty || password == ""){
-      return Message.returnMassage("insertuser","1","Password must be exist",("" -> ""))
+      return Message.returnMassage("insertuser","2","Password must be exist",("" -> ""))
     }else{
       password =  BCrypt.hashpw(password, BCrypt.gensalt())
     }
     if(username.isEmpty || username == ""){
-      return Message.returnMassage("insertuser","1","Username must be exist",("" -> ""))
+      return Message.returnMassage("insertuser","3","Username must be exist",("" -> ""))
+    }else{
+      val count = User.count("username" -> username)
+      if(count>0){
+        return Message.returnMassage("insertuser","31","Username existed",("" -> ""))
+      }
     }
 
-   val user= User.createRecord.id(id).crated_by(created_by).created_date(created_date).description(description)
+   val user= User.createRecord.id(id).crated_by(created_by).created_date(created_date).description(description).email(email)
     .displayname(displayname).facebookid(facebookid).googleid(googleid).modified_by(created_by).modified_date(modified_date)
-    .note(note).password(password).picture(picture).status(status).save(true)
+    .note(note).password(password).picture(picture).status(status).username(username).save(true)
 
   Message.returnMassage("insertuser","0","Success",user.asJValue)
 
