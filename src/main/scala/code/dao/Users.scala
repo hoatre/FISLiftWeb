@@ -14,7 +14,7 @@ object Users {
   def insertUser(u : UserModel) : List[UserModel] = {
     val uid = ObjectId.get()
 
-    UserModel.createRecord.id(uid).user(u.user.get).save
+    UserModel.createRecord.id(uid).user(u.user.get).save(true)
 
     val qry = QueryBuilder.start("_id").is(uid)
       .get

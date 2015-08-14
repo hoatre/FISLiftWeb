@@ -121,34 +121,34 @@ object GroupsAPI extends RestHelper{
 
   }
 
-  serve {
-    case "group" :: "insertFreeFormat" :: Nil JsonPost json -> request =>
-      for{JString(model) <- (json \\ "model").toOpt} yield insertFreeFormat(model)
-
-    case "group" :: "getall"  :: Nil JsonGet req => getGroupJSON() : JValue
-
-    case "group" :: "getbygroupid" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "group" :: "getbygroupid" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield getGroupByIdJSON(id)
-
-    case "group" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "group" :: "update" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt
-          JString(status) <- (json \\ "status").toOpt
-          JString(note) <- (json \\ "note").toOpt
-          JString(groupname) <- (json \\ "groupname").toOpt
-      } yield updateGroup(id, status, note, groupname)
-
-    case "group" :: "updates" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "group" :: "updates" :: Nil JsonPost json -> request =>updateGroups(json)
-
-    case "group" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "group" :: "delete" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield  deleteGroup(id)
-
-    case "group" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "group" :: "insert" :: Nil JsonPost json -> request  => insertGroup(json.values)
-
-
-  }
+//  serve {
+//    case "group" :: "insertFreeFormat" :: Nil JsonPost json -> request =>
+//      for{JString(model) <- (json \\ "model").toOpt} yield insertFreeFormat(model)
+//
+//    case "group" :: "getall"  :: Nil JsonGet req => getGroupJSON() : JValue
+//
+//    case "group" :: "getbygroupid" :: Nil Options _ => {"OK" -> "200"} :JValue
+//    case "group" :: "getbygroupid" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt} yield getGroupByIdJSON(id)
+//
+//    case "group" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
+//    case "group" :: "update" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt
+//          JString(status) <- (json \\ "status").toOpt
+//          JString(note) <- (json \\ "note").toOpt
+//          JString(groupname) <- (json \\ "groupname").toOpt
+//      } yield updateGroup(id, status, note, groupname)
+//
+//    case "group" :: "updates" :: Nil Options _ => {"OK" -> "200"} :JValue
+//    case "group" :: "updates" :: Nil JsonPost json -> request =>updateGroups(json)
+//
+//    case "group" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
+//    case "group" :: "delete" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "id").toOpt} yield  deleteGroup(id)
+//
+//    case "group" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
+//    case "group" :: "insert" :: Nil JsonPost json -> request  => insertGroup(json.values)
+//
+//
+//  }
 }

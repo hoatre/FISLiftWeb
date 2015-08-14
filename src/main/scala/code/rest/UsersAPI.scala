@@ -34,32 +34,32 @@ object UsersAPI extends RestHelper {
 
 
   serve {
-    case "user" :: "getall"  :: Nil JsonGet req => UsersSpet.getall("getall","") : JValue
-
-//    case "user" :: q   JsonGet req =>
-//      UsersSpet.getuserbyusername(q) : JValue
-
-    case "user" :: "update_user" :: q:: Nil Post req -> request =>
-      for{
-        JString(id) <- (q \\ "id").toOpt
-        JString(username) <- (q \\ "username").toOpt} yield UsersSpet.getupdate(id,username)
-
-    case "user" :: "delete" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "_id").toOpt} yield UsersSpet.getDelete(id)
-
-    case "user" ::"add"  :: Nil JsonPost json->request => UsersSpet.insert(json)
-
-    case "user" ::"test"  :: Nil JsonPost json->request => UsersSpet.insertUser(json)
-
-    case "user" ::"update"  :: Nil JsonPost json->request => UsersSpet.update(json)
-
-    case "shout" :: q:: Nil Post req => {"abc" -> "abc"} :JValue
-
-    case "user" :: "accesstoken" :: Nil Options _ => OkResponse()
-    case "user" :: "accesstoken" :: Nil JsonGet req => Oauth2users.getAccessToken()
-
-    case "user" :: "checkapi" :: Nil Options _ => OkResponse()
-    case "user" :: "checkapi" :: Nil JsonGet req => Oauth2users.validate()
+    case "users" :: "getall"  :: Nil JsonGet req => UsersSpet.getall("getall","") : JValue
+//
+////    case "user" :: q   JsonGet req =>
+////      UsersSpet.getuserbyusername(q) : JValue
+//
+//    case "user" :: "update_user" :: q:: Nil Post req -> request =>
+//      for{
+//        JString(id) <- (q \\ "id").toOpt
+//        JString(username) <- (q \\ "username").toOpt} yield UsersSpet.getupdate(id,username)
+//
+//    case "user" :: "delete" :: Nil JsonPost json -> request =>
+//      for{JString(id) <- (json \\ "_id").toOpt} yield UsersSpet.getDelete(id)
+//
+//    case "user" ::"add"  :: Nil JsonPost json->request => UsersSpet.insert(json)
+//
+//    case "user" ::"test"  :: Nil JsonPost json->request => UsersSpet.insertUser(json)
+//
+//    case "user" ::"update"  :: Nil JsonPost json->request => UsersSpet.update(json)
+//
+//    case "shout" :: q:: Nil Post req => {"abc" -> "abc"} :JValue
+//
+//    case "user" :: "accesstoken" :: Nil Options _ => OkResponse()
+//    case "user" :: "accesstoken" :: Nil JsonGet req => Oauth2users.getAccessToken()
+//
+//    case "user" :: "checkapi" :: Nil Options _ => OkResponse()
+//    case "user" :: "checkapi" :: Nil JsonGet req => Oauth2users.validate()
 
   }
 }
