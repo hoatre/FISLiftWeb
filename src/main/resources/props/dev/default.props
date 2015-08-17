@@ -1,9 +1,9 @@
 #######mongodb##########
-mongodburl=mongodb://UserReadWrite:Aa123aA@10.15.171.35:27017/ScoringCardDB
+mongodburl=mongodb://10.15.171.35:27017/ScoringCardDB
 mongodbuser=
 mongodbpass=
 
-mongodbuserurl=mongodb://UserReadWrite:Aa123aA@10.15.171.35:27017/UsersDB
+mongodbuserurl=mongodb://10.15.171.35:27017/UsersDB
 mongodbuseruser=
 mongodbuserpass=
 
