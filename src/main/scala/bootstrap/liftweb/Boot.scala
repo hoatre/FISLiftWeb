@@ -135,7 +135,7 @@ class Boot {
 
 }
 object UsersDb extends MongoIdentifier {
-  val jndiName = "Users"
+  val jndiName = "UsersDB"
 }
 object MongoUrl {
 
