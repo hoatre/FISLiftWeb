@@ -10,14 +10,13 @@ import code.common.Message
 import code.model._
 import com.mongodb.{BasicDBObject, QueryBuilder}
 import net.liftweb.common.Full
-import net.liftweb.http.{JsonResponse, S, OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
+import net.liftweb.http.{JsonResponse, LiftRules, OkResponse, S}
 import net.liftweb.json.JsonAST._
 import net.liftweb.mongodb.BsonDSL._
 import net.liftweb.mongodb.{Limit, Skip}
 import net.liftweb.util.Helpers._
 import net.liftweb.util.Props
-import org.bson.types.ObjectId
 
 import scala.collection.immutable.::
 
@@ -130,7 +129,7 @@ object ModelInfoAPI extends RestHelper {
 
     val qry = QueryBuilder.start("ModelId").is(id).get
 
-    var DBList = Factor.findAll(qry)
+    val DBList = Factor.findAll(qry).sortWith(_.Parentid.toString() < _.Parentid.toString())
 
     if (DBList.isEmpty)
       return code.common.Message.returnMassage("viewModelInfo", "1", "ModelInfo not found", null)
@@ -154,7 +153,7 @@ object ModelInfoAPI extends RestHelper {
 
     val qry = QueryBuilder.start("_id").is(id).get
 
-    var DBList = ModelInfo.findAll(qry)
+    val DBList = ModelInfo.findAll(qry)
 
     return code.common.Message.returnMassage("rangeAndUpdate", "0", "SUCCESS",
       DBList(0).update.min(range(0).toDouble).max(range(1).toDouble).save.asJValue)
