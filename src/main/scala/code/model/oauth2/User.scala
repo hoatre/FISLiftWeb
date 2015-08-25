@@ -121,6 +121,7 @@ object User extends User with MongoMetaRecord[User] {
 
 
   def searh(q:List[String]) : JValue= {
+    println(S.uri)
     var pageIndex: Int = 1
     var pageSize: Int = 5
     var id =""

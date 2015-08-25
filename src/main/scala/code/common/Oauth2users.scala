@@ -6,7 +6,6 @@ import net.liftweb.common.Full
 import net.liftweb.http.{S, OkResponse}
 import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json.{JsonDSL, JsonAST, JObject, Extraction}
-import omniauth.Omniauth
 import org.apache.http.NameValuePair
 import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.{HttpGet, HttpPost}

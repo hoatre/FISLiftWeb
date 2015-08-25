@@ -35,7 +35,7 @@ object Users {
 
   def getall(rest: String, q: String): JValue = {
 
-
+    println(S.uri)
     var dbOject: List[UsersModel] = List.empty
 
     if (!q.isEmpty) {

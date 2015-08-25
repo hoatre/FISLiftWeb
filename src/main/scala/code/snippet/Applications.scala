@@ -39,6 +39,7 @@ object Applications {
 
 
   def searh(q: List[String]): JValue = {
+    println(S.uri)
     var pageIndex: Int = 1
     var pageSize: Int = 5
     var id = ""
@@ -81,7 +82,7 @@ object Applications {
       order = (orderby -> -1)
     }
     val db = AppModel.findAll(jmap, order, Skip(pageSize * (pageIndex - 1)), Limit(pageSize))
-    val count = AppModel.count(qry)
+    val count = AppModel.count(jmap)
 
     Message.returnMassage("application", "0", "Success", db.map(_.asJValue), count)
   }

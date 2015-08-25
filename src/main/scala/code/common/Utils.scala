@@ -14,8 +14,12 @@ import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.{CloseableHttpResponse, HttpPost}
 import org.apache.http.impl.client.DefaultHttpClient
 import org.apache.http.message.BasicNameValuePair
+import authentikat.jwt._
 
+
+import scala.concurrent.Future
 import scala.io.Source
+import net.liftweb.mongodb.BsonDSL._
 
 /**
  * Created by bacnv on 31/07/2015.
@@ -79,5 +83,24 @@ object Utils {
       client.close()
     }
 
+  }
+
+  def validateJWT(): Option[JValue] = {
+    val Authorization = S.getRequestHeader("Authorization")
+    if (Authorization.isEmpty) {
+      val ret = {
+        ("status" -> "false") ~ ("errortype" -> "invail_authorization") ~ ("description" -> "Invalid Authorization") ~ ("code" -> "401")
+      }: JValue
+      return Option(ret)
+    }
+    val Full(auth) = Authorization
+
+    val claims: Option[JValue] = auth match {
+      case JsonWebToken(header, claimsSet, signature) =>
+        net.liftweb.json.parseOpt(claimsSet.asJsonString)
+      case x =>
+        None
+    }
+    claims
   }
 }

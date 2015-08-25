@@ -128,8 +128,12 @@ class Boot {
     RoleAPI.init()
     RoleGroupAPI.init()
     UserGroupAPI.init()
-
-
+//
+// val lst =LiftRules.statelessDispatch.toList
+//    for(x<- lst){
+//println(x)
+//
+//    }
   }
 
 
