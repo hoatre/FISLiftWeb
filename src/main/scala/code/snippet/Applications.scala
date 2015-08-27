@@ -38,6 +38,22 @@ import code.model, oauth2.{Applications => AppModel}
 object Applications {
 
 
+
+  def getbyid(q:String):JValue ={
+    val f = AppModel.find("_id" -> q)
+
+    f match {
+      case Full(s) => return  Message.returnMassage("application","0","success",s.asJValue)
+      case _ => return  Message.returnMassage("application","1","Not found",""->"")
+    }
+  }
+
+//  def getid(q:String):JValue={
+//    var a = ("" ->"")
+//    Future.successful(a = getbyid(q))
+//
+//  }
+
   def searh(q: List[String]): JValue = {
     println(S.uri)
     var pageIndex: Int = 1

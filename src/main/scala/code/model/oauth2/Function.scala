@@ -61,6 +61,16 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
 
   override def mongoIdentifier = UsersDb
 
+
+  def getbyid(q:String):JValue ={
+    val f = Functions.find("_id" -> q)
+
+    f match {
+      case Full(s) => return  Message.returnMassage("function","0","success",s.asJValue)
+      case _ => return  Message.returnMassage("function","1","Not found",""->"")
+    }
+  }
+
   def searh(q: List[String]): JValue = {
     var pageIndex: Int = 1
     var pageSize: Int = 5

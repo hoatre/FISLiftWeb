@@ -59,7 +59,14 @@ object Role extends Role with MongoMetaRecord[Role] {
 
   override def mongoIdentifier = UsersDb
 
+  def getbyid(q:String):JValue ={
+    val f = Role.find("_id" -> q)
 
+    f match {
+      case Full(s) => return  Message.returnMassage("role","0","success",s.asJValue)
+      case _ => return  Message.returnMassage("role","1","Not found",""->"")
+    }
+  }
   def searh(q: List[String]): JValue = {
     var pageIndex: Int = 1
     var pageSize: Int = 5

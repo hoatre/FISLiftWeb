@@ -1,7 +1,8 @@
 package code.rest.oauth2
 
 import code.model.oauth2.Group
-import net.liftweb.http.{OkResponse, LiftRules}
+import net.liftweb.common.Full
+import net.liftweb.http.{JsonResponse, S, OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 
 /**
@@ -18,6 +19,14 @@ object GroupAPI extends  RestHelper{
     case "group" ::"insert":: Nil Options _ => OkResponse()
     case "group" ::"update":: Nil Options _ => OkResponse()
     case "group" ::"delete":: Nil Options _ => OkResponse()
+    case "group" :: "id" :: q :: Nil Options _ => OkResponse()
+
+    case "group" :: "id" :: q :: Nil JsonGet req => {
+      S.respondAsync {
+        val s = Group.getbyid(q)
+        Full(JsonResponse(s))
+      }
+    }
     case "group" :: "search" :: q Post req => Group.searh(q)
     case "group" :: "insert" :: Nil JsonPost json -> request => Group.insert(json)
     case "group" :: "update" :: Nil JsonPost json -> request => Group.update(json)

@@ -119,6 +119,14 @@ object User extends User with MongoMetaRecord[User] {
 
   }
 
+  def getbyid(q:String):JValue ={
+    val f = User.find("_id" -> q)
+
+    f match {
+      case Full(s) => return  Message.returnMassage("user","0","success",s.asJValue)
+      case _ => return  Message.returnMassage("user","1","Not found",""->"")
+    }
+  }
 
   def searh(q:List[String]) : JValue= {
     println(S.uri)

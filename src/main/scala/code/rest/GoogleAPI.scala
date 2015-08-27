@@ -89,7 +89,7 @@ val entity = EntityUtils.toString(response.getEntity)
       val header : Map[String,String] = Map(("Conttent-Type" -> "application/x-www-form-urlencoded"))
       val namevalu : Map[String,String]= Map(("id_token" -> id_token))
 
-      val resp = Utils.http(urlid_token,"post",header,null,namevalu)
+      val resp = Utils.httppost(urlid_token,"post",header,null,namevalu)
 
       val enttt = EntityUtils.toString(resp.getEntity)
 

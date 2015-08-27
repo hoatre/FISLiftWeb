@@ -3,7 +3,8 @@ package code.rest.oauth2
 import code.common.Message
 import code.rest.oauth2.GroupAPI._
 import net.liftweb.common.CombinableBox.Result
-import net.liftweb.http.{Req, OkResponse, LiftRules}
+import net.liftweb.common.Full
+import net.liftweb.http._
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.JValue
 import code.model.oauth2.{Group, User, MyDataHandler}
@@ -24,6 +25,14 @@ object UserAPI extends  RestHelper{
     case "user" ::"insert":: Nil Options _ => OkResponse()
     case "user" ::"update":: Nil Options _ => OkResponse()
     case "user" ::"delete":: Nil Options _ => OkResponse()
+    case "user" :: "id" :: q :: Nil Options _ => OkResponse()
+
+    case "user" :: "id" :: q :: Nil JsonGet req => {
+      S.respondAsync {
+        val s = User.getbyid(q)
+        Full(JsonResponse(s))
+      }
+    }
     case "user" :: "search" :: q Post req => User.searh(q)
     case "user" :: "insert" :: Nil JsonPost json -> request => User.insert(json)
     case "user" :: "update" :: Nil JsonPost json -> request => User.update(json)

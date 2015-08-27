@@ -11,7 +11,7 @@ import net.liftweb.json.JsonAST.JValue
 import net.liftweb.util.Props
 import org.apache.http.NameValuePair
 import org.apache.http.client.entity.UrlEncodedFormEntity
-import org.apache.http.client.methods.{CloseableHttpResponse, HttpPost}
+import org.apache.http.client.methods.{HttpGet, CloseableHttpResponse, HttpPost}
 import org.apache.http.impl.client.DefaultHttpClient
 import org.apache.http.message.BasicNameValuePair
 import authentikat.jwt._
@@ -45,7 +45,7 @@ object Utils {
     val url = "http://api.hostip.info/get_json.php?ip=12.215.42.19"
   }
 
-  def http(url: String, method_name: String, header: Map[String, String], param: Map[String, String], namevaluepair: Map[String, String]): CloseableHttpResponse = {
+  def httppost(url: String, method_name: String, header: Map[String, String], param: Map[String, String], namevaluepair: Map[String, String]): CloseableHttpResponse = {
 
     val client = new DefaultHttpClient
     val post = new HttpPost(url)
@@ -78,6 +78,45 @@ object Utils {
       // send the post request
 
       client.execute(post)
+    }
+    finally {
+      client.close()
+    }
+
+  }
+  def httpget(url: String, method_name: String, header: Map[String, String], param: Map[String, String]): CloseableHttpResponse = {
+
+    val client = new DefaultHttpClient
+    val get = new HttpGet(url)
+    //    val post = if (url_type.toLowerCase.equals("post")) new HttpPost(url) else if (url_type.toLowerCase.equals("get")) new HttpPost(url)
+    try {
+
+      if (header != null && header.size > 0) {
+        for ((key, value) <- header) {
+          get.addHeader(key.toString, value.toString)
+        }
+      }
+
+
+      if (param != null && param.size > 0) {
+        val params = client.getParams
+        for ((key, value) <- param) {
+          params.setParameter(key.toString, value.toString)
+        }
+        client.setParams(params)
+      }
+
+
+//      if (namevaluepair != null && namevaluepair.size > 0) {
+//        val nameValuePairs = new util.ArrayList[NameValuePair](1)
+//        for ((key, value) <- namevaluepair) {
+//          nameValuePairs.add(new BasicNameValuePair(key.toString, value.toString))
+//        }
+//        get.setEntity(new UrlEncodedFormEntity(nameValuePairs))
+//      }
+      // send the post request
+
+      client.execute(get)
     }
     finally {
       client.close()
