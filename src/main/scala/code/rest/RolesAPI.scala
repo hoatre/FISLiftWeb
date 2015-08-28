@@ -3,6 +3,7 @@ package code.rest
 import java.util.UUID
 
 import code.model._
+import code.model.oauth2.Functions
 import com.mongodb.QueryBuilder
 import net.liftweb.http.LiftRules
 import net.liftweb.http.rest.RestHelper

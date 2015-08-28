@@ -12,6 +12,11 @@ object FunctionAPI extends  RestHelper{
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(FunctionAPI)
+    Functions.insertBoot("/function/search")
+    Functions.insertBoot("/function/insert")
+    Functions.insertBoot("/function/update")
+    Functions.insertBoot("/function/delete")
+    Functions.insertBoot("/function/id")
   }
 
   serve{

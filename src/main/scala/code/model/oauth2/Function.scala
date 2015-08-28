@@ -241,4 +241,12 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
     Functions.delete(("_id" -> q))
     Message.returnMassage("deleteFunction", "0", "Success", ("" -> ""))
   }
+  def insertBoot(api:String):Unit={
+    val f = Functions.findAll("name" -> api)
+    if(f.size == 0){
+      Functions.createRecord.id(UUID.randomUUID().toString).created_by("system").modified_by("system").app_id("").created_date(System.currentTimeMillis()).description("").modified_date(System.currentTimeMillis()).name(api)
+        .note("").parent_id("").status("1").save(true)
+    }
+
+  }
 }

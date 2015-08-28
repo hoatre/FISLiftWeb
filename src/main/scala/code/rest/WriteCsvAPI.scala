@@ -1,5 +1,6 @@
 package code.rest
 
+import code.model.oauth2.Functions
 import code.rest.ValidateAPI._
 import net.liftweb.common.Full
 import net.liftweb.http
@@ -42,6 +43,10 @@ object csvAPI extends RestHelper {
 
     //    LiftRules.dispatch.append(MyRest) // stateful — associated with a servlet container session
     //    LiftRules.statelessDispatchTable.append(MyRest) // stateless — no session created
+
+    Functions.insertBoot("/csv/download")
+    Functions.insertBoot("/csv/upload")
+    Functions.insertBoot("/csv/read")
   }
 
 

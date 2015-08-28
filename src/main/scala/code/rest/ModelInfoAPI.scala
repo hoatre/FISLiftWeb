@@ -8,6 +8,7 @@ import java.util.UUID
 
 import code.common.Message
 import code.model._
+import code.model.oauth2.Functions
 import com.mongodb.{BasicDBObject, QueryBuilder}
 import net.liftweb.common.Full
 import net.liftweb.http.rest.RestHelper
@@ -24,6 +25,83 @@ object ModelInfoAPI extends RestHelper {
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(ModelInfoAPI)
+
+    Functions.insertBoot("/modelinfo/search")
+    Functions.insertBoot("/modelinfo/factor")
+    Functions.insertBoot("/modelinfo/getall")
+    Functions.insertBoot("/modelinfo/getbymodelinfoid")
+    Functions.insertBoot("/modelinfo/getbymodelinfostatus")
+    Functions.insertBoot("/modelinfo/getbyfactoroptionid")
+    Functions.insertBoot("/modelinfo/update")
+    Functions.insertBoot("/modelinfo/delete")
+    Functions.insertBoot("/modelinfo/insert")
+    Functions.insertBoot("/modelinfo/view")
+    Functions.insertBoot("/modelinfo/range")
+    Functions.insertBoot("/modelinfo/rangeandupdate")
+    Functions.insertBoot("/modelinfo/copymodel")
+    Functions.insertBoot("/modelinfo/delall")
+
+  }
+  serve {
+
+    case "modelinfo" :: "search"  :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "search" :: q JsonGet req => search(q)
+
+    case "modelinfo" :: "factor"::q  :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "factor" :: q :: Nil JsonGet req => getmodelfactor(q): JValue
+
+    case "modelinfo" :: "getall" :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "getall" :: Nil JsonGet req => getModelInfoJSON(): JValue
+
+    case "modelinfo" :: "getbymodelinfoid" :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "getbymodelinfoid" :: Nil JsonPost json -> request =>
+      for {JString(id) <- (json \\ "_id").toOpt} yield getModelInfoByIdJSON(id): JValue
+
+    case "modelinfo" :: "getbymodelinfostatus" :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "getbymodelinfostatus" :: Nil JsonPost json -> request =>
+      for {JString(status) <- (json \\ "status").toOpt} yield getModelInfoByStatusJSON(status): JValue
+
+    //    case "modelinfo" :: "getbymodelinfoid" ::q:: Nil JsonGet req => getModelInfoByIdJSON(q) : JValue
+
+    case "modelinfo" :: "update" :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "update" :: Nil JsonPost json -> request => updateModelInfo(json)
+
+    case "modelinfo" :: "delete" :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "delete" :: Nil JsonPost json -> request =>
+      for {JString(id) <- (json \\ "_id").toOpt} yield deleteModelInfo(id)
+
+    //    case "modelinfo" :: "delete" :: id :: Nil JsonDelete req => deleteModelInfo(id)
+
+    case "modelinfo" :: "insert" :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "insert" :: Nil JsonPost json -> request => insertModelInfo(json)
+
+    case "modelinfo" :: "view" :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "view" :: Nil JsonPost json -> request =>
+      for {JString(id) <- (json \\ "_id").toOpt} yield viewModelInfo(id)
+
+    case "modelinfo" :: "range" :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "range" :: Nil JsonPost json -> request =>
+      for {JString(id) <- (json \\ "_id").toOpt} yield range(id)
+
+    case "modelinfo" :: "rangeandupdate" :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "rangeandupdate" :: Nil JsonPost json -> request =>
+      for {JString(id) <- (json \\ "_id").toOpt} yield rangeAndUpdate(id)
+
+    case "modelinfo" :: "copymodel" :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "copymodel" :: Nil JsonPost json -> request =>  {
+      S.respondAsync {
+        val s =  coppyModel(json)
+        Full(JsonResponse(s))
+      }
+    }
+    case "modelinfo" :: "delall"  :: Nil Options _ => OkResponse()
+    case "modelinfo" :: "delall" :: Nil JsonPost json -> request =>  {
+      S.respondAsync {
+        val s =  dellallmodel(json)
+        Full(JsonResponse(s))
+      }
+    }
+
   }
 
   def getModelInfoJSON(): JValue = {
@@ -402,66 +480,6 @@ return Message.returnMassage("copymodel","0","Success",modelinfonew.asJValue)
     }
   }
 
-      serve {
 
-        case "modelinfo" :: "search"  :: Nil Options _ => OkResponse()
-    case "modelinfo" :: "search" :: q JsonGet req => search(q)
-
-        case "modelinfo" :: "factor"::q  :: Nil Options _ => OkResponse()
-    case "modelinfo" :: "factor" :: q :: Nil JsonGet req => getmodelfactor(q): JValue
-
-        case "modelinfo" :: "getall" :: Nil Options _ => OkResponse()
-    case "modelinfo" :: "getall" :: Nil JsonGet req => getModelInfoJSON(): JValue
-
-    case "modelinfo" :: "getbymodelinfoid" :: Nil Options _ => OkResponse()
-    case "modelinfo" :: "getbymodelinfoid" :: Nil JsonPost json -> request =>
-      for {JString(id) <- (json \\ "_id").toOpt} yield getModelInfoByIdJSON(id): JValue
-
-    case "modelinfo" :: "getbymodelinfostatus" :: Nil Options _ => OkResponse()
-    case "modelinfo" :: "getbymodelinfostatus" :: Nil JsonPost json -> request =>
-      for {JString(status) <- (json \\ "status").toOpt} yield getModelInfoByStatusJSON(status): JValue
-
-    //    case "modelinfo" :: "getbymodelinfoid" ::q:: Nil JsonGet req => getModelInfoByIdJSON(q) : JValue
-
-    case "modelinfo" :: "update" :: Nil Options _ => OkResponse()
-    case "modelinfo" :: "update" :: Nil JsonPost json -> request => updateModelInfo(json)
-
-    case "modelinfo" :: "delete" :: Nil Options _ => OkResponse()
-    case "modelinfo" :: "delete" :: Nil JsonPost json -> request =>
-      for {JString(id) <- (json \\ "_id").toOpt} yield deleteModelInfo(id)
-
-    //    case "modelinfo" :: "delete" :: id :: Nil JsonDelete req => deleteModelInfo(id)
-
-    case "modelinfo" :: "insert" :: Nil Options _ => OkResponse()
-    case "modelinfo" :: "insert" :: Nil JsonPost json -> request => insertModelInfo(json)
-
-    case "modelinfo" :: "view" :: Nil Options _ => OkResponse()
-    case "modelinfo" :: "view" :: Nil JsonPost json -> request =>
-      for {JString(id) <- (json \\ "_id").toOpt} yield viewModelInfo(id)
-
-    case "modelinfo" :: "range" :: Nil Options _ => OkResponse()
-    case "modelinfo" :: "range" :: Nil JsonPost json -> request =>
-      for {JString(id) <- (json \\ "_id").toOpt} yield range(id)
-
-    case "modelinfo" :: "rangeandupdate" :: Nil Options _ => OkResponse()
-    case "modelinfo" :: "rangeandupdate" :: Nil JsonPost json -> request =>
-      for {JString(id) <- (json \\ "_id").toOpt} yield rangeAndUpdate(id)
-
-    case "modelinfo" :: "copymodel" :: Nil Options _ => OkResponse()
-     case "modelinfo" :: "copymodel" :: Nil JsonPost json -> request =>  {
-       S.respondAsync {
-         val s =  coppyModel(json)
-         Full(JsonResponse(s))
-       }
-     }
-    case "modelinfo" :: "delall"  :: Nil Options _ => OkResponse()
-    case "modelinfo" :: "delall" :: Nil JsonPost json -> request =>  {
-      S.respondAsync {
-        val s =  dellallmodel(json)
-        Full(JsonResponse(s))
-      }
-    }
-
-  }
 
 }

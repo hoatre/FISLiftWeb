@@ -7,7 +7,7 @@ import net.liftweb.common.Full
 import net.liftweb.http._
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.JValue
-import code.model.oauth2.{Group, User, MyDataHandler}
+import code.model.oauth2.{Functions, Group, User, MyDataHandler}
 
 import scalaoauth2.provider.{ProtectedResource, AuthInfo, DataHandler}
 
@@ -18,6 +18,11 @@ object UserAPI extends  RestHelper{
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(UserAPI)
+    Functions.insertBoot("/user/search")
+    Functions.insertBoot("/user/insert")
+    Functions.insertBoot("/user/update")
+    Functions.insertBoot("/user/delete")
+    Functions.insertBoot("/user/id")
   }
 
   serve{
@@ -33,10 +38,30 @@ object UserAPI extends  RestHelper{
         Full(JsonResponse(s))
       }
     }
-    case "user" :: "search" :: q Post req => User.searh(q)
-    case "user" :: "insert" :: Nil JsonPost json -> request => User.insert(json)
-    case "user" :: "update" :: Nil JsonPost json -> request => User.update(json)
-    case "user" :: "delete" :: q :: Nil JsonDelete req => User.delete(q)
+    case "user" :: "search" :: q Post req => {
+      S.respondAsync {
+        val s = User.searh(q)
+        Full(JsonResponse(s))
+      }
+    }
+    case "user" :: "insert" :: Nil JsonPost json -> request => {
+      S.respondAsync {
+        val s = User.insert(json)
+        Full(JsonResponse(s))
+      }
+    }
+    case "user" :: "update" :: Nil JsonPost json -> request => {
+      S.respondAsync {
+        val s = User.update(json)
+        Full(JsonResponse(s))
+      }
+    }
+    case "user" :: "delete" :: q :: Nil JsonDelete req => {
+      S.respondAsync {
+        val s = User.delete(q)
+        Full(JsonResponse(s))
+      }
+    }
 
   }
 

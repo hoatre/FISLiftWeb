@@ -3,6 +3,7 @@ package code.rest
 import java.util.UUID
 
 import code.common.{Message}
+import code.model.oauth2.Functions
 import net.liftweb.common.Full
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
@@ -18,6 +19,14 @@ import org.bson.types.ObjectId
 object ActiveTableAPI extends RestHelper{
   def init(): Unit = {
     LiftRules.statelessDispatch.append(ActiveTableAPI)
+    Functions.insertBoot("/activetable")
+  }
+  serve{
+    case "activetable" :: Nil JsonGet req => getall()
+    case "activetable" :: Nil Options _ => OkResponse()
+
+    case "activetable" :: Nil JsonPost json -> request => update(json)
+
   }
 
   def update(q:JValue):JValue={
@@ -54,14 +63,7 @@ object ActiveTableAPI extends RestHelper{
 
    return Message.returnMassage("activetable","0","Success",dbnew(0).asJValue)
   }
-  serve{
-    case "activetable" :: Nil JsonGet req => getall()
 
-    case "activetable" :: Nil Options _ => OkResponse()
-
-    case "activetable" :: Nil JsonPost json -> request => update(json)
-
-  }
 
 
 }

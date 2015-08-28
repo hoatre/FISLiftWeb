@@ -6,8 +6,9 @@ package code.rest
 
 import java.util.UUID
 import code.model._
+import code.model.oauth2.Functions
 import com.mongodb.QueryBuilder
-import net.liftweb.http.LiftRules
+import net.liftweb.http.{OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST._
 import net.liftweb.mongodb.BsonDSL._
@@ -18,6 +19,52 @@ object ModulesAPI extends RestHelper {
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(ModulesAPI)
+    Functions.insertBoot("/module/getall")
+    Functions.insertBoot("/module/getbyroleid")
+    Functions.insertBoot("/module/update")
+    Functions.insertBoot("/module/delete")
+    Functions.insertBoot("/module/insert")
+  }
+  serve {
+    case "module" :: "getall" :: Nil Options _ => OkResponse()
+    case "module" :: "getall"  :: Nil JsonGet req => getModuleJSON() : JValue
+
+    case "module" :: "getbyroleid" :: Nil Options _ => OkResponse()
+    case "module" :: "getbyroleid" :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "id").toOpt} yield getModuleByIdJSON(id) : JValue
+
+    case "module" :: "update" :: Nil Options _ => OkResponse()
+    case "module" :: "update" :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "id").toOpt
+          JString(status) <- (json \\ "status").toOpt
+          JString(displayforguess) <- (json \\ "displayforguess").toOpt
+          JString(note) <- (json \\ "note").toOpt
+          JString(parentname) <- (json \\ "parentname").toOpt
+          JString(parent) <- (json \\ "parent").toOpt
+          JString(icon) <- (json \\ "icon").toOpt
+          JString(link) <- (json \\ "link").toOpt
+          JString(modulename) <- (json \\ "modulename").toOpt
+      } yield updateModule(id, status, displayforguess, note, parentname
+        , parent, icon, link, modulename)
+
+    case "module" :: "delete" :: Nil Options _ => OkResponse()
+    case "module" :: "delete" :: Nil JsonPost json -> request =>
+      for{JString(id) <- (json \\ "id").toOpt} yield deleteModule(id)
+
+    //    case "module" :: "delete" :: id :: Nil JsonDelete req => deleteModule(id)
+
+    case "module" :: "insert" :: Nil Options _ => OkResponse()
+    case "module" :: "insert" :: Nil JsonPost json -> request =>
+      for{JString(status) <- (json \\ "status").toOpt
+          JString(displayforguess) <- (json \\ "displayforguess").toOpt
+          JString(note) <- (json \\ "note").toOpt
+          JString(parentname) <- (json \\ "parentname").toOpt
+          JString(parent) <- (json \\ "parent").toOpt
+          JString(icon) <- (json \\ "icon").toOpt
+          JString(link) <- (json \\ "link").toOpt
+          JString(modulename) <- (json \\ "modulename").toOpt
+      } yield insertModule(status, displayforguess, note, parentname
+        , parent, icon, link, modulename)
   }
 
   def getModuleJSON(): JValue = {
@@ -85,46 +132,7 @@ object ModulesAPI extends RestHelper {
   }
 
 
-  serve {
-    case "module" :: "getall"  :: Nil JsonGet req => getModuleJSON() : JValue
 
-    case "module" :: "getbyroleid" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "module" :: "getbyroleid" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield getModuleByIdJSON(id) : JValue
-
-    case "module" :: "update" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "module" :: "update" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt
-          JString(status) <- (json \\ "status").toOpt
-          JString(displayforguess) <- (json \\ "displayforguess").toOpt
-          JString(note) <- (json \\ "note").toOpt
-          JString(parentname) <- (json \\ "parentname").toOpt
-          JString(parent) <- (json \\ "parent").toOpt
-          JString(icon) <- (json \\ "icon").toOpt
-          JString(link) <- (json \\ "link").toOpt
-          JString(modulename) <- (json \\ "modulename").toOpt
-      } yield updateModule(id, status, displayforguess, note, parentname
-                            , parent, icon, link, modulename)
-
-    case "module" :: "delete" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "module" :: "delete" :: Nil JsonPost json -> request =>
-      for{JString(id) <- (json \\ "id").toOpt} yield deleteModule(id)
-
-//    case "module" :: "delete" :: id :: Nil JsonDelete req => deleteModule(id)
-
-    case "module" :: "insert" :: Nil Options _ => {"OK" -> "200"} :JValue
-    case "module" :: "insert" :: Nil JsonPost json -> request =>
-      for{JString(status) <- (json \\ "status").toOpt
-          JString(displayforguess) <- (json \\ "displayforguess").toOpt
-          JString(note) <- (json \\ "note").toOpt
-          JString(parentname) <- (json \\ "parentname").toOpt
-          JString(parent) <- (json \\ "parent").toOpt
-          JString(icon) <- (json \\ "icon").toOpt
-          JString(link) <- (json \\ "link").toOpt
-          JString(modulename) <- (json \\ "modulename").toOpt
-      } yield insertModule(status, displayforguess, note, parentname
-                            , parent, icon, link, modulename)
-  }
 
 }
 

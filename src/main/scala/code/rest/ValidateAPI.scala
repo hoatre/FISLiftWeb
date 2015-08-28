@@ -6,6 +6,7 @@ package code.rest
 import java.util.UUID
 
 import code.common.Message
+import code.model.oauth2.Functions
 import net.liftweb.http.{OkResponse, LiftRules, S}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json._
@@ -39,6 +40,9 @@ object ValidateAPI extends RestHelper {
 
     //    LiftRules.dispatch.append(MyRest) // stateful — associated with a servlet container session
     //    LiftRules.statelessDispatchTable.append(MyRest) // stateless — no session created
+
+    Functions.insertBoot("/validate/checkweightrate")
+
   }
 
 

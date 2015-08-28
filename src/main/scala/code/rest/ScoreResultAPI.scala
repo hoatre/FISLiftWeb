@@ -5,6 +5,7 @@ import java.util.concurrent.{Callable, ExecutorService, Executors, FutureTask}
 
 import code.common.{Utils, Message}
 import code.model._
+import code.model.oauth2.Functions
 import com.mongodb.{BasicDBObject, DBObject, QueryBuilder}
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
 import net.liftweb.common.Full
@@ -31,6 +32,12 @@ object ScoreResultAPI extends RestHelper{
 
     //    LiftRules.dispatch.append(MyRest) // stateful — associated with a servlet container session
     //    LiftRules.statelessDispatchTable.append(MyRest) // stateless — no session created
+
+    Functions.insertBoot("/scoreresult/customer")
+    Functions.insertBoot("/scoreresult/result")
+    Functions.insertBoot("/scoreresult/delete")
+    Functions.insertBoot("/scoreresult/getmodelid")
+    Functions.insertBoot("/scoreresult")
   }
 
 

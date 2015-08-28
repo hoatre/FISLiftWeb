@@ -1,7 +1,7 @@
 package code.api
 
 import com.redis.RedisClient
-import net.liftweb.http.LiftRules
+import net.liftweb.http.{OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json._
 import net.liftweb.mongodb.BsonDSL._
@@ -18,6 +18,18 @@ object SparkAPI extends RestHelper {
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(SparkAPI)
+  }
+
+  serve {
+
+    case "spark" :: "percentoptionoffactor" :: Nil Options _ => OkResponse()
+    case "spark" :: "percentoptionoffactor" :: Nil JsonPost json -> request => PercentOptionOfFactor(json)
+
+    case "spark" :: "scoringrange" :: Nil Options _ => OkResponse()
+    case "spark" :: "scoringrange" :: Nil JsonPost json -> request => ScoringRange(json)
+
+    case "spark" :: "topbot" :: Nil Options _ => OkResponse()
+    case "spark" :: "topbot" :: Nil JsonPost json -> request => TopBot(json)
   }
 
   def PercentOptionOfFactor(q: JValue) : JValue={
@@ -115,21 +127,5 @@ object SparkAPI extends RestHelper {
       return code.common.Message.returnMassage("ScoringRange", "3", mess, null)
   }
 
-  serve {
 
-    case "spark" :: "percentoptionoffactor" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
-    case "spark" :: "percentoptionoffactor" :: Nil JsonPost json -> request => PercentOptionOfFactor(json)
-
-    case "spark" :: "scoringrange" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
-    case "spark" :: "scoringrange" :: Nil JsonPost json -> request => ScoringRange(json)
-
-    case "spark" :: "topbot" :: Nil Options _ => {
-      "OK" -> "200"
-    }: JValue
-    case "spark" :: "topbot" :: Nil JsonPost json -> request => TopBot(json)
-  }
 }
