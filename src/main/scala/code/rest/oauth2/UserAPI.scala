@@ -29,7 +29,7 @@ object UserAPI extends  RestHelper{
     case "user" ::"search":: Nil  Options _ => OkResponse()
     case "user" ::"insert":: Nil Options _ => OkResponse()
     case "user" ::"update":: Nil Options _ => OkResponse()
-    case "user" ::"delete":: Nil Options _ => OkResponse()
+    case "user" ::"delete":: q ::  Nil Options _ => OkResponse()
     case "user" :: "id" :: q :: Nil Options _ => OkResponse()
 
     case "user" :: "id" :: q :: Nil JsonGet req => {

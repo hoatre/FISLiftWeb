@@ -151,9 +151,9 @@ object Applications {
     var id = ""
 
     //    val bu = QueryBuilder.start("_id").is("55cc53aae4b0fb6acad9a144").get
-    val avc = AppModel.findAll("_id" -> "a468451b-5faf-4c14-b389-bc1898dcaa87")
+//    val avc = AppModel.findAll("_id" -> "a468451b-5faf-4c14-b389-bc1898dcaa87")
 
-    println(avc.size)
+//    println(avc.size)
     for ((key, value) <- jsonmap) {
       if (key.toString.equals("id")) {
         id = value.toString

@@ -24,7 +24,7 @@ object RoleAPI extends  RestHelper{
     case "role" ::"search":: Nil  Options _ => OkResponse()
     case "role" ::"insert":: Nil Options _ => OkResponse()
     case "role" ::"update":: Nil Options _ => OkResponse()
-    case "role" ::"delete":: Nil Options _ => OkResponse()
+    case "role" ::"delete":: q ::  Nil Options _ => OkResponse()
     case "role" :: "id" :: q :: Nil Options _ => OkResponse()
 
     case "role" :: "id" :: q :: Nil JsonGet req => {

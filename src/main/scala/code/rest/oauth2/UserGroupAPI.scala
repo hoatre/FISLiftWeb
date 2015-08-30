@@ -21,7 +21,7 @@ object UserGroupAPI extends  RestHelper{
     case "usergroup" ::"search":: Nil  Options _ => OkResponse()
     case "usergroup" ::"insert":: Nil Options _ => OkResponse()
     case "usergroup" ::"update":: Nil Options _ => OkResponse()
-    case "usergroup" ::"delete":: Nil Options _ => OkResponse()
+    case "usergroup" ::"delete":: q ::  Nil Options _ => OkResponse()
     case "usergroup" :: "search" :: q Post req => UserGroup.searh(q)
     case "usergroup" :: "insert" :: Nil JsonPost json -> request => UserGroup.insert(json)
     case "usergroup" :: "update" :: Nil JsonPost json -> request => OkResponse()

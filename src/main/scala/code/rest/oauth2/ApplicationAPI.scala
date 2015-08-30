@@ -49,7 +49,7 @@ object ApplicationAPI extends RestHelper {
     case "application" :: "search" :: Nil Options _ => OkResponse()
     case "application" :: "insert" :: Nil Options _ => OkResponse()
     case "application" :: "update" :: Nil Options _ => OkResponse()
-    case "application" :: "delete" :: Nil Options _ => OkResponse()
+    case "application" :: "delete":: q :: Nil Options _ => OkResponse()
     case "application" :: "id" :: q :: Nil Options _ => OkResponse()
 
     case "application" :: "id" :: q :: Nil JsonGet req => {

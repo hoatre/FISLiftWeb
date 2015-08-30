@@ -23,7 +23,7 @@ object FunctionAPI extends  RestHelper{
     case "function" ::"search":: Nil  Options _ => OkResponse()
     case "function" ::"insert":: Nil Options _ => OkResponse()
     case "function" ::"update":: Nil Options _ => OkResponse()
-    case "function" ::"delete":: Nil Options _ => OkResponse()
+    case "function" ::"delete":: q :: Nil Options _ => OkResponse()
     case "function" :: "id" :: q :: Nil Options _ => OkResponse()
 
     case "function" :: "id" :: q :: Nil JsonGet req => {

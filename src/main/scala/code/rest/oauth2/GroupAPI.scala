@@ -23,7 +23,7 @@ object GroupAPI extends  RestHelper{
     case "group" ::"search":: Nil  Options _ => OkResponse()
     case "group" ::"insert":: Nil Options _ => OkResponse()
     case "group" ::"update":: Nil Options _ => OkResponse()
-    case "group" ::"delete":: Nil Options _ => OkResponse()
+    case "group" ::"delete":: q :: Nil Options _ => OkResponse()
     case "group" :: "id" :: q :: Nil Options _ => OkResponse()
 
     case "group" :: "id" :: q :: Nil JsonGet req => {

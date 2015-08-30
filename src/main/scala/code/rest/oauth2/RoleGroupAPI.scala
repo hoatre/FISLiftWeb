@@ -21,7 +21,7 @@ object RoleGroupAPI extends  RestHelper{
     case "rolegroup" ::"search":: Nil  Options _ => OkResponse()
     case "rolegroup" ::"insert":: Nil Options _ => OkResponse()
     case "rolegroup" ::"update":: Nil Options _ => OkResponse()
-    case "rolegroup" ::"delete":: Nil Options _ => OkResponse()
+    case "rolegroup" ::"delete":: q ::  Nil Options _ => OkResponse()
     case "rolegroup" :: "search" :: q Post req => RoleGroup.searh(q)
     case "rolegroup" :: "insert" :: Nil JsonPost json -> request => RoleGroup.insert(json)
     case "rolegroup" :: "update" :: Nil JsonPost json -> request => OkResponse()
