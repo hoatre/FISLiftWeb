@@ -179,7 +179,7 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
   }
 
   def update(q: JValue): JValue = {
-    val jsonmap: Map[String, String] = q.values.asInstanceOf[Map[String, String]]
+    val jsonmap: Map[String, Any] = q.values.asInstanceOf[Map[String, Any]]
     var qry1: Map[String, String] = Map()
     var modified_date = System.currentTimeMillis() / 1000
     var id = ""
@@ -194,27 +194,27 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
 
       }
       else if (key.toString.equals("name")) {
-        if (value.isEmpty || value == "") {
+        if (value.toString.isEmpty || value == "") {
           return Message.returnMassage("updateFunction", "1", "Name must be exist", ("" -> ""))
         }
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if (key.toString.equals("description")) {
 
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if (key.toString.equals("status")) {
 
-        if (value.isEmpty || value == "") {
+        if (value.toString.isEmpty || value == "") {
           return Message.returnMassage("updateFunction", "2", "Status must be exist", ("" -> ""))
         }
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if (key.toString.equals("note")) {
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if (key.toString.equals("modified_by")) {
-        qry1 += key -> value
+        qry1 += key -> value.toString
       }else if (key.toString.equals("app_id")) {
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if (key.toString.equals("parent_id")) {
-        qry1 += key -> value
+        qry1 += key -> value.toString
       }
 
 

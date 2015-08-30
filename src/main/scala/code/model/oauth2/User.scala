@@ -253,7 +253,7 @@ object User extends User with MongoMetaRecord[User] {
 
   }
   def update(q: JValue): JValue = {
-    val jsonmap: Map[String, String] = q.values.asInstanceOf[Map[String, String]]
+    val jsonmap: Map[String, Any] = q.values.asInstanceOf[Map[String, Any]]
     var qry1: Map[String, String] = Map()
     var modified_date = System.currentTimeMillis() / 1000
     var id = ""
@@ -263,39 +263,39 @@ object User extends User with MongoMetaRecord[User] {
         id = value.toString
 
       }else if(key.toString.equals("username")){
-        if(value.isEmpty || value == "" ){
+        if(value.toString.isEmpty || value == "" ){
           return Message.returnMassage("insertuser","1","Username must be exist",("" -> ""))
         }
         qry1 += key -> value
       }else  if(key.toString.equals("email")){
-        if(value.isEmpty || value == "" ){
+        if(value.toString.isEmpty || value == "" ){
           return Message.returnMassage("insertuser","1","Email must be exist",("" -> ""))
         }
         qry1 += key -> value
       } else if(key.toString.equals("password")){
 
-        if (value.isEmpty || value == "") {
+        if (value.toString.isEmpty || value == "") {
           return Message.returnMassage("updateUser", "3", "Password must be exist", ("" -> ""))
         }
-        qry1 += key -> BCrypt.hashpw(value, BCrypt.gensalt())
+        qry1 += key -> BCrypt.hashpw(value.toString, BCrypt.gensalt())
       } else if(key.toString.equals("imageurl")){
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if(key.toString.equals("picture")){
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if(key.toString.equals("facebookid")){
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if(key.toString.equals("googleid")){
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if(key.toString.equals("displayname")){
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if(key.toString.equals("status")){
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if(key.toString.equals("description")){
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if(key.toString.equals("note")){
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if (key.toString.equals("modified_by")) {
-        qry1 += key -> value
+        qry1 += key -> value.toString
       }
 
 
