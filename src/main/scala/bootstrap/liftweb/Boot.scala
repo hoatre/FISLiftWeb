@@ -4,6 +4,7 @@ import java.net.URI
 
 import code.api.SparkAPI
 import code.common.Utils
+import code.model.oauth2.FirstBoot
 import code.rest._
 import code.rest.oauth2._
 import com.mongodb.{Mongo, ServerAddress}
@@ -80,6 +81,7 @@ class Boot {
     JQueryModule.InitParam.JQuery=JQueryModule.JQuery191
     JQueryModule.init()
 
+    FirstBoot.firstboot()
     // Init RestService
     SparkAPI.init()
 
@@ -134,6 +136,8 @@ class Boot {
 //println(x)
 //
 //    }
+
+    FirstBoot.updateBoot()
   }
 
 
