@@ -1,5 +1,6 @@
 package code.rest.oauth2
 
+import code.common.Utils
 import code.model.oauth2.Applications
 import code.model.oauth2.Functions
 import net.liftweb.common.Full
@@ -64,17 +65,24 @@ object ApplicationAPI extends RestHelper {
         Full(JsonResponse(s))
       }
     }
-    case "application" :: "insert" :: Nil JsonPost json -> request => {
-      S.respondAsync {
-        val s = AppSnip.insert(json)
-        Full(JsonResponse(s))
+    case "application" :: "insert" :: Nil JsonPost json -> request => Utils.checkVailAPI() match {
+
+      case Some(fail) => fail
+      case _ => {
+        S.respondAsync {
+          val s = AppSnip.insert(json)
+          Full(JsonResponse(s))
+        }
       }
     }
-    case "application" :: "update" :: Nil JsonPost json -> request => {
-      S.respondAsync {
+    case "application" :: "update" :: Nil JsonPost json -> request => Utils.checkVailAPI() match {
+
+      case Some(fail) => fail
+     case _ => S.respondAsync {
         val s = AppSnip.update(json)
         Full(JsonResponse(s))
       }
+
     }
     case "application" :: "delete" :: q :: Nil JsonDelete req => {
       S.respondAsync {

@@ -106,7 +106,7 @@ object GroupFunction extends GroupFunction with MongoMetaRecord[GroupFunction] {
     Message.returnMassage("GroupFunction", "0", "Success", db.map(_.asJValue), count)
   }
   def insert(q:JValue) :  JValue= {
-    val jsonmap : Map[String,String] = q.values.asInstanceOf[Map[String,String]]
+    val jsonmap : Map[String,Any] = q.values.asInstanceOf[Map[String,Any]]
     val id = UUID.randomUUID().toString
     var  func_id = ""
     var group_id  = ""
@@ -115,11 +115,11 @@ object GroupFunction extends GroupFunction with MongoMetaRecord[GroupFunction] {
 
     for((key,value) <- jsonmap){
       if(key.toString.equals("func_id")){
-        func_id = value
+        func_id = value.toString
       }else  if(key.toString.equals("group_id")){
-        group_id = value
+        group_id = value.toString
       } else if(key.toString.equals("created_by")){
-        created_by = value
+        created_by = value.toString
       }
 
 

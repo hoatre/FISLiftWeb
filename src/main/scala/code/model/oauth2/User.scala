@@ -62,7 +62,7 @@ class User private () extends MongoRecord[User] with StringPk[User] {
 
 }
 object User extends User with MongoMetaRecord[User] {
-  override def collectionName = "user"
+  override def collectionName = "users"
   override def mongoIdentifier = UsersDb
 
   def get(id: String): Option[User] = {
@@ -71,6 +71,11 @@ object User extends User with MongoMetaRecord[User] {
 //
   def findByUsername(username: String): Option[User] ={
   User.find("username" -> username)
+
+  }
+
+  def findByEmail(email: String): Option[User] ={
+    User.find("email" -> email)
 
   }
 

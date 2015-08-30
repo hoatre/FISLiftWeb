@@ -244,8 +244,8 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
   def insertBoot(api:String):Unit={
     val f = Functions.findAll("name" -> api)
     if(f.size == 0){
-      Functions.createRecord.id(UUID.randomUUID().toString).created_by("system").modified_by("system").app_id("").created_date(System.currentTimeMillis()).description("").modified_date(System.currentTimeMillis()).name(api)
-        .note("").parent_id("").status("1").save(true)
+      Functions.createRecord.id(UUID.randomUUID().toString).created_by("system").modified_by("system").app_id(Props.props.apply("app_id")).created_date(System.currentTimeMillis()).description("").modified_date(System.currentTimeMillis()).name(api)
+        .note("").parent_id("").status("active").save(true)
     }
 
   }

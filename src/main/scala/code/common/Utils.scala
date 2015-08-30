@@ -4,10 +4,10 @@ import java.io.FileInputStream
 import java.lang.{Throwable, Exception}
 import java.util
 
-import net.liftweb.common.Full
-import net.liftweb.http.S
+import net.liftweb.common.{Box, Full}
+import net.liftweb.http._
 import net.liftweb.http.provider.HTTPResponse
-import net.liftweb.json.JsonAST.JValue
+import net.liftweb.json.JsonAST.{JObject, JValue}
 import net.liftweb.util.Props
 import org.apache.http.NameValuePair
 import org.apache.http.client.entity.UrlEncodedFormEntity
@@ -20,6 +20,7 @@ import authentikat.jwt._
 import scala.concurrent.Future
 import scala.io.Source
 import net.liftweb.mongodb.BsonDSL._
+import code.model.oauth2.{User => UserModel, Functions, GroupFunction, Group, UserGroup}
 
 /**
  * Created by bacnv on 31/07/2015.
@@ -141,5 +142,74 @@ object Utils {
         None
     }
     claims
+  }
+
+  def checkAPI(claims: Option[JValue]):Boolean={
+    claims match {
+      case Some(json) => {
+val j = json.asInstanceOf[JObject]
+        if(!j.values.contains("errortype")){
+        val u = UserModel.findByEmail(j.values.apply("sub").toString)
+         u match {
+           case Some(user) => {
+             val uga = UserGroup.findAll("user_id" -> user.id.toString())
+             if (uga.size > 0) {
+               var check = false
+               for (ug <- uga) {
+                 if(check == false){
+                 val g = Group.find("_id" -> ug.group_id.toString())
+                 g match {
+                   case Full(group)=>{
+                     val gfa = GroupFunction.findAll("group_id" -> group.id.toString())
+
+                     if(gfa.size > 0){
+                       for(gf <- gfa){
+                         val fa = Functions.findAll("_id" -> gf.func_id.toString())
+                         if(fa.size > 0){
+                           for(f<-fa){
+                             if(f.name.toString().equals(S.uri)){
+                               check = true
+                             }
+                           }
+                         }
+                       }
+                     }
+                   }
+                   case _ =>
+                 }
+
+                 }
+
+               }
+               check
+             } else
+               {
+                 return false
+               }
+           }
+          case _ => return false
+        }
+        }else{
+          return false
+        }
+
+      }
+      case _ => return false
+    }
+
+  }
+
+  def checkVailAPI():Option[BadResponse]= {
+    try {
+      checkAPI(validateJWT()) match {
+        case false => return Option(BadResponse())
+        case _ => None
+
+      }
+
+    }
+    catch {
+      case _ =>  return Option(BadResponse())
+    }
   }
 }
