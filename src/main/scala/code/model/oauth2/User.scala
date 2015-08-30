@@ -266,12 +266,12 @@ object User extends User with MongoMetaRecord[User] {
         if(value.toString.isEmpty || value == "" ){
           return Message.returnMassage("insertuser","1","Username must be exist",("" -> ""))
         }
-        qry1 += key -> value
+        qry1 += key -> value.toString
       }else  if(key.toString.equals("email")){
         if(value.toString.isEmpty || value == "" ){
           return Message.returnMassage("insertuser","1","Email must be exist",("" -> ""))
         }
-        qry1 += key -> value
+        qry1 += key -> value.toString
       } else if(key.toString.equals("password")){
 
         if (value.toString.isEmpty || value == "") {
