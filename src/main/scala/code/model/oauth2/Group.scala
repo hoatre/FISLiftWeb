@@ -178,7 +178,7 @@ object Group extends Group with MongoMetaRecord[Group] {
     //
     //    println(avc.size)
     for ((key, value) <- jsonmap) {
-      if (key.toString.equals("id")) {
+      if (key.toString.equals("_id")) {
         id = value.toString
 
       }

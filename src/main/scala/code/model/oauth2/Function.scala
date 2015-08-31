@@ -189,7 +189,7 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
 //
 //    println(avc.size)
     for ((key, value) <- jsonmap) {
-      if (key.toString.equals("id")) {
+      if (key.toString.equals("_id")) {
         id = value.toString
 
       }
@@ -249,4 +249,8 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
     }
 
   }
+//  def gettree():JValue={
+//    val fil = Functions.findAll("status" -> "active")
+//
+//  }
 }

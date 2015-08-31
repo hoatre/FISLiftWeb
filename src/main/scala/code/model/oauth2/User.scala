@@ -264,7 +264,7 @@ object User extends User with MongoMetaRecord[User] {
     var id = ""
 
     for ((key, value) <- jsonmap) {
-      if (key.toString.equals("id")) {
+      if (key.toString.equals("_id")) {
         id = value.toString
 
       }else if(key.toString.equals("username")){

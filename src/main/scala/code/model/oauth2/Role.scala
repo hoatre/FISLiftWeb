@@ -168,7 +168,7 @@ object Role extends Role with MongoMetaRecord[Role] {
     //
     //    println(avc.size)
     for ((key, value) <- jsonmap) {
-      if (key.toString.equals("id")) {
+      if (key.toString.equals("_id")) {
         id = value.toString
 
       }
