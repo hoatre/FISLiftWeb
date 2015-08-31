@@ -75,14 +75,20 @@ object ApplicationAPI extends RestHelper {
         }
       }
     }
-    case "application" :: "update" :: Nil JsonPost json -> request => Utils.checkVailAPI() match {
-
-      case Some(fail) => fail
-     case _ => S.respondAsync {
+//    case "application" :: "update" :: Nil JsonPost json -> request => Utils.checkVailAPI() match {
+//
+//      case Some(fail) => fail
+//     case _ => S.respondAsync {
+//        val s = AppSnip.update(json)
+//        Full(JsonResponse(s))
+//      }
+//
+//    }
+    case "application" :: "update" :: Nil JsonPost json -> request => {
+        S.respondAsync {
         val s = AppSnip.update(json)
         Full(JsonResponse(s))
       }
-
     }
     case "application" :: "delete" :: q :: Nil JsonDelete req => {
       S.respondAsync {
