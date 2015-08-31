@@ -53,6 +53,7 @@ class Functions private () extends MongoRecord[Functions] with StringPk[Function
   object created_date extends LongField(this)
   object modified_by extends StringField(this,1024)
   object modified_date extends LongField(this)
+  object ordinal extends LongField(this)
 
 
 }
@@ -80,6 +81,7 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
     var name = ""
     var status = ""
     var orderby = "created_date"
+    var ordertype = -1
     val qry = QueryBuilder.start().get()
     //    var qry1: JObject = ("" -> "")
     var jmap : Map[String,String] = Map()
@@ -103,6 +105,9 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
           app_id = a.toString
         } else if (paramName.toLowerCase.equals("order_by")) {
           orderby = a.toString
+          if(orderby.equals("ordinal")){
+            ordertype = 1
+          }
         }
       }
     }
@@ -123,7 +128,7 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
     }
 
     if (!orderby.isEmpty && orderby != "") {
-      order = (orderby -> -1)
+      order = (orderby -> ordertype)
     }
     val db = Functions.findAll(jmap, order, Skip(pageSize * (pageIndex - 1)), Limit(pageSize))
     val count = Functions.count(qry)
@@ -132,7 +137,7 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
   }
 
   def insert(q: JValue): JValue = {
-    val jsonmap: Map[String, String] = q.values.asInstanceOf[Map[String, String]]
+    val jsonmap: Map[String, Any] = q.values.asInstanceOf[Map[String, Any]]
     val id = UUID.randomUUID().toString
     var parent_id = ""
     var app_id = ""
@@ -144,37 +149,40 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
     var created_date = System.currentTimeMillis() / 1000
     var modified_by = ""
     var modified_date = System.currentTimeMillis() / 1000
+    var ordinal : Long = 100
 
     for ((key, value) <- jsonmap) {
       if (key.toString.equals("name")) {
-        name = value
+        name = value.toString
       } else if (key.toString.equals("description")) {
-        description = value
+        description = value.toString
       } else if (key.toString.equals("status")) {
-        status = value
+        status = value.toString
       } else if (key.toString.equals("note")) {
-        note = value
+        note = value.toString
       } else if (key.toString.equals("created_by")) {
-        created_by = value
+        created_by = value.toString
       }else if (key.toString.equals("parent_id")) {
-        parent_id = value
+        parent_id = value.toString
       } else if (key.toString.equals("app_id")) {
-        app_id = value
+        app_id = value.toString
+      }else if (key.toString.equals("ordinal")) {
+        ordinal = value.toString.toLong
       }
 
 
     }
     if (name.isEmpty || name == "") {
-      return Message.returnMassage("insertFunction", "1", "Name must be exist", ("" -> ""))
+      return Message.returnMassage("function", "1", "Name must be exist", ("" -> ""))
     }
     if (status.isEmpty || status == "") {
-      return Message.returnMassage("insertFunction", "2", "Status must be exist", ("" -> ""))
+      return Message.returnMassage("function", "2", "Status must be exist", ("" -> ""))
     }
 
     val application = Functions.createRecord.id(id).created_by(created_by).created_date(created_date).description(description)
-      .modified_by(created_by).modified_date(modified_date).name(name).note(note).status(status).app_id(app_id).parent_id(parent_id).save(true)
+      .modified_by(created_by).modified_date(modified_date).name(name).note(note).status(status).app_id(app_id).parent_id(parent_id).ordinal(ordinal).save(true)
 
-    Message.returnMassage("insertFunction", "0", "Success", application.asJValue)
+    Message.returnMassage("function", "0", "Success", application.asJValue)
 
   }
 
@@ -195,7 +203,7 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
       }
       else if (key.toString.equals("name")) {
         if (value.toString.isEmpty || value == "") {
-          return Message.returnMassage("updateFunction", "1", "Name must be exist", ("" -> ""))
+          return Message.returnMassage("function", "1", "Name must be exist", ("" -> ""))
         }
         qry1 += key -> value.toString
       } else if (key.toString.equals("description")) {
@@ -204,7 +212,7 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
       } else if (key.toString.equals("status")) {
 
         if (value.toString.isEmpty || value == "") {
-          return Message.returnMassage("updateFunction", "2", "Status must be exist", ("" -> ""))
+          return Message.returnMassage("function", "2", "Status must be exist", ("" -> ""))
         }
         qry1 += key -> value.toString
       } else if (key.toString.equals("note")) {
@@ -215,6 +223,8 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
         qry1 += key -> value.toString
       } else if (key.toString.equals("parent_id")) {
         qry1 += key -> value.toString
+      }else if (key.toString.equals("ordinal")) {
+        qry1 += key -> value.toString
       }
 
 
@@ -222,24 +232,24 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
     qry1 += "modified_date" -> modified_date.toString
 
     if (id.isEmpty || id == "") {
-      return Message.returnMassage("updateFunction", "3", "Id must be exist", ("" -> ""))
+      return Message.returnMassage("function", "3", "Id must be exist", ("" -> ""))
     }
     val count = Functions.findAll("_id" -> id)
     if (count.size == 0) {
-      return Message.returnMassage("updateFunction", "4", "Function not found", ("" -> ""))
+      return Message.returnMassage("function", "4", "Function not found", ("" -> ""))
     }
 
 
     Functions.update(("_id" -> id), ("$set" -> qry1))
     val application = Functions.findAll("_id" -> id)
 
-    Message.returnMassage("updateFunction", "0", "Success", application(0).asJValue)
+    Message.returnMassage("function", "0", "Success", application(0).asJValue)
 
   }
 
   def delete(q: String): JValue = {
     Functions.delete(("_id" -> q))
-    Message.returnMassage("deleteFunction", "0", "Success", ("" -> ""))
+    Message.returnMassage("function", "0", "Success", ("" -> ""))
   }
   def insertBoot(api:String):Unit={
     val f = Functions.findAll("name" -> api)
@@ -250,7 +260,12 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
 
   }
 //  def gettree():JValue={
-//    val fil = Functions.findAll("status" -> "active")
+//    val fi = Functions.findAll("status" -> "active")
+//    if(fi.size >0){
+//      for(f <- fi){
+//
+//      }
+//    }
 //
 //  }
 }

@@ -104,7 +104,7 @@ object Applications {
   }
 
   def insert(q: JValue): JValue = {
-    val jsonmap: Map[String, String] = q.values.asInstanceOf[Map[String, String]]
+    val jsonmap: Map[String, Any] = q.values.asInstanceOf[Map[String, Any]]
     val id = UUID.randomUUID().toString
     var name = ""
     var description = ""
@@ -114,33 +114,36 @@ object Applications {
     var created_date = System.currentTimeMillis()/1000
     var modified_by = ""
     var modified_date = created_date
+    var ordinal :Long = 100
 
     for ((key, value) <- jsonmap) {
       if (key.toString.equals("name")) {
-        name = value
+        name = value.toString
       } else if (key.toString.equals("description")) {
-        description = value
+        description = value.toString
       } else if (key.toString.equals("status")) {
-        status = value
+        status = value.toString
       } else if (key.toString.equals("note")) {
-        note = value
+        note = value.toString
       } else if (key.toString.equals("created_by")) {
-        created_by = value
+        created_by = value.toString
+      } else if(key.toString.equals("ordinal")){
+        ordinal = name.toString.toLong
       }
 
 
     }
     if (name.isEmpty || name == "") {
-      return Message.returnMassage("insertApplication", "1", "Name must be exist", ("" -> ""))
+      return Message.returnMassage("application", "1", "Name must be exist", ("" -> ""))
     }
     if (status.isEmpty || status == "") {
-      return Message.returnMassage("insertApplication", "2", "Status must be exist", ("" -> ""))
+      return Message.returnMassage("application", "2", "Status must be exist", ("" -> ""))
     }
 
     val application = AppModel.createRecord.id(id).created_by(created_by).created_date(created_date).description(description)
-      .modified_by(created_by).modified_date(modified_date).name(name).note(note).status(status).save(true)
+      .modified_by(created_by).modified_date(modified_date).name(name).note(note).status(status).ordinal(ordinal).save(true)
 
-    Message.returnMassage("insertApplication", "0", "Success", application.asJValue)
+    Message.returnMassage("application", "0", "Success", application.asJValue)
 
   }
 
@@ -161,7 +164,7 @@ object Applications {
       }
       else if (key.toString.equals("name")) {
         if (value.toString.isEmpty || value == "") {
-          return Message.returnMassage("updateApplication", "1", "Name must be exist", ("" -> ""))
+          return Message.returnMassage("application", "1", "Name must be exist", ("" -> ""))
         }
         qry1 += key -> value.toString
       } else if (key.toString.equals("description")) {
@@ -170,37 +173,49 @@ object Applications {
       } else if (key.toString.equals("status")) {
 
         if (value.toString.isEmpty || value == "") {
-          return Message.returnMassage("updateApplication", "2", "Status must be exist", ("" -> ""))
+          return Message.returnMassage("application", "2", "Status must be exist", ("" -> ""))
         }
         qry1 += key -> value.toString
       } else if (key.toString.equals("note")) {
         qry1 += key -> value.toString
       } else if (key.toString.equals("modified_by")) {
         qry1 += key -> value.toString
+      } else if (key.toString.equals("ordinal")) {
+        qry1 += key -> value.toString
       }
-
 
     }
     qry1 += "modified_date" -> modified_date.toString
 
     if (id.isEmpty || id == "") {
-      return Message.returnMassage("updateApplication", "3", "Id must be exist", ("" -> ""))
+      return Message.returnMassage("application", "3", "Id must be exist", ("" -> ""))
     }
     val count = AppModel.findAll("_id" -> id)
     if (count.size == 0) {
-      return Message.returnMassage("updateApplication", "4", "Application not found", ("" -> ""))
+      return Message.returnMassage("application", "4", "Application not found", ("" -> ""))
     }
 
     AppModel.update(("_id" -> id), ("$set" -> qry1))
     val application = AppModel.findAll("_id" -> id)
 
-    Message.returnMassage("updateApplication", "0", "Success", application(0).asJValue)
+    Message.returnMassage("application", "0", "Success", application(0).asJValue)
 
   }
 
   def delete(q: String): JValue = {
     AppModel.delete(("_id" -> q))
-    Message.returnMassage("deleteApplication", "0", "Success", ("" -> ""))
+    Message.returnMassage("application", "0", "Success", ("" -> ""))
   }
 
+  def getActive():JValue={
+    val f = AppModel.findAll(("status" -> "active"),("ordinal,name" -> 1))
+    return Message.returnMassage("application","0","Success",f.map(_.asJValue.remove{
+    case JField("created_by", _) =>  true
+    case JField("modified_by", _) =>  true
+    case JField("created_date", _) =>  true
+    case JField("modified_date", _) =>  true
+    case _ => false
+    }))
+
+  }
 }

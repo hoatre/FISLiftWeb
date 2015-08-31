@@ -59,6 +59,7 @@ class User private () extends MongoRecord[User] with StringPk[User] {
   object created_date  extends LongField(this,15)
   object modified_by  extends StringField(this,1024)
   object modified_date  extends LongField(this,15)
+  object  ordinal extends  LongField(this)
 
 }
 object User extends User with MongoMetaRecord[User] {
@@ -198,6 +199,7 @@ object User extends User with MongoMetaRecord[User] {
     var created_date  = System.currentTimeMillis()/1000
     var modified_by  =""
     var modified_date  = System.currentTimeMillis()/1000
+    var ordinal : Long = 100
 
     for((key,value) <- jsonmap){
       if(key.toString.equals("username")){
@@ -224,37 +226,39 @@ object User extends User with MongoMetaRecord[User] {
         note = value.toString
       } else if(key.toString.equals("created_by")){
         created_by = value.toString
+      }else if(key.toString.equals("ordinal")){
+        ordinal = value.toString.toLong
       }
 
 
     }
     if(email.isEmpty || email == "" ){
-      return Message.returnMassage("insertuser","1","Email must be exist",("" -> ""))
+      return Message.returnMassage("user","1","Email must be exist",("" -> ""))
     }else{
       val count = User.count("email" -> email)
       if(count>0){
-        return Message.returnMassage("insertuser","11","Email existed",("" -> ""))
+        return Message.returnMassage("user","11","Email existed",("" -> ""))
       }
     }
     if(password.isEmpty || password == ""){
-      return Message.returnMassage("insertuser","2","Password must be exist",("" -> ""))
+      return Message.returnMassage("user","2","Password must be exist",("" -> ""))
     }else{
       password =  BCrypt.hashpw(password, BCrypt.gensalt())
     }
     if(username.isEmpty || username == ""){
-      return Message.returnMassage("insertuser","3","Username must be exist",("" -> ""))
+      return Message.returnMassage("user","3","Username must be exist",("" -> ""))
     }else{
       val count = User.count("username" -> username)
       if(count>0){
-        return Message.returnMassage("insertuser","31","Username existed",("" -> ""))
+        return Message.returnMassage("user","31","Username existed",("" -> ""))
       }
     }
 
    val user= User.createRecord.id(id).crated_by(created_by).created_date(created_date).description(description).email(email)
     .displayname(displayname).facebookid(facebookid).googleid(googleid).modified_by(created_by).modified_date(modified_date)
-    .note(note).password(password).picture(picture).status(status).username(username).save(true)
+    .note(note).password(password).picture(picture).status(status).username(username).ordinal(ordinal).save(true)
 
-  Message.returnMassage("insertuser","0","Success",user.asJValue)
+  Message.returnMassage("user","0","Success",user.asJValue)
 
   }
   def update(q: JValue): JValue = {
@@ -269,18 +273,18 @@ object User extends User with MongoMetaRecord[User] {
 
       }else if(key.toString.equals("username")){
         if(value.toString.isEmpty || value == "" ){
-          return Message.returnMassage("insertuser","1","Username must be exist",("" -> ""))
+          return Message.returnMassage("user","1","Username must be exist",("" -> ""))
         }
         qry1 += key -> value.toString
       }else  if(key.toString.equals("email")){
         if(value.toString.isEmpty || value == "" ){
-          return Message.returnMassage("insertuser","1","Email must be exist",("" -> ""))
+          return Message.returnMassage("user","1","Email must be exist",("" -> ""))
         }
         qry1 += key -> value.toString
       } else if(key.toString.equals("password")){
 
         if (value.toString.isEmpty || value == "") {
-          return Message.returnMassage("updateUser", "3", "Password must be exist", ("" -> ""))
+          return Message.returnMassage("user", "3", "Password must be exist", ("" -> ""))
         }
         qry1 += key -> BCrypt.hashpw(value.toString, BCrypt.gensalt())
       } else if(key.toString.equals("imageurl")){
@@ -301,6 +305,8 @@ object User extends User with MongoMetaRecord[User] {
         qry1 += key -> value.toString
       } else if (key.toString.equals("modified_by")) {
         qry1 += key -> value.toString
+      }else if (key.toString.equals("ordinal")) {
+        qry1 += key -> value.toString
       }
 
 
@@ -308,23 +314,23 @@ object User extends User with MongoMetaRecord[User] {
     qry1 += "modified_date" -> modified_date.toString
 
     if (id.isEmpty || id == "") {
-      return Message.returnMassage("updateUser", "3", "Id must be exist", ("" -> ""))
+      return Message.returnMassage("user", "3", "Id must be exist", ("" -> ""))
     }
     val count = User.findAll("_id" -> id)
     if (count.size == 0) {
-      return Message.returnMassage("updateUser", "4", "User not found", ("" -> ""))
+      return Message.returnMassage("user", "4", "User not found", ("" -> ""))
     }
 
     User.update(("_id" -> id), ("$set" -> qry1))
     val application = User.findAll("_id" -> id)
 
-    Message.returnMassage("updateUser", "0", "Success", application(0).asJValue)
+    Message.returnMassage("user", "0", "Success", application(0).asJValue)
 
   }
 
   def delete(q: String): JValue = {
     User.delete(("_id" -> q))
-    Message.returnMassage("deleteUser", "0", "Success", ("" -> ""))
+    Message.returnMassage("user", "0", "Success", ("" -> ""))
   }
 
 }

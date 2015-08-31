@@ -55,6 +55,7 @@ class Applications private () extends MongoRecord[Applications] with StringPk[Ap
   object created_date extends LongField(this)
   object modified_by extends StringField(this,1024)
   object modified_date extends LongField(this)
+  object ordinal extends LongField(this)
 
 
 }

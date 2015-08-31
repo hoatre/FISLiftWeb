@@ -96,6 +96,13 @@ object ApplicationAPI extends RestHelper {
         Full(JsonResponse(s))
       }
     }
+    case "application" :: "getactive" :: Nil JsonGet req => {
+      S.respondAsync {
+        val s = AppSnip.getActive()
+        Full(JsonResponse(s))
+      }
+    }
+
 
   }
 }

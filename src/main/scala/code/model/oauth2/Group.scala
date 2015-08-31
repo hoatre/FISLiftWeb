@@ -52,6 +52,7 @@ class Group private () extends MongoRecord[Group] with StringPk[Group] {
   object created_date extends LongField(this)
   object modified_by extends StringField(this,1024)
   object modified_date extends LongField(this)
+  object ordinal extends LongField(this)
 
 
 }
@@ -76,6 +77,7 @@ object Group extends Group with MongoMetaRecord[Group] {
     var name = ""
     var status = ""
     var orderby = "created_date"
+
     val qry = QueryBuilder.start().get()
     //    var qry1: JObject = ("" -> "")
     var jmap : Map[String,String] = Map()
@@ -124,7 +126,7 @@ object Group extends Group with MongoMetaRecord[Group] {
   }
 
   def insert(q: JValue): JValue = {
-    val jsonmap: Map[String, String] = q.values.asInstanceOf[Map[String, String]]
+    val jsonmap: Map[String, Any] = q.values.asInstanceOf[Map[String, Any]]
     val id = UUID.randomUUID().toString
     var app_id = ""
     var name = ""
@@ -135,35 +137,38 @@ object Group extends Group with MongoMetaRecord[Group] {
     var created_date = System.currentTimeMillis() / 1000
     var modified_by = ""
     var modified_date = System.currentTimeMillis() / 1000
+    var ordinal : Long = 100
 
     for ((key, value) <- jsonmap) {
       if (key.toString.equals("name")) {
-        name = value
+        name = value.toString
       } else if (key.toString.equals("description")) {
-        description = value
+        description = value.toString
       } else if (key.toString.equals("status")) {
-        status = value
+        status = value.toString
       } else if (key.toString.equals("note")) {
-        note = value
+        note = value.toString
       } else if (key.toString.equals("created_by")) {
-        created_by = value
+        created_by = value.toString
       } else if (key.toString.equals("app_id")) {
-        app_id = value
+        app_id = value.toString
+      }else if (key.toString.equals("ordinal")) {
+        ordinal = value.toString.toLong
       }
 
 
     }
     if (name.isEmpty || name == "") {
-      return Message.returnMassage("insertGroup", "1", "Name must be exist", ("" -> ""))
+      return Message.returnMassage("group", "1", "Name must be exist", ("" -> ""))
     }
     if (status.isEmpty || status == "") {
-      return Message.returnMassage("insertGroup", "2", "Status must be exist", ("" -> ""))
+      return Message.returnMassage("group", "2", "Status must be exist", ("" -> ""))
     }
 
     val application = Group.createRecord.id(id).created_by(created_by).created_date(created_date).description(description)
-      .modified_by(created_by).modified_date(modified_date).name(name).note(note).status(status).app_id(app_id).save(true)
+      .modified_by(created_by).modified_date(modified_date).name(name).note(note).status(status).app_id(app_id).ordinal(ordinal).save(true)
 
-    Message.returnMassage("insertGroup", "0", "Success", application.asJValue)
+    Message.returnMassage("group", "0", "Success", application.asJValue)
 
   }
 
@@ -184,7 +189,7 @@ object Group extends Group with MongoMetaRecord[Group] {
       }
       else if (key.toString.equals("name")) {
         if (value.toString.isEmpty || value == "") {
-          return Message.returnMassage("updateGroup", "1", "Name must be exist", ("" -> ""))
+          return Message.returnMassage("group", "1", "Name must be exist", ("" -> ""))
         }
         qry1 += key -> value.toString
       } else if (key.toString.equals("description")) {
@@ -193,7 +198,7 @@ object Group extends Group with MongoMetaRecord[Group] {
       } else if (key.toString.equals("status")) {
 
         if (value.toString.isEmpty || value == "") {
-          return Message.returnMassage("updateGroup", "2", "Status must be exist", ("" -> ""))
+          return Message.returnMassage("group", "2", "Status must be exist", ("" -> ""))
         }
         qry1 += key -> value.toString
       } else if (key.toString.equals("note")) {
@@ -202,6 +207,8 @@ object Group extends Group with MongoMetaRecord[Group] {
         qry1 += key -> value.toString
       }else if (key.toString.equals("app_id")) {
         qry1 += key -> value.toString
+      }else if (key.toString.equals("ordinal")) {
+        qry1 += key -> value.toString
       }
 
 
@@ -209,23 +216,23 @@ object Group extends Group with MongoMetaRecord[Group] {
     qry1 += "modified_date" -> modified_date.toString
 
     if (id.isEmpty || id == "") {
-      return Message.returnMassage("updateGroup", "3", "Id must be exist", ("" -> ""))
+      return Message.returnMassage("group", "3", "Id must be exist", ("" -> ""))
     }
     val count = Group.findAll("_id" -> id)
     if (count.size == 0) {
-      return Message.returnMassage("updateGroup", "4", "Group not found", ("" -> ""))
+      return Message.returnMassage("group", "4", "Group not found", ("" -> ""))
     }
 
     Group.update(("_id" -> id), ("$set" -> qry1))
     val application = Group.findAll("_id" -> id)
 
-    Message.returnMassage("updateGroup", "0", "Success", application(0).asJValue)
+    Message.returnMassage("group", "0", "Success", application(0).asJValue)
 
   }
 
   def delete(q: String): JValue = {
     Group.delete(("_id" -> q))
-    Message.returnMassage("deleteGroup", "0", "Success", ("" -> ""))
+    Message.returnMassage("group", "0", "Success", ("" -> ""))
   }
 
 }
