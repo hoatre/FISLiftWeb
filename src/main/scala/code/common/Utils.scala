@@ -135,6 +135,7 @@ object Utils {
     }
     val Full(auth) = Authorization
 
+
     val claims: Option[JValue] = auth match {
       case JsonWebToken(header, claimsSet, signature) =>
         net.liftweb.json.parseOpt(claimsSet.asJsonString)

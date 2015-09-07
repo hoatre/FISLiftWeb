@@ -33,11 +33,11 @@ object ScoreResultAPI extends RestHelper{
     //    LiftRules.dispatch.append(MyRest) // stateful — associated with a servlet container session
     //    LiftRules.statelessDispatchTable.append(MyRest) // stateless — no session created
 
-    Functions.insertBoot("/scoreresult/customer")
-    Functions.insertBoot("/scoreresult/result")
-    Functions.insertBoot("/scoreresult/delete")
-    Functions.insertBoot("/scoreresult/getmodelid")
-    Functions.insertBoot("/scoreresult")
+    APIs.insertBoot("/scoreresult/customer")
+    APIs.insertBoot("/scoreresult/result")
+    APIs.insertBoot("/scoreresult/delete")
+    APIs.insertBoot("/scoreresult/getmodelid")
+    APIs.insertBoot("/scoreresult")
   }
 
 

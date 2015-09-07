@@ -20,15 +20,15 @@ object FactorAPI extends RestHelper {
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(FactorAPI)
-    Functions.insertBoot("/factor/getall")
-    Functions.insertBoot("/factor/getbyfactorid")
-    Functions.insertBoot("/factor/update")
-    Functions.insertBoot("/factor/delete")
-    Functions.insertBoot("/factor/insert")
-    Functions.insertBoot("/factoroption/getbyfactoroptionid")
-    Functions.insertBoot("/factoroption/deleteoption")
-    Functions.insertBoot("/factoroption/insertoption")
-    Functions.insertBoot("/factoroption/updateoption")
+    APIs.insertBoot("/factor/getall")
+    APIs.insertBoot("/factor/getbyfactorid")
+    APIs.insertBoot("/factor/update")
+    APIs.insertBoot("/factor/delete")
+    APIs.insertBoot("/factor/insert")
+    APIs.insertBoot("/factoroption/getbyfactoroptionid")
+    APIs.insertBoot("/factoroption/deleteoption")
+    APIs.insertBoot("/factoroption/insertoption")
+    APIs.insertBoot("/factoroption/updateoption")
 
   }
   serve {

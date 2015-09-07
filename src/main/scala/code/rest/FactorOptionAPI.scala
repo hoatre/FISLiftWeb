@@ -137,8 +137,8 @@ object FactorOptionAPI extends RestHelper {
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(FactorOptionAPI)
-    Functions.insertBoot("/factoroption/getbymodelid")
-    Functions.insertBoot("/factoroption/getoptionbymodelid")
+    APIs.insertBoot("/factoroption/getbymodelid")
+    APIs.insertBoot("/factoroption/getoptionbymodelid")
 
   }
 

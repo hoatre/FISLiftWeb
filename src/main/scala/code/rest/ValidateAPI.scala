@@ -41,7 +41,7 @@ object ValidateAPI extends RestHelper {
     //    LiftRules.dispatch.append(MyRest) // stateful — associated with a servlet container session
     //    LiftRules.statelessDispatchTable.append(MyRest) // stateless — no session created
 
-    Functions.insertBoot("/validate/checkweightrate")
+    APIs.insertBoot("/validate/checkweightrate")
 
   }
 

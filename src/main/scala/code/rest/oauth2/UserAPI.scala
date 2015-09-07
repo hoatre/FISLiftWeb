@@ -1,6 +1,7 @@
 package code.rest.oauth2
 
 import code.common.Message
+import code.model.APIs
 import code.rest.oauth2.GroupAPI._
 import net.liftweb.common.CombinableBox.Result
 import net.liftweb.common.Full
@@ -18,11 +19,11 @@ object UserAPI extends  RestHelper{
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(UserAPI)
-    Functions.insertBoot("/user/search")
-    Functions.insertBoot("/user/insert")
-    Functions.insertBoot("/user/update")
-    Functions.insertBoot("/user/delete")
-    Functions.insertBoot("/user/id")
+    APIs.insertBoot("/user/search")
+    APIs.insertBoot("/user/insert")
+    APIs.insertBoot("/user/update")
+    APIs.insertBoot("/user/delete")
+    APIs.insertBoot("/user/id")
   }
 
   serve{

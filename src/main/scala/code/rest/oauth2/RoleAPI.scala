@@ -1,6 +1,7 @@
 package code.rest.oauth2
 
 
+import code.model.APIs
 import code.model.oauth2.{Functions, Role}
 import net.liftweb.common.Full
 import net.liftweb.http.{JsonResponse, S, OkResponse, LiftRules}
@@ -13,11 +14,11 @@ object RoleAPI extends  RestHelper{
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(RoleAPI)
-    Functions.insertBoot("/role/search")
-    Functions.insertBoot("/role/insert")
-    Functions.insertBoot("/role/update")
-    Functions.insertBoot("/role/delete")
-    Functions.insertBoot("/role/id")
+    APIs.insertBoot("/role/search")
+    APIs.insertBoot("/role/insert")
+    APIs.insertBoot("/role/update")
+    APIs.insertBoot("/role/delete")
+    APIs.insertBoot("/role/id")
   }
 
   serve{

@@ -44,9 +44,9 @@ object csvAPI extends RestHelper {
     //    LiftRules.dispatch.append(MyRest) // stateful — associated with a servlet container session
     //    LiftRules.statelessDispatchTable.append(MyRest) // stateless — no session created
 
-    Functions.insertBoot("/csv/download")
-    Functions.insertBoot("/csv/upload")
-    Functions.insertBoot("/csv/read")
+    APIs.insertBoot("/csv/download")
+    APIs.insertBoot("/csv/upload")
+    APIs.insertBoot("/csv/read")
   }
 
 

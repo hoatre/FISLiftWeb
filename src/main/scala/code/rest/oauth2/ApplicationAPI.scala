@@ -2,7 +2,7 @@ package code.rest.oauth2
 
 import code.common.Utils
 import code.model.oauth2.Applications
-import code.model.oauth2.Functions
+import code.model.oauth2.APIs
 import net.liftweb.common.Full
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.http.{JsonResponse, OkResponse, LiftRules, S}
@@ -38,11 +38,11 @@ object ApplicationAPI extends RestHelper {
   def init(): Unit = {
     LiftRules.statelessDispatch.append(ApplicationAPI)
 
-    Functions.insertBoot("/application/search")
-    Functions.insertBoot("/application/insert")
-    Functions.insertBoot("/application/update")
-    Functions.insertBoot("/application/delete")
-    Functions.insertBoot("/application/id")
+    APIs.insertBoot("/application/search")
+    APIs.insertBoot("/application/insert")
+    APIs.insertBoot("/application/update")
+    APIs.insertBoot("/application/delete")
+    APIs.insertBoot("/application/id")
 
   }
 

@@ -4,7 +4,7 @@ import java.util.UUID
 
 import code.common.Message
 import code.model.oauth2.Functions
-import code.model.{ModelInfo, Rating, codeIN}
+import code.model.{APIs, ModelInfo, Rating, codeIN}
 import com.mongodb.{BasicDBObject, QueryBuilder}
 import net.liftweb.http.{OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
@@ -23,13 +23,13 @@ object RatingAPI extends RestHelper {
     //    LiftRules.dispatch.append(MyRest) // stateful — associated with a servlet container session
     //    LiftRules.statelessDispatchTable.append(MyRest) // stateless — no session created
 
-    Functions.insertBoot("/rating/add")
-    Functions.insertBoot("/rating/update")
-    Functions.insertBoot("/rating/delete")
-    Functions.insertBoot("/rating/getmodelid")
-    Functions.insertBoot("/rating/search")
-    Functions.insertBoot("/rating/getcode")
-    Functions.insertBoot("/rating/getall")
+    APIs.insertBoot("/rating/add")
+    APIs.insertBoot("/rating/update")
+    APIs.insertBoot("/rating/delete")
+    APIs.insertBoot("/rating/getmodelid")
+    APIs.insertBoot("/rating/search")
+    APIs.insertBoot("/rating/getcode")
+    APIs.insertBoot("/rating/getall")
   }
 
 

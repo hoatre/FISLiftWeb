@@ -27,7 +27,7 @@ import scala.concurrent.{Future, ExecutionContext}
 object UsersAPI extends RestHelper {
 
   def init(): Unit = {
-    LiftRules.statelessDispatch.append(UsersAPI)
+    LiftRules.dispatch.append(UsersAPI)
 
 //    LiftRules.dispatch.append(MyRest) // stateful — associated with a servlet container session
 //    LiftRules.statelessDispatchTable.append(MyRest) // stateless — no session created

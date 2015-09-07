@@ -1,5 +1,6 @@
 package code.rest.oauth2
 
+import code.model.APIs
 import code.model.oauth2.{Functions, Group}
 import net.liftweb.common.Full
 import net.liftweb.http.{JsonResponse, S, OkResponse, LiftRules}
@@ -12,11 +13,11 @@ object GroupAPI extends  RestHelper{
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(GroupAPI)
-    Functions.insertBoot("/group/search")
-    Functions.insertBoot("/group/insert")
-    Functions.insertBoot("/group/update")
-    Functions.insertBoot("/group/delete")
-    Functions.insertBoot("/group/id")
+    APIs.insertBoot("/group/search")
+    APIs.insertBoot("/group/insert")
+    APIs.insertBoot("/group/update")
+    APIs.insertBoot("/group/delete")
+    APIs.insertBoot("/group/id")
   }
 
   serve{

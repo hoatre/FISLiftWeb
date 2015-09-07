@@ -10,7 +10,7 @@ import bootstrap.liftweb._
 import net.liftweb.http.{LiftRules, OkResponse}
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
-import code.model.{ActiveTable}
+import code.model.{APIs, ActiveTable}
 import org.bson.types.ObjectId
 
 /**
@@ -19,7 +19,7 @@ import org.bson.types.ObjectId
 object ActiveTableAPI extends RestHelper{
   def init(): Unit = {
     LiftRules.statelessDispatch.append(ActiveTableAPI)
-    Functions.insertBoot("/activetable")
+    APIs.insertBoot("/activetable")
   }
   serve{
     case "activetable" :: Nil JsonGet req => getall()
