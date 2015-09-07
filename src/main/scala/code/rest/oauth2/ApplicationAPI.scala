@@ -52,6 +52,7 @@ object ApplicationAPI extends RestHelper {
     case "application" :: "update" :: Nil Options _ => OkResponse()
     case "application" :: "delete":: q :: Nil Options _ => OkResponse()
     case "application" :: "id" :: q :: Nil Options _ => OkResponse()
+    case "application" :: "getactive" :: Nil Options _ => OkResponse()
 
     case "application" :: "id" :: q :: Nil JsonGet req => {
       S.respondAsync {
@@ -75,21 +76,21 @@ object ApplicationAPI extends RestHelper {
         }
       }
     }
-//    case "application" :: "update" :: Nil JsonPost json -> request => Utils.checkVailAPI() match {
-//
-//      case Some(fail) => fail
-//     case _ => S.respondAsync {
-//        val s = AppSnip.update(json)
-//        Full(JsonResponse(s))
-//      }
-//
-//    }
-    case "application" :: "update" :: Nil JsonPost json -> request => {
-        S.respondAsync {
+    case "application" :: "update" :: Nil JsonPost json -> request => Utils.checkVailAPI() match {
+
+      case Some(fail) => fail
+     case _ => S.respondAsync {
         val s = AppSnip.update(json)
         Full(JsonResponse(s))
       }
+
     }
+//    case "application" :: "update" :: Nil JsonPost json -> request => {
+//        S.respondAsync {
+//        val s = AppSnip.update(json)
+//        Full(JsonResponse(s))
+//      }
+//    }
     case "application" :: "delete" :: q :: Nil JsonDelete req => {
       S.respondAsync {
         val s = AppSnip.delete(q)
