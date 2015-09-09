@@ -253,7 +253,7 @@ object Functions extends Functions with MongoMetaRecord[Functions] {
   }
 
 
-  }
+
 //  def gettree():JValue={
 //    val fi = Functions.findAll("status" -> "active")
 //    if(fi.size >0){

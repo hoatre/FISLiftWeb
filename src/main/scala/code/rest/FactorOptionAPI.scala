@@ -124,7 +124,7 @@
 package code.rest
 
 import code.model._
-import code.model.oauth2.Functions
+import code.model.oauth2.{APIs, Functions}
 import com.mongodb.QueryBuilder
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.http.{LiftRules, OkResponse}

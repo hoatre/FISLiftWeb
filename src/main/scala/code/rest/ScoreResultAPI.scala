@@ -5,7 +5,7 @@ import java.util.concurrent.{Callable, ExecutorService, Executors, FutureTask}
 
 import code.common.{Utils, Message}
 import code.model._
-import code.model.oauth2.Functions
+import code.model.oauth2.{APIs, Functions}
 import com.mongodb.{BasicDBObject, DBObject, QueryBuilder}
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
 import net.liftweb.common.Full

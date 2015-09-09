@@ -3,8 +3,8 @@ package code.rest
 import java.util.UUID
 
 import code.common.Message
-import code.model.oauth2.Functions
-import code.model.{APIs, ModelInfo, Rating, codeIN}
+import code.model.oauth2.{APIs, Functions}
+import code.model.{ModelInfo, Rating, codeIN}
 import com.mongodb.{BasicDBObject, QueryBuilder}
 import net.liftweb.http.{OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper

@@ -1,14 +1,13 @@
 package code.rest.oauth2
 
 import code.common.Message
-import code.model.APIs
 import code.rest.oauth2.GroupAPI._
 import net.liftweb.common.CombinableBox.Result
 import net.liftweb.common.Full
 import net.liftweb.http._
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JsonAST.JValue
-import code.model.oauth2.{Functions, Group, User, MyDataHandler}
+import code.model.oauth2._
 
 import scalaoauth2.provider.{ProtectedResource, AuthInfo, DataHandler}
 

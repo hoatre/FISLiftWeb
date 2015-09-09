@@ -6,7 +6,7 @@ package code.rest
 import java.util.UUID
 
 import code.common.Message
-import code.model.oauth2.Functions
+import code.model.oauth2.{APIs, Functions}
 import net.liftweb.http.{OkResponse, LiftRules, S}
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json._

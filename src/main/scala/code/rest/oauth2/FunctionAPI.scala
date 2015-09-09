@@ -1,7 +1,6 @@
 package code.rest.oauth2
 
-import code.model.APIs
-import code.model.oauth2.Functions
+import code.model.oauth2.{APIs, Functions}
 import net.liftweb.common.Full
 import net.liftweb.http.{JsonResponse, S, OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper

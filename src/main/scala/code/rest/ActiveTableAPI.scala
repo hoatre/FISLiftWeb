@@ -3,14 +3,14 @@ package code.rest
 import java.util.UUID
 
 import code.common.{Message}
-import code.model.oauth2.Functions
+import code.model.oauth2.{APIs, Functions}
 import net.liftweb.common.Full
 import net.liftweb.http.rest.RestHelper
 import bootstrap.liftweb._
 import net.liftweb.http.{LiftRules, OkResponse}
 import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
-import code.model.{APIs, ActiveTable}
+import code.model.ActiveTable
 import org.bson.types.ObjectId
 
 /**

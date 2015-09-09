@@ -1,6 +1,6 @@
 package code.rest
 
-import code.model.oauth2.Functions
+import code.model.oauth2.{APIs, Functions}
 import code.rest.ValidateAPI._
 import net.liftweb.common.Full
 import net.liftweb.http

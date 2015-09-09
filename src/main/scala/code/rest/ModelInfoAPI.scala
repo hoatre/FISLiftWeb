@@ -8,7 +8,7 @@ import java.util.UUID
 
 import code.common.Message
 import code.model._
-import code.model.oauth2.Functions
+import code.model.oauth2.{APIs, Functions}
 import com.mongodb.{BasicDBObject, QueryBuilder}
 import net.liftweb.common.Full
 import net.liftweb.http.rest.RestHelper

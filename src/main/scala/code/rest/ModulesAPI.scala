@@ -6,7 +6,7 @@ package code.rest
 
 import java.util.UUID
 import code.model._
-import code.model.oauth2.Functions
+import code.model.oauth2.{APIs, Functions}
 import com.mongodb.QueryBuilder
 import net.liftweb.http.{OkResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
@@ -19,11 +19,11 @@ object ModulesAPI extends RestHelper {
 
   def init(): Unit = {
     LiftRules.statelessDispatch.append(ModulesAPI)
-    Functions.insertBoot("/module/getall")
-    Functions.insertBoot("/module/getbyroleid")
-    Functions.insertBoot("/module/update")
-    Functions.insertBoot("/module/delete")
-    Functions.insertBoot("/module/insert")
+    APIs.insertBoot("/module/getall")
+    APIs.insertBoot("/module/getbyroleid")
+    APIs.insertBoot("/module/update")
+    APIs.insertBoot("/module/delete")
+    APIs.insertBoot("/module/insert")
   }
   serve {
     case "module" :: "getall" :: Nil Options _ => OkResponse()
